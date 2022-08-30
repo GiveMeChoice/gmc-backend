@@ -1,0 +1,53 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "apps/web-server/src",
+  "monorepo": true,
+  "root": "apps/web-server",
+  "compilerOptions": {
+    "webpack": true,
+    "tsConfigPath": "apps/web-server/tsconfig.app.json",
+    "assets": [
+      {
+        "include": "../config/*",
+        "outDir": "./dist/apps/web-server",
+        "watchAssets": true
+      }
+    ]
+  },
+  "projects": {
+    "web-server": {
+      "type": "application",
+      "root": "apps/web-server",
+      "entryFile": "main",
+      "sourceRoot": "apps/web-server/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/web-server/tsconfig.app.json"
+      }
+    },
+    "provider-integration": {
+      "type": "application",
+      "root": "apps/provider-integration",
+      "entryFile": "main",
+      "sourceRoot": "apps/provider-integration/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/provider-integration/tsconfig.app.json",
+        "assets": [
+          {
+            "include": "../config/*",
+            "outDir": "./dist/apps/provider-integration",
+            "watchAssets": true
+          }
+        ]
+      }
+    },
+    "products": {
+      "type": "library",
+      "root": "libs/products",
+      "entryFile": "index",
+      "sourceRoot": "libs/products/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/products/tsconfig.lib.json"
+      }
+    }
+  }
+}
