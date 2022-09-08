@@ -1,0 +1,5 @@
+\d+   -> List of relations
+\dt+  -> List of tables
+\dT+  -> List of data types
+
+\d <table_name>   -> show table schema

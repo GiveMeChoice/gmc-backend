@@ -19,7 +19,12 @@
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "@app/products": ["libs/products/src"],
-      "@app/products/*": ["libs/products/src/*"]
+      "@app/products/*": ["libs/products/src/*"],
+      "@app/provider-integration": ["apps/provider-integration/src"],
+      "@app/provider-integration/*": ["apps/provider-integration/src/*"],
+      "@app/web-server": ["apps/web-server/src"],
+      "@app/web-server/*": ["apps/web-server/src/*"],
+      "@database/*": ["database/*"]
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 import { ProviderKey } from './provider-key.enum';
 
 @Entity({ name: 'pi_provider' })
@@ -8,4 +8,7 @@ export class Provider {
     enum: ProviderKey,
   })
   id: ProviderKey;
+
+  @Column()
+  description: string;
 }

@@ -1,2 +1,0 @@
-/dt   -> list tables
-/d <table_name>   -> show table schema

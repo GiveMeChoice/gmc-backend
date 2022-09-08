@@ -11,5 +11,6 @@ export const AppDataSource = new DataSource({
   username: process.env['datasource.username'] || 'postgres',
   password: process.env['datasource.password'] || 'password',
   database: process.env['datasource.databse'] || 'gmc_db',
-  migrations: ['**/*.migration.ts'],
+  migrations: ['./database/migrations/*.ts'],
+  entities: ['./**/*.entity.*'],
 });
