@@ -6,12 +6,21 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity({ name: 'product' })
+@Entity({ name: 'gmc_product' })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'varchar', length: 300 })
+  @Column()
+  provider: string;
+
+  @Column()
+  providerId: string;
+
+  @Column()
+  sku: string;
+
+  @Column({ name: 'DESCRIPTION', type: 'varchar', length: 300 })
   description;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

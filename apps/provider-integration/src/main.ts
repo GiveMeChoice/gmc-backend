@@ -1,10 +1,10 @@
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ProviderIntegrationModule } from './provider-integration.module';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   Logger.log('Starting GMC Provider Integration Service (BETA)');
-  const app = await NestFactory.create(ProviderIntegrationModule);
+  const app = await NestFactory.create(AppModule);
   await app.listen(3000);
 }
 bootstrap();

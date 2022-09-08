@@ -1,17 +1,18 @@
 import { ProductsService } from '@app/products';
 import { Product } from '@app/products/model/product.entity';
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ProviderIntegrationService } from './provider-integration.service';
+import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { AppService } from './app.service';
 
 @Controller()
-export class ProviderIntegrationController {
+export class AppController {
   constructor(
-    private readonly providerIntegrationService: ProviderIntegrationService,
+    private readonly appService: AppService,
     private readonly productsService: ProductsService,
   ) {}
 
   @Get()
   async getProducts(): Promise<Product[]> {
+    Logger.debug('Provider Integration controller is getting your products');
     return await this.productsService.findAll();
   }
 

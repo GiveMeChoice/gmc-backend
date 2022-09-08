@@ -10,10 +10,12 @@ export class ProductsService {
   ) {}
 
   findAll(): Promise<Product[]> {
+    Logger.debug('Finding all products');
     return this.productsRepository.find();
   }
 
   findOne(id: string): Promise<Product> {
+    Logger.debug('Finding one product');
     return this.productsRepository.findOneBy({ id });
   }
 

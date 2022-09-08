@@ -23,4 +23,4 @@ echo "\l" | docker exec -i $SERVER psql -U postgres
 docker exec -i $SERVER psql -U postgres $DB -c "\dt"
 
 # show result
-echo "DATABASE $DB STARTED"
+echo "DATABASE $DB RESET"
