@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersModule } from './providers/providers.module';
 import { AwsModule } from './aws/aws.module';
+import { IntegrationModule } from './integration/integration.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AwsModule } from './aws/aws.module';
     // local
     ProvidersModule,
     AwsModule,
+    IntegrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
