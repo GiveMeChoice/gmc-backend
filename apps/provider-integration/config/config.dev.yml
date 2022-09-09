@@ -3,4 +3,4 @@ datasource:
   port: 5432
   username: postgres
   password: password
-  database: gmc_cb
+  database: gmc_db

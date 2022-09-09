@@ -1,5 +1,5 @@
 import { Product } from '@app/products/model/product.entity';
-import { ProviderKey } from '@app/provider-integration/providers/model/provider-key.enum';
+import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import { Provider } from '@app/provider-integration/providers/model/provider.entity';
 import { ProviderSeed } from '@database/seeds/providers.seed';
 import { MigrationInterface, QueryRunner } from 'typeorm';
