@@ -30,11 +30,13 @@
     "db:revert": "npm run typeorm-d migration:revert"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.165.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.2.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/typeorm": "^9.0.1",
+    "csvtojson": "^2.0.10",
     "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

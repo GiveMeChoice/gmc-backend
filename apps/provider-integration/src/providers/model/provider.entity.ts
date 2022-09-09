@@ -2,12 +2,11 @@ import {
   Column,
   Entity,
   OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { ProviderCategory } from './provider-cateogry.entity';
 import { ProviderKey } from './enum/provider-key.enum';
+import { ProviderCategory } from './provider-category.entity';
 
 @Entity({ name: 'pi_provider' })
 @Unique(['key'])

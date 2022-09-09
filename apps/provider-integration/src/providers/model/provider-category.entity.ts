@@ -9,7 +9,7 @@ import {
 import { Provider } from './provider.entity';
 
 @Entity({ name: 'pi_provider_category' })
-@Unique(['provider', 'category'])
+@Unique(['provider', 'category', 'subcategory1', 'subcategory2'])
 export class ProviderCategory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -20,6 +20,15 @@ export class ProviderCategory {
 
   @Column()
   category: string;
+
+  @Column()
+  subcategory1: string;
+
+  @Column()
+  subcategory2: string;
+
+  @Column()
+  location: string;
 
   @Column()
   description: string;

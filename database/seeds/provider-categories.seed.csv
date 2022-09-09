@@ -1,0 +1,225 @@
+providerKey,category,subcategory1,subcategory2,location,description
+rainforest-api,grocery,,,i/grocery,Grocery
+rainforest-api,stripbooks,,,i/stripbooks,Books
+rainforest-api,drugstore,,,i/drugstore,Health & Personal Care
+rainforest-api,kitchen,,,i/kitchen,Home & Kitchen
+rainforest-api,beauty,,,i/beauty,Beauty
+rainforest-api,office-products,,,i/office-products,Stationery & Office Supplies
+rainforest-api,electronics,,,i/electronics,Electronics & Photo
+rainforest-api,computers,,,i/computers,Computers & Accessories
+rainforest-api,sports,,,i/sports,Sports & Outdoors
+rainforest-api,industrial,,,i/industrial,Industrial & Scientific
+rainforest-api,baby,,,i/baby,Baby
+rainforest-api,toys,,,i/toys,Toys & Games
+rainforest-api,outdoor,,,i/outdoor,Garden & Outdoors
+rainforest-api,fashion,,,i/fashion,Fashion
+rainforest-api,diy,,,i/diy,DIY & Tools
+rainforest-api,pets,,,i/pets,Pet Supplies
+rainforest-api,automotive,,,i/automotive,Car & Motorbike
+rainforest-api,misc,,,i/misc,Everything Else
+ethical-superstore,groceries-and-everyday,store-cupboard,breakfast-cereals,/category/groceries-and-everyday/store-cupboard/breakfast-cereals/,Breakfast cereals
+ethical-superstore,groceries-and-everyday,store-cupboard,herbs-and-spices,/category/groceries-and-everyday/store-cupboard/herbs-and-spices/,Herbs and spices
+ethical-superstore,groceries-and-everyday,store-cupboard,tinned-veg-and-pulses,/category/groceries-and-everyday/store-cupboard/tinned-veg-and-pulses/,Tinned veg and pulses
+ethical-superstore,groceries-and-everyday,store-cupboard,soup,/category/groceries-and-everyday/store-cupboard/soup/,Soup
+ethical-superstore,groceries-and-everyday,store-cupboard,coconut,/category/groceries-and-everyday/store-cupboard/coconut/,Coconut
+ethical-superstore,groceries-and-everyday,store-cupboard,fish-and-seafood,/category/groceries-and-everyday/store-cupboard/fish-and-seafood/,Fish and seafood
+ethical-superstore,groceries-and-everyday,pasta-and-noodles,pasta,/category/groceries-and-everyday/pasta-and-noodles/pasta/,Pasta
+ethical-superstore,groceries-and-everyday,pasta-and-noodles,noodles,/category/groceries-and-everyday/pasta-and-noodles/noodles/,Noodles
+ethical-superstore,groceries-and-everyday,pasta-rice-and-pulses,rice,/category/groceries-and-everyday/pasta-rice-and-pulses/rice/,Rice
+ethical-superstore,groceries-and-everyday,pasta-rice-and-pulses,pulses,/category/groceries-and-everyday/pasta-rice-and-pulses/pulses/,Pulses
+ethical-superstore,groceries-and-everyday,pasta-rice-and-pulses,beans-and-pulses-dried,/category/groceries-and-everyday/pasta-rice-and-pulses/beans-and-pulses-dried/,Beans and pulses dried
+ethical-superstore,groceries-and-everyday,pasta-rice-and-pulses,grains,/category/groceries-and-everyday/pasta-rice-and-pulses/grains/,Grains
+ethical-superstore,groceries-and-everyday,sauces-and-stock,curry-sauces,/category/groceries-and-everyday/sauces-and-stock/curry-sauces/,Curry sauces
+ethical-superstore,groceries-and-everyday,sauces-and-stock,pasta-sauce-and-pesto,/category/groceries-and-everyday/sauces-and-stock/pasta-sauce-and-pesto/,Pasta sauce and pesto
+ethical-superstore,groceries-and-everyday,sauces-and-stock,gravy-and-stock,/category/groceries-and-everyday/sauces-and-stock/gravy-and-stock/,Gravy and stock
+ethical-superstore,groceries-and-everyday,sauces-and-stock,cooking-sauces,/category/groceries-and-everyday/sauces-and-stock/cooking-sauces/,Cooking sauces
+ethical-superstore,groceries-and-everyday,jams-and-preserves,preserves,/category/groceries-and-everyday/jams-and-preserves/preserves/,Preserves
+ethical-superstore,groceries-and-everyday,jams-and-preserves,savoury-spreads,/category/groceries-and-everyday/jams-and-preserves/savoury-spreads/,Savoury spreads
+ethical-superstore,groceries-and-everyday,jams-and-preserves,chocolate-spread,/category/groceries-and-everyday/jams-and-preserves/chocolate-spread/,Chocolate spread
+ethical-superstore,groceries-and-everyday,condiments,table-sauces,/category/groceries-and-everyday/condiments/table-sauces/,Table sauces
+ethical-superstore,groceries-and-everyday,condiments,mayonnaise,/category/groceries-and-everyday/condiments/mayonnaise/,Mayonnaise
+ethical-superstore,groceries-and-everyday,condiments,chutney-and-relish,/category/groceries-and-everyday/condiments/chutney-and-relish/,Chutney and relish
+ethical-superstore,groceries-and-everyday,condiments,salt-and-pepper,/category/groceries-and-everyday/condiments/salt-and-pepper/,Salt and pepper
+ethical-superstore,groceries-and-everyday,deli-and-antipasti,olives,/category/groceries-and-everyday/deli-and-antipasti/olives/,Olives
+ethical-superstore,groceries-and-everyday,deli-and-antipasti,oils-and-vinegars,/category/groceries-and-everyday/deli-and-antipasti/oils-and-vinegars/,Oils and vinegars
+ethical-superstore,groceries-and-everyday,deli-and-antipasti,pate-and-dips,/category/groceries-and-everyday/deli-and-antipasti/pate-and-dips/,Pate and dips
+ethical-superstore,groceries-and-everyday,deli-and-antipasti,antipasti,/category/groceries-and-everyday/deli-and-antipasti/antipasti/,Antipasti
+ethical-superstore,groceries-and-everyday,deli-and-antipasti,salad-dressings,/category/groceries-and-everyday/deli-and-antipasti/salad-dressings/,Salad dressings
+ethical-superstore,groceries-and-everyday,fruit-nuts-and-seeds,fruit,/category/groceries-and-everyday/fruit-nuts-and-seeds/fruit/,Fruit
+ethical-superstore,groceries-and-everyday,fruit-nuts-and-seeds,nuts,/category/groceries-and-everyday/fruit-nuts-and-seeds/nuts/,Nuts
+ethical-superstore,groceries-and-everyday,fruit-nuts-and-seeds,seeds,/category/groceries-and-everyday/fruit-nuts-and-seeds/seeds/,Seeds
+ethical-superstore,groceries-and-everyday,baking-ingredients,flour,/category/groceries-and-everyday/baking-ingredients/flour/,Flour
+ethical-superstore,groceries-and-everyday,baking-ingredients,sugars-and-syrups,/category/groceries-and-everyday/baking-ingredients/sugars-and-syrups/,Sugars and syrups
+ethical-superstore,groceries-and-everyday,baking-ingredients,baking-mixes,/category/groceries-and-everyday/baking-ingredients/baking-mixes/,Baking mixes
+ethical-superstore,groceries-and-everyday,baking-ingredients,egg-replacers,/category/groceries-and-everyday/baking-ingredients/egg-replacers/,Egg replacers
+ethical-superstore,groceries-and-everyday,drinks,coffee-beans,/category/groceries-and-everyday/drinks/coffee-beans/,Coffee beans
+ethical-superstore,groceries-and-everyday,drinks,ground-coffee,/category/groceries-and-everyday/drinks/ground-coffee/,Ground coffee
+ethical-superstore,groceries-and-everyday,drinks,instant-coffee,/category/groceries-and-everyday/drinks/instant-coffee/,Instant coffee
+ethical-superstore,groceries-and-everyday,drinks,tea,/category/groceries-and-everyday/drinks/tea/,Tea
+ethical-superstore,groceries-and-everyday,drinks,green-tea,/category/groceries-and-everyday/drinks/green-tea/,Green tea
+ethical-superstore,groceries-and-everyday,drinks,herbal-tea,/category/groceries-and-everyday/drinks/herbal-tea/,Herbal tea
+ethical-superstore,groceries-and-everyday,drinks,chocolate,/category/groceries-and-everyday/drinks/chocolate/,Chocolate
+ethical-superstore,groceries-and-everyday,drinks,soft-drinks,/category/groceries-and-everyday/drinks/soft-drinks/,Soft drinks
+ethical-superstore,groceries-and-everyday,drinks,juice,/category/groceries-and-everyday/drinks/juice/,Juice
+ethical-superstore,groceries-and-everyday,drinks,milk-alternatives,/category/groceries-and-everyday/drinks/milk-alternatives/,Milk alternatives
+ethical-superstore,groceries-and-everyday,cakes-biscuits-and-snacks,biscuits,/category/groceries-and-everyday/cakes-biscuits-and-snacks/biscuits/,Biscuits
+ethical-superstore,groceries-and-everyday,cakes-biscuits-and-snacks,snack-bars,/category/groceries-and-everyday/cakes-biscuits-and-snacks/snack-bars/,Snack bars
+ethical-superstore,groceries-and-everyday,cakes-biscuits-and-snacks,snacks,/category/groceries-and-everyday/cakes-biscuits-and-snacks/snacks/,Snacks
+ethical-superstore,groceries-and-everyday,yoghurt,yoghurt,/category/groceries-and-everyday/yoghurt/yoghurt/,Yoghurt
+ethical-superstore,groceries-and-everyday,yoghurt,custard-and-jelly,/category/groceries-and-everyday/yoghurt/custard-and-jelly/,Custard and jelly
+ethical-superstore,groceries-and-everyday,yoghurt,cream,/category/groceries-and-everyday/yoghurt/cream/,Cream
+ethical-superstore,groceries-and-everyday,chocolate,chocolate-bars,/category/groceries-and-everyday/chocolate/chocolate-bars/,Chocolate bars
+ethical-superstore,groceries-and-everyday,chocolate,raw-chocolate,/category/groceries-and-everyday/chocolate/raw-chocolate/,Raw chocolate
+ethical-superstore,groceries-and-everyday,chocolate,chocolate-gifts,/category/groceries-and-everyday/chocolate/chocolate-gifts/,Chocolate gifts
+ethical-superstore,groceries-and-everyday,chocolate,sweets,/category/groceries-and-everyday/chocolate/sweets/,Sweets
+ethical-superstore,groceries-and-everyday,free-from,vegan,/category/groceries-and-everyday/free-from/vegan/,Vegan
+ethical-superstore,groceries-and-everyday,free-from,gluten-free,/category/groceries-and-everyday/free-from/gluten-free/,Gluten free
+ethical-superstore,groceries-and-everyday,free-from,no-added-sugar,/category/groceries-and-everyday/free-from/no-added-sugar/,No added sugar
+ethical-superstore,groceries-and-everyday,meat-alternatives,,/category/groceries-and-everyday/meat-alternatives/,Meat alternatives
+ethical-superstore,groceries-and-everyday,ready-meals,,/category/groceries-and-everyday/ready-meals/,Ready meals
+ethical-superstore,groceries-and-everyday,cheese,,/category/groceries-and-everyday/cheese/,Cheese
+ethical-superstore,groceries-and-everyday,world-food,african,/category/groceries-and-everyday/world-food/african/,African
+ethical-superstore,groceries-and-everyday,world-food,mexican,/category/groceries-and-everyday/world-food/mexican/,Mexican
+ethical-superstore,groceries-and-everyday,world-food,mediterannean,/category/groceries-and-everyday/world-food/mediterannean/,Mediterannean
+ethical-superstore,groceries-and-everyday,world-food,chinese-and-japanese,/category/groceries-and-everyday/world-food/chinese-and-japanese/,Chinese and japanese
+ethical-superstore,groceries-and-everyday,world-food,indian,/category/groceries-and-everyday/world-food/indian/,Indian
+ethical-superstore,groceries-and-everyday,world-food,thai-and-indonesian,/category/groceries-and-everyday/world-food/thai-and-indonesian/,Thai and indonesian
+ethical-superstore,groceries-and-everyday,wine-beer-spirits,,/category/groceries-and-everyday/wine-beer-spirits/,Wine beer spirits
+ethical-superstore,groceries-and-everyday,baby-food,,/category/groceries-and-everyday/baby-food/,Baby food
+ethical-superstore,groceries-and-everyday,plastic-free.htm,,/category/groceries-and-everyday/plastic-free.htm,Groceries and Everyday - Plastic free
+ethical-superstore,cleaning-and-household,dish-washing,washing-up-liquid,/category/cleaning-and-household/dish-washing/washing-up-liquid/,Washing up liquid
+ethical-superstore,cleaning-and-household,dish-washing,dish-washer,/category/cleaning-and-household/dish-washing/dish-washer/,Dish washer
+ethical-superstore,cleaning-and-household,cleaning,kitchen-cleaners,/category/cleaning-and-household/cleaning/kitchen-cleaners/,Kitchen cleaners
+ethical-superstore,cleaning-and-household,cleaning,bathroom-cleaners,/category/cleaning-and-household/cleaning/bathroom-cleaners/,Bathroom cleaners
+ethical-superstore,cleaning-and-household,cleaning,all-purpose-cleaners,/category/cleaning-and-household/cleaning/all-purpose-cleaners/,All purpose cleaners
+ethical-superstore,cleaning-and-household,cleaning,glass-cleaners-and-polish,/category/cleaning-and-household/cleaning/glass-cleaners-and-polish/,Glass cleaners and polish
+ethical-superstore,cleaning-and-household,cleaning,floor-cleaners,/category/cleaning-and-household/cleaning/floor-cleaners/,Floor cleaners
+ethical-superstore,cleaning-and-household,laundry,laundry-liquid,/category/cleaning-and-household/laundry/laundry-liquid/,Laundry liquid
+ethical-superstore,cleaning-and-household,laundry,washing-powder-and-tablets,/category/cleaning-and-household/laundry/washing-powder-and-tablets/,Washing powder and tablets
+ethical-superstore,cleaning-and-household,laundry,fabric-conditioner,/category/cleaning-and-household/laundry/fabric-conditioner/,Fabric conditioner
+ethical-superstore,cleaning-and-household,laundry,stain-removers-and-treatments,/category/cleaning-and-household/laundry/stain-removers-and-treatments/,Stain removers and treatments
+ethical-superstore,cleaning-and-household,laundry,clothes-drying,/category/cleaning-and-household/laundry/clothes-drying/,Clothes drying
+ethical-superstore,cleaning-and-household,cloths-and-mops,,/category/cleaning-and-household/cloths-and-mops/,Cloths and mops
+ethical-superstore,cleaning-and-household,bin-bags-and-foils,,/category/cleaning-and-household/bin-bags-and-foils/,Bin bags and foils
+ethical-superstore,cleaning-and-household,tissues-and-towels,,/category/cleaning-and-household/tissues-and-towels/,Tissues and towels
+ethical-superstore,cleaning-and-household,diy,,/category/cleaning-and-household/diy/,Diy
+ethical-superstore,cleaning-and-household,plastic-free.htm,,/category/cleaning-and-household/plastic-free.htm,Cleaning and Household - Plastic free
+ethical-superstore,fashion,womens,blouses--tunics---camis,/category/fashion/womens/blouses--tunics---camis/,Blouses tunics camis
+ethical-superstore,fashion,womens,knitwear,/category/fashion/womens/knitwear/,Knitwear
+ethical-superstore,fashion,womens,coats---jackets,/category/fashion/womens/coats---jackets/,Coats jackets
+ethical-superstore,fashion,womens,dresses,/category/fashion/womens/dresses/,Dresses
+ethical-superstore,fashion,womens,accessories,/category/fashion/womens/accessories/,Accessories
+ethical-superstore,fashion,womens,lingerie-and-nightwear,/category/fashion/womens/lingerie-and-nightwear/,Lingerie and nightwear
+ethical-superstore,fashion,womens,lounge-and-leisurewear,/category/fashion/womens/lounge-and-leisurewear/,Lounge and leisurewear
+ethical-superstore,fashion,womens,socks,/category/fashion/womens/socks/,Socks
+ethical-superstore,fashion,womens,nightwear,/category/fashion/womens/nightwear/,Nightwear
+ethical-superstore,fashion,womens,trousers,/category/fashion/womens/trousers/,Trousers
+ethical-superstore,fashion,womens,graphic-t_shirt-and-jumpers,/category/fashion/womens/graphic-t_shirt-and-jumpers/,Graphic t_shirt and jumpers
+ethical-superstore,fashion,womens,bags,/category/fashion/womens/bags/,Bags
+ethical-superstore,fashion,mens,t_shirts,/category/fashion/mens/t_shirts/,T_shirts
+ethical-superstore,fashion,mens,shirts,/category/fashion/mens/shirts/,Shirts
+ethical-superstore,fashion,mens,graphic-tees,/category/fashion/mens/graphic-tees/,Graphic tees
+ethical-superstore,fashion,mens,trousers-and-shorts,/category/fashion/mens/trousers-and-shorts/,Trousers and shorts
+ethical-superstore,fashion,mens,jackets-and-jumpers,/category/fashion/mens/jackets-and-jumpers/,Jackets and jumpers
+ethical-superstore,fashion,mens,underwear,/category/fashion/mens/underwear/,Underwear
+ethical-superstore,fashion,mens,socks,/category/fashion/mens/socks/,Socks
+ethical-superstore,fashion,mens,accessories,/category/fashion/mens/accessories/,Accessories
+ethical-superstore,fashion,jewellery,necklaces,/category/fashion/jewellery/necklaces/,Necklaces
+ethical-superstore,fashion,jewellery,earrings,/category/fashion/jewellery/earrings/,Earrings
+ethical-superstore,fashion,jewellery,bracelets,/category/fashion/jewellery/bracelets/,Bracelets
+ethical-superstore,fashion,jewellery,rings,/category/fashion/jewellery/rings/,Rings
+ethical-superstore,fashion,footwear,mens,/category/fashion/footwear/mens/,Mens
+ethical-superstore,fashion,footwear,womens,/category/fashion/footwear/womens/,Womens
+ethical-superstore,fashion,footwear,slippers,/category/fashion/footwear/slippers/,Slippers
+ethical-superstore,home-and-garden,living,decorative-accessories,/category/home-and-garden/living/decorative-accessories/,Decorative accessories
+ethical-superstore,home-and-garden,living,home-furnishings,/category/home-and-garden/living/home-furnishings/,Home furnishings
+ethical-superstore,home-and-garden,living,storage-baskets,/category/home-and-garden/living/storage-baskets/,Storage baskets
+ethical-superstore,home-and-garden,living,lighting,/category/home-and-garden/living/lighting/,Lighting
+ethical-superstore,home-and-garden,living,home-fragrance,/category/home-and-garden/living/home-fragrance/,Home fragrance
+ethical-superstore,home-and-garden,living,books,/category/home-and-garden/living/books/,Books
+ethical-superstore,home-and-garden,living,gifts,/category/home-and-garden/living/gifts/,Gifts
+ethical-superstore,home-and-garden,living,cards-and-wrap,/category/home-and-garden/living/cards-and-wrap/,Cards and wrap
+ethical-superstore,home-and-garden,garden-and-outdoor,garden-accessories,/category/home-and-garden/garden-and-outdoor/garden-accessories/,Garden accessories
+ethical-superstore,home-and-garden,garden-and-outdoor,trees-plants-and-seeds,/category/home-and-garden/garden-and-outdoor/trees-plants-and-seeds/,Trees plants and seeds
+ethical-superstore,home-and-garden,garden-and-outdoor,solar-garden-products,/category/home-and-garden/garden-and-outdoor/solar-garden-products/,Solar garden products
+ethical-superstore,home-and-garden,garden-and-outdoor,wildlife,/category/home-and-garden/garden-and-outdoor/wildlife/,Wildlife
+ethical-superstore,home-and-garden,garden-and-outdoor,outdoor-furniture,/category/home-and-garden/garden-and-outdoor/outdoor-furniture/,Outdoor furniture
+ethical-superstore,home-and-garden,kitchen-and-dining,dining-and-entertaining,/category/home-and-garden/kitchen-and-dining/dining-and-entertaining/,Dining and entertaining
+ethical-superstore,home-and-garden,kitchen-and-dining,cups-mugs-and-glasses,/category/home-and-garden/kitchen-and-dining/cups-mugs-and-glasses/,Cups mugs and glasses
+ethical-superstore,home-and-garden,kitchen-and-dining,cookware-and-food-prep,/category/home-and-garden/kitchen-and-dining/cookware-and-food-prep/,Cookware and food prep
+ethical-superstore,home-and-garden,kitchen-and-dining,eco-kettles,/category/home-and-garden/kitchen-and-dining/eco-kettles/,Eco kettles
+ethical-superstore,home-and-garden,kitchen-and-dining,kitchen-accessories,/category/home-and-garden/kitchen-and-dining/kitchen-accessories/,Kitchen accessories
+ethical-superstore,home-and-garden,kitchen-and-dining,picnicware-and-lunchboxes,/category/home-and-garden/kitchen-and-dining/picnicware-and-lunchboxes/,Picnicware and lunchboxes
+ethical-superstore,home-and-garden,kitchen-and-dining,reusable-cups-and-bottles,/category/home-and-garden/kitchen-and-dining/reusable-cups-and-bottles/,Reusable cups and bottles
+ethical-superstore,home-and-garden,kitchen-and-dining,home-composting,/category/home-and-garden/kitchen-and-dining/home-composting/,Home composting
+ethical-superstore,home-and-garden,bed-and-bath,bedding-sets,/category/home-and-garden/bed-and-bath/bedding-sets/,Bedding sets
+ethical-superstore,home-and-garden,bed-and-bath,duvet-covers-and-pillowcases,/category/home-and-garden/bed-and-bath/duvet-covers-and-pillowcases/,Duvet covers and pillowcases
+ethical-superstore,home-and-garden,bed-and-bath,duvets-pillows-and-protectors,/category/home-and-garden/bed-and-bath/duvets-pillows-and-protectors/,Duvets pillows and protectors
+ethical-superstore,home-and-garden,bed-and-bath,flat-sheets,/category/home-and-garden/bed-and-bath/flat-sheets/,Flat sheets
+ethical-superstore,home-and-garden,bed-and-bath,throws-and-blankets,/category/home-and-garden/bed-and-bath/throws-and-blankets/,Throws and blankets
+ethical-superstore,home-and-garden,bed-and-bath,bath-linen,/category/home-and-garden/bed-and-bath/bath-linen/,Bath linen
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,bath-and-shower,/category/beauty-health-and-wellbeing/bath-and-body/bath-and-shower/,Bath and shower
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,body-lotion,/category/beauty-health-and-wellbeing/bath-and-body/body-lotion/,Body lotion
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,soap,/category/beauty-health-and-wellbeing/bath-and-body/soap/,Soap
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,hand-soap,/category/beauty-health-and-wellbeing/bath-and-body/hand-soap/,Hand soap
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,hands-nails-and-feet,/category/beauty-health-and-wellbeing/bath-and-body/hands-nails-and-feet/,Hands nails and feet
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,sun-care-and-tanning,/category/beauty-health-and-wellbeing/bath-and-body/sun-care-and-tanning/,Sun care and tanning
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,bath-accessories,/category/beauty-health-and-wellbeing/bath-and-body/bath-accessories/,Bath accessories
+ethical-superstore,beauty-health-and-wellbeing,bath-and-body,deodorant,/category/beauty-health-and-wellbeing/bath-and-body/deodorant/,Deodorant
+ethical-superstore,beauty-health-and-wellbeing,skin-care,moisturiser,/category/beauty-health-and-wellbeing/skin-care/moisturiser/,Moisturiser
+ethical-superstore,beauty-health-and-wellbeing,skin-care,cleanser-toner-and-facewash,/category/beauty-health-and-wellbeing/skin-care/cleanser-toner-and-facewash/,Cleanser toner and facewash
+ethical-superstore,beauty-health-and-wellbeing,skin-care,lip-care,/category/beauty-health-and-wellbeing/skin-care/lip-care/,Lip care
+ethical-superstore,beauty-health-and-wellbeing,skin-care,treatments,/category/beauty-health-and-wellbeing/skin-care/treatments/,Treatments
+ethical-superstore,beauty-health-and-wellbeing,hair-care,shampoo,/category/beauty-health-and-wellbeing/hair-care/shampoo/,Shampoo
+ethical-superstore,beauty-health-and-wellbeing,hair-care,shampoo-bars,/category/beauty-health-and-wellbeing/hair-care/shampoo-bars/,Shampoo bars
+ethical-superstore,beauty-health-and-wellbeing,hair-care,conditioner,/category/beauty-health-and-wellbeing/hair-care/conditioner/,Conditioner
+ethical-superstore,beauty-health-and-wellbeing,hair-care,conditioner-bars,/category/beauty-health-and-wellbeing/hair-care/conditioner-bars/,Conditioner bars
+ethical-superstore,beauty-health-and-wellbeing,hair-care,styling,/category/beauty-health-and-wellbeing/hair-care/styling/,Styling
+ethical-superstore,beauty-health-and-wellbeing,make-up,face,/category/beauty-health-and-wellbeing/make-up/face/,Face
+ethical-superstore,beauty-health-and-wellbeing,make-up,eyes,/category/beauty-health-and-wellbeing/make-up/eyes/,Eyes
+ethical-superstore,beauty-health-and-wellbeing,make-up,tools,/category/beauty-health-and-wellbeing/make-up/tools/,Tools
+ethical-superstore,beauty-health-and-wellbeing,make-up,nail-polish,/category/beauty-health-and-wellbeing/make-up/nail-polish/,Nail polish
+ethical-superstore,beauty-health-and-wellbeing,for-men,shaving,/category/beauty-health-and-wellbeing/for-men/shaving/,Shaving
+ethical-superstore,beauty-health-and-wellbeing,for-men,skin-care,/category/beauty-health-and-wellbeing/for-men/skin-care/,Skin care
+ethical-superstore,beauty-health-and-wellbeing,for-men,bath-and-shower,/category/beauty-health-and-wellbeing/for-men/bath-and-shower/,Bath and shower
+ethical-superstore,beauty-health-and-wellbeing,dental-care,toothbrushes,/category/beauty-health-and-wellbeing/dental-care/toothbrushes/,Toothbrushes
+ethical-superstore,beauty-health-and-wellbeing,dental-care,toothpaste,/category/beauty-health-and-wellbeing/dental-care/toothpaste/,Toothpaste
+ethical-superstore,beauty-health-and-wellbeing,dental-care,mouthwash-and-dental-floss,/category/beauty-health-and-wellbeing/dental-care/mouthwash-and-dental-floss/,Mouthwash and dental floss
+ethical-superstore,beauty-health-and-wellbeing,essentials,,/category/beauty-health-and-wellbeing/essentials/,Essentials
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,tampons,/category/beauty-health-and-wellbeing/menstrual-care/tampons/,Tampons
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,menstrual-cups,/category/beauty-health-and-wellbeing/menstrual-care/menstrual-cups/,Menstrual cups
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,pads-and-panty-liners,/category/beauty-health-and-wellbeing/menstrual-care/pads-and-panty-liners/,Pads and panty liners
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,reusable-sanitary-pads,/category/beauty-health-and-wellbeing/menstrual-care/reusable-sanitary-pads/,Reusable sanitary pads
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,period-underwear,/category/beauty-health-and-wellbeing/menstrual-care/period-underwear/,Period underwear
+ethical-superstore,beauty-health-and-wellbeing,menstrual-care,intimate-wipes-washes,/category/beauty-health-and-wellbeing/menstrual-care/intimate-wipes-washes/,Intimate wipes washes
+ethical-superstore,beauty-health-and-wellbeing,remedies-and-wellbeing,face-masks,/category/beauty-health-and-wellbeing/remedies-and-wellbeing/face-masks/,Face masks
+ethical-superstore,beauty-health-and-wellbeing,remedies-and-wellbeing,remedies,/category/beauty-health-and-wellbeing/remedies-and-wellbeing/remedies/,Remedies
+ethical-superstore,beauty-health-and-wellbeing,remedies-and-wellbeing,light-therapy,/category/beauty-health-and-wellbeing/remedies-and-wellbeing/light-therapy/,Light therapy
+ethical-superstore,beauty-health-and-wellbeing,remedies-and-wellbeing,sports-nutrition,/category/beauty-health-and-wellbeing/remedies-and-wellbeing/sports-nutrition/,Sports nutrition
+ethical-superstore,beauty-health-and-wellbeing,beauty-gift-sets,,/category/beauty-health-and-wellbeing/beauty-gift-sets/,Beauty gift sets
+ethical-superstore,beauty-health-and-wellbeing,plastic-free.htm,,/category/beauty-health-and-wellbeing/plastic-free.htm,"Beauty, Health & Wellbeing - Plastic free"
+ethical-superstore,beauty-health-and-wellbeing,organic.htm,,/category/beauty-health-and-wellbeing/organic.htm,"Beauty, Health & Wellbeing - Organic"
+ethical-superstore,baby-child-and-toys,clothing,baby,/category/baby-child-and-toys/clothing/baby/,Baby
+ethical-superstore,baby-child-and-toys,clothing,tops-and-t_shirts,/category/baby-child-and-toys/clothing/tops-and-t_shirts/,Tops and t_shirts
+ethical-superstore,baby-child-and-toys,clothing,knitwear-and-jumpers,/category/baby-child-and-toys/clothing/knitwear-and-jumpers/,Knitwear and jumpers
+ethical-superstore,baby-child-and-toys,clothing,coats-and-jackets,/category/baby-child-and-toys/clothing/coats-and-jackets/,Coats and jackets
+ethical-superstore,baby-child-and-toys,clothing,trousers,/category/baby-child-and-toys/clothing/trousers/,Trousers
+ethical-superstore,baby-child-and-toys,clothing,dresses-and-skirts,/category/baby-child-and-toys/clothing/dresses-and-skirts/,Dresses and skirts
+ethical-superstore,baby-child-and-toys,clothing,pyjamas-and-underwear,/category/baby-child-and-toys/clothing/pyjamas-and-underwear/,Pyjamas and underwear
+ethical-superstore,baby-child-and-toys,clothing,accessories,/category/baby-child-and-toys/clothing/accessories/,Accessories
+ethical-superstore,baby-child-and-toys,clothing,school-uniform,/category/baby-child-and-toys/clothing/school-uniform/,School uniform
+ethical-superstore,baby-child-and-toys,feeding-and-nursing,,/category/baby-child-and-toys/feeding-and-nursing/,Feeding and nursing
+ethical-superstore,baby-child-and-toys,nappies,eco-nappies,/category/baby-child-and-toys/nappies/eco-nappies/,Eco nappies
+ethical-superstore,baby-child-and-toys,nappies,reusable-nappies,/category/baby-child-and-toys/nappies/reusable-nappies/,Reusable nappies
+ethical-superstore,baby-child-and-toys,nappies,wipes-and-creams,/category/baby-child-and-toys/nappies/wipes-and-creams/,Wipes and creams
+ethical-superstore,baby-child-and-toys,bodycare,bathtime,/category/baby-child-and-toys/bodycare/bathtime/,Bathtime
+ethical-superstore,baby-child-and-toys,bodycare,baby-oil-and-lotion,/category/baby-child-and-toys/bodycare/baby-oil-and-lotion/,Baby oil and lotion
+ethical-superstore,baby-child-and-toys,bodycare,dental-care,/category/baby-child-and-toys/bodycare/dental-care/,Dental care
+ethical-superstore,baby-child-and-toys,baby-food,,/category/baby-child-and-toys/baby-food/,Baby food
+ethical-superstore,baby-child-and-toys,toys,baby,/category/baby-child-and-toys/toys/baby/,Baby
+ethical-superstore,baby-child-and-toys,toys,kids,/category/baby-child-and-toys/toys/kids/,Kids
+ethical-superstore,pet-care,dog-food,,/category/pet-care/dog-food/,Dog food
+ethical-superstore,pet-care,cat-food,,/category/pet-care/cat-food/,Cat food
+ethical-superstore,pet-care,vegan-pet-food,,/category/pet-care/vegan-pet-food/,Vegan pet food
+ethical-superstore,pet-care,accessories,,/category/pet-care/accessories/,Accessories
+ethical-superstore,pet-care,toys,,/category/pet-care/toys/,Toys

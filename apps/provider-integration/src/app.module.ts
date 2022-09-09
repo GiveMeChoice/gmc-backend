@@ -6,6 +6,7 @@ import configuration from '../config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersModule } from './providers/providers.module';
+import { AwsModule } from './aws/aws.module';
 
 @Module({
   imports: [
@@ -28,10 +29,11 @@ import { ProvidersModule } from './providers/providers.module';
       }),
       inject: [ConfigService],
     }),
-    // app
-    ProvidersModule,
-    // libs
+    // libraries
     ProductsModule,
+    // local
+    ProvidersModule,
+    AwsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
