@@ -2,8 +2,8 @@ import { ProductsService } from '@app/products';
 import { Product } from '@app/products/model/product.entity';
 import { Body, Controller, Get, Inject, Logger, Post } from '@nestjs/common';
 import { AppService } from './app.service';
-import { INTEGRATOR_FACTORY } from './integration/constants/integration.tokens';
-import { IntegratorFactory } from './integration/integrator/integrator.factory';
+import { PIPELINE_RUNNER_FACTORY } from './pipelines/constants/pipeline.tokens';
+import { PipelineRunnerFactory } from './pipelines/shared/runner/pipeline-runner.factory';
 import { ProviderKey } from './providers/model/enum/provider-key.enum';
 
 @Controller()
@@ -11,8 +11,8 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly productsService: ProductsService,
-    @Inject(INTEGRATOR_FACTORY)
-    private readonly integratorFactory: IntegratorFactory,
+    @Inject(PIPELINE_RUNNER_FACTORY)
+    private readonly pipelineRunnerFactory: PipelineRunnerFactory,
   ) {}
 
   @Get()
@@ -28,9 +28,9 @@ export class AppController {
 
   @Get('integrate')
   async integrate(): Promise<void> {
-    const integrator = this.integratorFactory.getIntegrator(
+    const runner = this.pipelineRunnerFactory.getRunner(
       ProviderKey.RAINFOREST_API,
     );
-    await integrator.getCategoryProductList(null);
+    await runner.runById('37c4ed20-cf2a-49dd-bb59-a83cbe315434');
   }
 }

@@ -12,16 +12,34 @@ export class Product {
   id: string;
 
   @Column()
-  provider: string;
-
-  @Column()
   providerId: string;
 
   @Column()
-  sku: string;
+  providerKey: string;
 
-  @Column({ name: 'DESCRIPTION', type: 'varchar', length: 300 })
-  description;
+  @Column()
+  providerProductId: string;
+
+  @Column()
+  title: string;
+
+  @Column()
+  rating: number;
+
+  @Column()
+  ratingsTotal: number;
+
+  @Column()
+  price: number;
+
+  @Column()
+  currency: string;
+
+  @Column()
+  image: string;
+
+  @Column()
+  link: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdOn: Date;

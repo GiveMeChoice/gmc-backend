@@ -1,3 +1,4 @@
+import { Pipeline } from '@app/provider-integration/pipelines/model/pipeline.entity';
 import {
   Column,
   Entity,
@@ -6,7 +7,6 @@ import {
   Unique,
 } from 'typeorm';
 import { ProviderKey } from './enum/provider-key.enum';
-import { ProviderCategory } from './provider-category.entity';
 
 @Entity({ name: 'pi_provider' })
 @Unique(['key'])
@@ -20,12 +20,15 @@ export class Provider {
   })
   key: ProviderKey;
 
+  // @Column({
+  //   type: 'enum',
+  //   enum: MarketplaceKey,
+  // })
+  // marketplace: MarketplaceKey;
+
   @Column()
   description: string;
 
-  @OneToMany(
-    () => ProviderCategory,
-    (category: ProviderCategory) => category.provider,
-  )
-  categories: ProviderCategory[];
+  @OneToMany(() => Pipeline, (pipeline: Pipeline) => pipeline.provider)
+  pipelines: Pipeline[];
 }

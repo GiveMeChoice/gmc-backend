@@ -1,3 +1,4 @@
+import { Provider } from '@app/provider-integration/providers/model/provider.entity';
 import {
   Column,
   Entity,
@@ -6,15 +7,14 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Provider } from './provider.entity';
 
-@Entity({ name: 'pi_provider_category' })
+@Entity({ name: 'pi_pipeline' })
 @Unique(['provider', 'category', 'subcategory1', 'subcategory2'])
-export class ProviderCategory {
+export class Pipeline {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Provider, (provider: Provider) => provider.categories)
+  @ManyToOne(() => Provider, (provider: Provider) => provider.pipelines)
   @JoinColumn({ name: 'providerId' })
   provider: Provider;
 

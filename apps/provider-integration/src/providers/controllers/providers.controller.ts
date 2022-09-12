@@ -1,5 +1,4 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { ProviderCategory } from '../model/provider-category.entity';
 import { Provider } from '../model/provider.entity';
 import { ProvidersService } from '../services/providers.service';
 

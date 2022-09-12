@@ -10,6 +10,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Readable } from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -48,6 +49,24 @@ export class S3Service {
     return data.Contents
       ? data.Contents.filter((o) => !o.Key.endsWith('/'))
       : [];
+  }
+
+  public async getObjectStream(
+    providerKey: ProviderKey,
+    key: string,
+  ): Promise<any> {
+    const command = new GetObjectCommand({
+      Bucket: this.providerBucket(providerKey),
+      Key: `${key}`,
+    });
+    try {
+      const response: GetObjectCommandOutput = await this._client.send(command);
+      Logger.debug(typeof response.Body);
+      return response.Body;
+    } catch (e) {
+      Logger.error(e);
+      throw e;
+    }
   }
 
   public async getObjectContent(providerKey: ProviderKey, key: string) {
