@@ -16,4 +16,10 @@ export class PipelineResult {
 
   @Column({ default: 0 })
   errors: number;
+
+  @Column()
+  startedAt: Date;
+
+  @Column()
+  completedAt: Date;
 }

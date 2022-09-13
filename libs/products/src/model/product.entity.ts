@@ -2,44 +2,48 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity({ name: 'gmc_product' })
+@Index(['providerId', 'providerProductId'], { unique: true })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  readonly id: string;
 
   @Column()
   providerId: string;
 
   @Column()
-  providerKey: string;
-
-  @Column()
   providerProductId: string;
 
-  @Column()
-  title: string;
+  @Column({ nullable: true })
+  title?: string;
 
-  @Column()
-  rating: number;
+  @Column({
+    type: 'decimal',
+    precision: 3,
+    scale: 2,
+    nullable: true,
+  })
+  rating?: number;
 
-  @Column()
-  ratingsTotal: number;
+  @Column({ nullable: true })
+  ratingsTotal?: number;
 
-  @Column()
-  price: number;
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  price?: number;
 
-  @Column()
-  currency: string;
+  @Column({ nullable: true })
+  currency?: string;
 
-  @Column()
-  image: string;
+  @Column({ nullable: true })
+  image?: string;
 
-  @Column()
-  link: string;
+  @Column({ nullable: true })
+  link?: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdOn: Date;

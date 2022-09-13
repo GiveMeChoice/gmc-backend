@@ -10,7 +10,6 @@ import {
 } from '@aws-sdk/client-s3';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Readable } from 'stream';
 
 @Injectable()
 export class S3Service {
@@ -61,7 +60,6 @@ export class S3Service {
     });
     try {
       const response: GetObjectCommandOutput = await this._client.send(command);
-      Logger.debug(typeof response.Body);
       return response.Body;
     } catch (e) {
       Logger.error(e);

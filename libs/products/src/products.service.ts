@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { Product } from './model/product.entity';
 
 @Injectable()
@@ -10,18 +10,29 @@ export class ProductsService {
   ) {}
 
   findAll(): Promise<Product[]> {
-    Logger.debug('Finding all products');
     return this.productsRepository.find();
   }
 
+  findByProviderId(
+    providerId: string,
+    providerProductId: string,
+  ): Promise<Product> {
+    return this.productsRepository.findOneBy({
+      providerId,
+      providerProductId,
+    });
+  }
+
   findOne(id: string): Promise<Product> {
-    Logger.debug('Finding one product');
     return this.productsRepository.findOneBy({ id });
   }
 
-  async create(product: Product): Promise<Product> {
-    Logger.log('Creating a product');
+  async create(product: Partial<Product>): Promise<Product> {
     return await this.productsRepository.save(product);
+  }
+
+  async update(id: string, updates: Partial<Product>): Promise<UpdateResult> {
+    return await this.productsRepository.update(id, updates);
   }
 
   async remove(id: string): Promise<void> {

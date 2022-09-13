@@ -8,12 +8,13 @@ export class PipelineRunnerFactory {
 
   public getRunner(providerKey: ProviderKey): PipelineRunner {
     try {
-      return this.runners.find((r) => r.providerKey === providerKey);
+      const runner = this.runners.find((r) => r.providerKey === providerKey);
+      if (runner) return runner;
     } catch (e) {
       Logger.error(e);
-      throw new Error(
-        `Unable to find pipeline runner for Provider Key ${providerKey}`,
-      );
     }
+    throw new Error(
+      `Unable to find pipeline runner for Provider Key ${providerKey}`,
+    );
   }
 }

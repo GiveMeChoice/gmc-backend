@@ -7,7 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersModule } from './providers/providers.module';
 import { AwsModule } from './aws/aws.module';
-import { PipelinesModule } from './pipelines/pipelines.module';
+import { IntegrationModule } from './integration/integration.module';
 
 @Module({
   imports: [
@@ -35,7 +35,7 @@ import { PipelinesModule } from './pipelines/pipelines.module';
     // local
     ProvidersModule,
     AwsModule,
-    PipelinesModule,
+    IntegrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

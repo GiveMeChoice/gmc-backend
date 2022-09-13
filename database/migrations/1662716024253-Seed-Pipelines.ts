@@ -1,4 +1,4 @@
-import { Pipeline } from '@app/provider-integration/pipelines/model/pipeline.entity';
+import { Pipeline } from '@app/provider-integration/providers/model/pipeline.entity';
 import { Provider } from '@app/provider-integration/providers/model/provider.entity';
 import { Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
