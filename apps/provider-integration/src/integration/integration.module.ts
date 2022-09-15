@@ -1,4 +1,5 @@
 import { AwsModule } from '@lib/aws';
+import { MessagingModule } from '@lib/messaging';
 import { ProductsModule } from '@lib/products';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -24,6 +25,7 @@ import { TransformerFactory } from './shared/transform/transformer.factory';
     ProductsModule,
     ProvidersModule,
     AwsModule,
+    MessagingModule.register(),
   ],
   providers: [
     IntegrationService,

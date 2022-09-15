@@ -1,5 +1,5 @@
 import { Product } from '@lib/products/model/product.entity';
-import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { PipelineResult } from './integration/model/pipeline-result.entity';
 import { IntegrationService } from './integration/services/integration.service';
 import { ProviderKey } from './providers/model/enum/provider-key.enum';
@@ -19,10 +19,8 @@ export class AppController {
   //   return await this.productsService.create(product);
   // }
 
-  @Get('integrate')
-  async integrate(): Promise<PipelineResult> {
-    return await this.integrationService.integrateSourceById(
-      '01ac267a-e356-47dc-a97d-8da1407134e9',
-    );
+  @Get('integrate/:id')
+  async integrate(@Param('id') id: string): Promise<PipelineResult> {
+    return await this.integrationService.integrateSourceById(id);
   }
 }

@@ -28,7 +28,9 @@
       "@lib/aws": ["libs/aws/src"],
       "@lib/aws/*": ["libs/aws/src/*"],
       "@lib/database": ["libs/database/src"],
-      "@lib/database/*": ["libs/database/src/*"]
+      "@lib/database/*": ["libs/database/src/*"],
+      "@lib/messaging": ["libs/messaging/src"],
+      "@lib/messaging/*": ["libs/messaging/src/*"]
     }
   }
 }

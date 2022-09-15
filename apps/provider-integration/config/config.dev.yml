@@ -8,6 +8,9 @@ datasource:
   password: password
   database: gmc_db
 
+rabbitmq:
+  uri: amqp://guest:guest@localhost:5672
+
 aws:
   id:
   secret:
