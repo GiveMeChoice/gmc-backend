@@ -87,7 +87,8 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/products(|/.*)$": "<rootDir>/libs/products/src/$1"
+      "^@lib/products(|/.*)$": "<rootDir>/libs/products/src/$1",
+      "^@lib/aws(|/.*)$": "<rootDir>/libs/aws/src/$1"
     }
   }
 }

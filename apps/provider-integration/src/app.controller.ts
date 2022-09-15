@@ -1,5 +1,5 @@
-import { ProductsService } from '@app/products';
-import { Product } from '@app/products/model/product.entity';
+import { ProductsService } from '@lib/products';
+import { Product } from '@lib/products/model/product.entity';
 import { Body, Controller, Get, Inject, Logger, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { RUNNER_FACTORY } from './integration/constants/integration.tokens';

@@ -1,6 +1,6 @@
-import { ProductsService } from '@app/products';
-import { Product } from '@app/products/model/product.entity';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProductsService } from '@lib/products';
+import { Product } from '@lib/products/model/product.entity';
+import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../providers/model/enum/provider-key.enum';
@@ -39,7 +39,7 @@ export class RainforestRunner extends PipelineRunnerBase {
   }
 
   async runListPipelineInternal(
-    source: ProductSource,
+    source: ProviderSource,
   ): Promise<Partial<PipelineResult>> {
     let productsFound = 0,
       productsLoaded = 0;

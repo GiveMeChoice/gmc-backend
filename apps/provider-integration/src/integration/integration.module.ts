@@ -1,7 +1,7 @@
-import { ProductsModule } from '@app/products';
+import { AwsModule } from '@lib/aws';
+import { ProductsModule } from '@lib/products';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AwsModule } from '../aws/aws.module';
 import { ProvidersModule } from '../providers/providers.module';
 import {
   EXTRACTOR_FACTORY,

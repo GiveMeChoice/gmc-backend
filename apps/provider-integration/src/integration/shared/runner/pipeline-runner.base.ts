@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { Inject, Logger } from '@nestjs/common';
 import { PipelineResult } from '../../model/pipeline-result.entity';
 import { PipelineResultsService } from '../../services/pipeline-results.service';
@@ -11,7 +11,7 @@ export abstract class PipelineRunnerBase implements PipelineRunner {
   @Inject(PipelineResultsService)
   private readonly resultsService: PipelineResultsService;
 
-  async runSourcePipeline(source: ProductSource): Promise<PipelineResult> {
+  async runSourcePipeline(source: ProviderSource): Promise<PipelineResult> {
     Logger.debug(
       `Running source pipeline "${source.description}" for provider: ${source.provider.key}`,
     );
@@ -30,6 +30,6 @@ export abstract class PipelineRunnerBase implements PipelineRunner {
   }
 
   abstract runListPipelineInternal(
-    list: ProductSource,
+    list: ProviderSource,
   ): Promise<Partial<PipelineResult>>;
 }

@@ -1,4 +1,4 @@
-import { Product } from '@app/products/model/product.entity';
+import { Product } from '@lib/products/model/product.entity';
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import { Injectable } from '@nestjs/common';
 import { SourceTransformer } from '../../shared/transform/transformer.interface';

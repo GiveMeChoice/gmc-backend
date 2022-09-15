@@ -1,7 +1,8 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { ProductSourcesService } from '@app/provider-integration/providers/services/product-sources.service';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { RUNNER_FACTORY } from '../constants/integration.tokens';
 import { PipelineResult } from '../model/pipeline-result.entity';
 import { PipelineRunnerFactory } from '../shared/runner/pipeline-runner.factory';
 
@@ -9,6 +10,7 @@ import { PipelineRunnerFactory } from '../shared/runner/pipeline-runner.factory'
 export class IntegrationService {
   constructor(
     private readonly productSourcesService: ProductSourcesService,
+    @Inject(RUNNER_FACTORY)
     private readonly pipelineRunnerFactory: PipelineRunnerFactory,
   ) {}
 
@@ -17,7 +19,9 @@ export class IntegrationService {
     return this.integrateProductSource(source);
   }
 
-  async integrateProductSource(source: ProductSource): Promise<PipelineResult> {
+  async integrateProductSource(
+    source: ProviderSource,
+  ): Promise<PipelineResult> {
     const runner = this.pipelineRunnerFactory.getRunner(source.provider.key);
     return await runner.runSourcePipeline(source);
   }

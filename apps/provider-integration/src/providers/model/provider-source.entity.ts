@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity({ name: 'pi_product_source' })
-export class ProductSource {
+@Entity({ name: 'pi_provider_source' })
+export class ProviderSource {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -30,7 +30,7 @@ export class ProductSource {
   @Column()
   subcategory2: string;
 
-  @ManyToOne(() => Provider, (provider: Provider) => provider.productSources)
+  @ManyToOne(() => Provider, (provider: Provider) => provider.sources)
   @JoinColumn({ name: 'providerId' })
   provider: Provider;
 }

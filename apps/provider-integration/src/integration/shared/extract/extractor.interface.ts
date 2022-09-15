@@ -1,10 +1,10 @@
-import { Product } from '@app/products/model/product.entity';
+import { Product } from '@lib/products/model/product.entity';
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 
 export interface Extractor<L, P> {
   providerKey: ProviderKey;
 
-  extractSource(source: ProductSource): L;
+  extractSource(source: ProviderSource): L;
   extractDetail(product: Product): P;
 }

@@ -21,7 +21,7 @@ export class ProvidersService {
     return this.providersRepo.findOne({
       where: { id },
       relations: {
-        productSources: true,
+        sources: true,
       },
     });
   }

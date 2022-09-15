@@ -1,4 +1,3 @@
-import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -14,6 +13,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class S3Service {
   private _client: S3Client;
+  private readonly _defaultBucket: string = 'give-me-choice';
 
   constructor(configService: ConfigService) {
     this._client = new S3Client({
@@ -26,22 +26,10 @@ export class S3Service {
     Logger.log('Connected to AWS S3');
   }
 
-  private providerBucket(providerKey: ProviderKey): string {
-    switch (providerKey) {
-      case ProviderKey.RAINFOREST_API:
-        return 'rainforest-api';
-      default:
-        return 'give-me-choice';
-    }
-  }
-
-  public async listObjects(
-    providerKey: ProviderKey,
-    key: string,
-  ): Promise<_Object[]> {
+  public async listObjects(bucket: string, key: string): Promise<_Object[]> {
     const Prefix = `${key}`;
     const listCommand = new ListObjectsCommand({
-      Bucket: this.providerBucket(providerKey),
+      Bucket: bucket || this._defaultBucket,
       Prefix,
     });
     const data = await this._client.send(listCommand);
@@ -50,12 +38,9 @@ export class S3Service {
       : [];
   }
 
-  public async getObjectStream(
-    providerKey: ProviderKey,
-    key: string,
-  ): Promise<any> {
+  public async getObjectStream(bucket: string, key: string): Promise<any> {
     const command = new GetObjectCommand({
-      Bucket: this.providerBucket(providerKey),
+      Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
     });
     try {
@@ -67,11 +52,11 @@ export class S3Service {
     }
   }
 
-  public async getObjectContent(providerKey: ProviderKey, key: string) {
+  public async getObjectContent(bucket: string, key: string, bytes: number) {
     const command = new GetObjectCommand({
-      Bucket: this.providerBucket(providerKey),
+      Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
-      Range: 'bytes=0-5000',
+      Range: `bytes=0-${bytes}`,
     });
     try {
       const response: GetObjectCommandOutput = await this._client.send(command);
@@ -85,22 +70,23 @@ export class S3Service {
   }
 
   public async copyObject(
-    providerKey: ProviderKey,
+    sourceBucket: string,
+    targetBucket: string,
     sourceKey: string,
     targetKey: string,
   ) {
     const copyCommand = new CopyObjectCommand({
-      Bucket: this.providerBucket(providerKey),
-      CopySource: `${this.providerBucket(providerKey)}/${sourceKey}`,
+      Bucket: targetBucket || this._defaultBucket,
+      CopySource: `${sourceBucket || this._defaultBucket}/${sourceKey}`,
       Key: `${targetKey}`,
     });
     Logger.debug(`Copying object from ${sourceKey} to ${targetKey}`);
     await this._client.send(copyCommand);
   }
 
-  public async deleteObject(providerKey: ProviderKey, key: string) {
+  public async deleteObject(bucket: string, key: string) {
     const deleteCommand = new DeleteObjectCommand({
-      Bucket: this.providerBucket(providerKey),
+      Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
     });
     Logger.debug(`Removing ${key}`);

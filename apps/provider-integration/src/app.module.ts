@@ -1,4 +1,4 @@
-import { ProductsModule } from '@app/products';
+import { ProductsModule } from '@lib/products';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,7 +6,6 @@ import configuration from '../config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersModule } from './providers/providers.module';
-import { AwsModule } from './aws/aws.module';
 import { IntegrationModule } from './integration/integration.module';
 
 @Module({
@@ -34,7 +33,6 @@ import { IntegrationModule } from './integration/integration.module';
     ProductsModule,
     // local
     ProvidersModule,
-    AwsModule,
     IntegrationModule,
   ],
   controllers: [AppController],
