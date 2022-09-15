@@ -2,7 +2,7 @@ import { ProviderKey } from '@app/provider-integration/providers/model/enum/prov
 import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { ProductSourcesService } from '@app/provider-integration/providers/services/product-sources.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { RUNNER_FACTORY } from '../constants/integration.tokens';
+import { RUNNER_FACTORY } from '../integration.constants';
 import { PipelineResult } from '../model/pipeline-result.entity';
 import { PipelineRunnerFactory } from '../shared/runner/pipeline-runner.factory';
 

@@ -7,11 +7,11 @@ import { ProviderKey } from '../../../providers/model/enum/provider-key.enum';
 import {
   EXTRACTOR_FACTORY,
   TRANSFORMER_FACTORY,
-} from '../../constants/integration.tokens';
+} from '../../integration.constants';
 import { PipelineResult } from '../../model/pipeline-result.entity';
-import { ExtractorFactory } from '../../shared/extract/extractor.factory';
+import { ExtractorFactory } from '../../shared/extractor/extractor.factory';
 import { PipelineRunnerBase } from '../../shared/runner/pipeline-runner.base';
-import { TransformerFactory } from '../../shared/transform/transformer.factory';
+import { TransformerFactory } from '../../shared/transformer/transformer.factory';
 import { RainforestCategoryItem } from './dto/rainforest-category-item.dto';
 import { RainforestExtractor } from './rainforest.extractor';
 import { RainforestTransformer } from './rainforest.transformer';
@@ -20,6 +20,7 @@ import {
   DEFAULT_EXCHANGE,
   PRODUCT_REFRESH_QUEUE,
 } from '@lib/messaging/messaging.constants';
+import { ConsumeMessage } from 'amqplib';
 
 @Injectable()
 export class RainforestRunner extends PipelineRunnerBase {
@@ -49,7 +50,7 @@ export class RainforestRunner extends PipelineRunnerBase {
   ): Promise<Partial<PipelineResult>> {
     let productsFound = 0,
       productsLoaded = 0;
-    for (let i = 0; i < 1000; i++) {
+    for (let i = 0; i < 100; i++) {
       productsFound++;
       productsLoaded++;
       await this.amqpConnection.publish(
@@ -96,16 +97,11 @@ export class RainforestRunner extends PipelineRunnerBase {
     routingKey: 'pi.product.*',
     queue: PRODUCT_REFRESH_QUEUE,
   })
-  async receive(msg: any) {
+  async receive(msg: any, amqpMsg: ConsumeMessage) {
     const ms = Math.random() * 10000;
-    const start = new Date();
     await delay(ms);
-    Logger.debug(
-      `Product Refreshed: ${JSON.stringify(msg)}`,
-      // --Started at ${start}
-      // --Finished at ${new Date()}
-      // --Should have taken ~${ms} ms`,
-    );
+    Logger.debug(`Product Refreshed: ${JSON.stringify(msg)}`);
+    Logger.debug(amqpMsg.fields.routingKey);
   }
 
   async refresh(product: Product): Promise<void> {

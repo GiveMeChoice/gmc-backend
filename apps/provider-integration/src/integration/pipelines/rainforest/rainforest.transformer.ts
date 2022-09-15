@@ -1,7 +1,7 @@
 import { Product } from '@lib/products/model/product.entity';
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import { Injectable } from '@nestjs/common';
-import { SourceTransformer } from '../../shared/transform/transformer.interface';
+import { SourceTransformer } from '../../shared/transformer/transformer.interface';
 import { RainforestCategoryItem } from './dto/rainforest-category-item.dto';
 import { RainforestProductResponse } from './dto/rainforest-product.response';
 

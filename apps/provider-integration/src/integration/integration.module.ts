@@ -8,16 +8,16 @@ import {
   EXTRACTOR_FACTORY,
   RUNNER_FACTORY,
   TRANSFORMER_FACTORY,
-} from './constants/integration.tokens';
+} from './integration.constants';
 import { PipelineResult } from './model/pipeline-result.entity';
 import { RainforestExtractor } from './pipelines/rainforest/rainforest.extractor';
 import { RainforestRunner } from './pipelines/rainforest/rainforest.runner';
 import { RainforestTransformer } from './pipelines/rainforest/rainforest.transformer';
 import { IntegrationService } from './services/integration.service';
 import { PipelineResultsService } from './services/pipeline-results.service';
-import { ExtractorFactory } from './shared/extract/extractor.factory';
+import { ExtractorFactory } from './shared/extractor/extractor.factory';
 import { PipelineRunnerFactory } from './shared/runner/pipeline-runner.factory';
-import { TransformerFactory } from './shared/transform/transformer.factory';
+import { TransformerFactory } from './shared/transformer/transformer.factory';
 
 @Module({
   imports: [

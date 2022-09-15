@@ -3,6 +3,7 @@ import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
 import { PipelineResult } from './integration/model/pipeline-result.entity';
 import { IntegrationService } from './integration/services/integration.service';
 import { ProviderKey } from './providers/model/enum/provider-key.enum';
+import * as uuid from "uuid";
 
 @Controller()
 export class AppController {
@@ -18,6 +19,8 @@ export class AppController {
   // async addProduct(@Body() product: Product): Promise<Product> {
   //   return await this.productsService.create(product);
   // }
+
+  uuid.
 
   @Get('integrate/:id')
   async integrate(@Param('id') id: string): Promise<PipelineResult> {

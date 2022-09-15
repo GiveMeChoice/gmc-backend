@@ -4,7 +4,7 @@ import { ProviderKey } from '@app/provider-integration/providers/model/enum/prov
 import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { Injectable } from '@nestjs/common';
 import { Readable } from 'stream';
-import { Extractor } from '../../shared/extract/extractor.interface';
+import { Extractor } from '../../shared/extractor/extractor.interface';
 import { RainforestProductResponse } from './dto/rainforest-product.response';
 
 @Injectable()
