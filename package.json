@@ -20,14 +20,15 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./apps/gmc-backend/test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm",
-    "typeorm-d": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm -d ./database/datasource.ts",
+    "typeorm-d": "ts-node -r tsconfig-paths/register ./node_modules/.bin/typeorm -d ./libs/database/migration-datasource.ts",
     "db:migrate": "npm run typeorm-d migration:run",
-    "db:sync": "npm run typeorm-d migration:run && bash ./database/scripts/migration-generate.sh && npm run typeorm-d migration:run",
-    "db:reset": "bash ./database/scripts/reset.sh",
-    "db:start": "bash ./database/scripts/start.sh",
-    "db:connect": "bash ./database/scripts/connect.sh",
-    "db:seed": "bash ./database/scripts/migration-seed.sh",
-    "db:revert": "npm run typeorm-d migration:revert"
+    "db:sync": "npm run typeorm-d migration:run && bash ./libs/database/scripts/migration-generate.sh && npm run typeorm-d migration:run",
+    "db:reset": "bash ./libs/database/scripts/reset.sh",
+    "db:start": "bash ./libs/database/scripts/start.sh",
+    "db:connect": "bash ./libs/database/scripts/connect.sh",
+    "db:seed": "bash ./libs/database/scripts/migration-seed.sh",
+    "db:revert": "npm run typeorm-d migration:revert",
+    "db:test": "bash ./libs/database/scripts/test.sh"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.165.0",
@@ -88,7 +89,8 @@
     ],
     "moduleNameMapper": {
       "^@lib/products(|/.*)$": "<rootDir>/libs/products/src/$1",
-      "^@lib/aws(|/.*)$": "<rootDir>/libs/aws/src/$1"
+      "^@lib/aws(|/.*)$": "<rootDir>/libs/aws/src/$1",
+      "^@lib/database(|/.*)$": "<rootDir>/libs/database/src/$1"
     }
   }
 }

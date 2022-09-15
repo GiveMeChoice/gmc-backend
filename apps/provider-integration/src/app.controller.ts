@@ -1,36 +1,28 @@
-import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
-import { Body, Controller, Get, Inject, Logger, Post } from '@nestjs/common';
-import { AppService } from './app.service';
-import { RUNNER_FACTORY } from './integration/constants/integration.tokens';
-import { PipelineRunnerFactory } from './integration/shared/runner/pipeline-runner.factory';
+import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { PipelineResult } from './integration/model/pipeline-result.entity';
+import { IntegrationService } from './integration/services/integration.service';
 import { ProviderKey } from './providers/model/enum/provider-key.enum';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    private readonly productsService: ProductsService,
-    @Inject(RUNNER_FACTORY)
-    private readonly pipelineRunnerFactory: PipelineRunnerFactory,
-  ) {}
+  constructor(private readonly integrationService: IntegrationService) {}
 
-  @Get()
-  async getProducts(): Promise<Product[]> {
-    Logger.debug('Provider Integration controller is getting your products');
-    return await this.productsService.findAll();
-  }
+  // @Get()
+  // async getProducts(): Promise<Product[]> {
+  //   Logger.debug('Provider Integration controller is getting your products');
+  //   return await this.productsService.findAll();
+  // }
 
-  @Post()
-  async addProduct(@Body() product: Product): Promise<Product> {
-    return await this.productsService.create(product);
-  }
+  // @Post()
+  // async addProduct(@Body() product: Product): Promise<Product> {
+  //   return await this.productsService.create(product);
+  // }
 
   @Get('integrate')
-  async integrate(): Promise<void> {
-    const runner = this.pipelineRunnerFactory.getRunner(
-      ProviderKey.RAINFOREST_API,
+  async integrate(): Promise<PipelineResult> {
+    return await this.integrationService.integrateSourceById(
+      '01ac267a-e356-47dc-a97d-8da1407134e9',
     );
-    // await runner.runById('37c4ed20-cf2a-49dd-bb59-a83cbe315434');
   }
 }

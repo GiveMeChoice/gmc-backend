@@ -14,19 +14,17 @@ export class IntegrationService {
     private readonly pipelineRunnerFactory: PipelineRunnerFactory,
   ) {}
 
-  async integrateProductSourceById(sourceId: string): Promise<PipelineResult> {
+  async integrateSourceById(sourceId: string): Promise<PipelineResult> {
     const source = await this.productSourcesService.findOne(sourceId);
-    return this.integrateProductSource(source);
+    return this.integrateSource(source);
   }
 
-  async integrateProductSource(
-    source: ProviderSource,
-  ): Promise<PipelineResult> {
+  async integrateSource(source: ProviderSource): Promise<PipelineResult> {
     const runner = this.pipelineRunnerFactory.getRunner(source.provider.key);
     return await runner.runSourcePipeline(source);
   }
 
-  async refreshProductDetails(provider: ProviderKey, productId: string) {
+  async refreshProduct(provider: ProviderKey, productId: string) {
     // do nothing
   }
 }

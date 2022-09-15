@@ -7,6 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProvidersModule } from './providers/providers.module';
 import { IntegrationModule } from './integration/integration.module';
+import { DatabaseModule } from 'libs/database/src';
 
 @Module({
   imports: [
@@ -14,22 +15,8 @@ import { IntegrationModule } from './integration/integration.module';
       isGlobal: true,
       load: [configuration],
     }),
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.get('datasource.host'),
-        port: +configService.get('datasource.port'),
-        username: configService.get('datasource.username'),
-        password: configService.get('datasource.password'),
-        database: configService.get('datasource.database'),
-        autoLoadEntities: true,
-        synchronize: true,
-        logging: configService.get('NODE_ENV') === 'dev',
-      }),
-      inject: [ConfigService],
-    }),
     // libraries
+    DatabaseModule,
     ProductsModule,
     // local
     ProvidersModule,

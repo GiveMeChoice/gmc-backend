@@ -26,9 +26,8 @@ import { TransformerFactory } from './shared/transform/transformer.factory';
     AwsModule,
   ],
   providers: [
-    // shared
+    IntegrationService,
     PipelineResultsService,
-    // impl
     RainforestRunner,
     RainforestExtractor,
     RainforestTransformer,
@@ -50,9 +49,7 @@ import { TransformerFactory } from './shared/transform/transformer.factory';
         new TransformerFactory([rainforestTranformer]),
       inject: [RainforestTransformer],
     },
-    // api
-    IntegrationService,
   ],
-  exports: [RUNNER_FACTORY, EXTRACTOR_FACTORY, TRANSFORMER_FACTORY],
+  exports: [IntegrationService],
 })
 export class IntegrationModule {}
