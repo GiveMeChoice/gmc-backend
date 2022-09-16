@@ -1,13 +1,36 @@
+import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
-import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { PipelineResult } from './integration/model/pipeline-result.entity';
 import { IntegrationService } from './integration/services/integration.service';
-import { ProviderKey } from './providers/model/enum/provider-key.enum';
-import * as uuid from "uuid";
 
 @Controller()
 export class AppController {
-  constructor(private readonly integrationService: IntegrationService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly integrationService: IntegrationService,
+  ) {}
+
+  @Get('find-product')
+  async findProduct(@Query() params: any): Promise<string> {
+    const { providerKey, providerId } = params;
+    return (await this.productsService.existsByProvider(
+      providerKey,
+      providerId,
+    ))
+      ? 'true'
+      : 'false';
+  }
+
+  @Get('product/:id')
+  async getProduct(@Param('id') id: string): Promise<Product> {
+    return await this.productsService.findOne(id);
+  }
+
+  @Get('product/:id/exists')
+  async existsProduct(@Param('id') id: string): Promise<string> {
+    return (await this.productsService.existsById(id)) ? 'true' : 'false';
+  }
 
   // @Get()
   // async getProducts(): Promise<Product[]> {
@@ -19,8 +42,6 @@ export class AppController {
   // async addProduct(@Body() product: Product): Promise<Product> {
   //   return await this.productsService.create(product);
   // }
-
-  uuid.
 
   @Get('integrate/:id')
   async integrate(@Param('id') id: string): Promise<PipelineResult> {

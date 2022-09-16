@@ -1,4 +1,13 @@
 #!/bin/bash
-docker run -itd --name gmc_rabbitmq2 -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+set -e
 
-docker exec gmc_rabbitmq rabbitmqctl status
+SERVER="gmc_rabbitmq"
+
+echo "starting rabbitmq broker instance "
+docker start $SERVER
+
+#wait for rmq to start
+sleep 6;
+
+#show status
+docker exec $SERVER rabbitmqctl status

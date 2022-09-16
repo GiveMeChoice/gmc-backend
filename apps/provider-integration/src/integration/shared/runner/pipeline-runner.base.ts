@@ -17,10 +17,9 @@ export abstract class PipelineRunnerBase implements PipelineRunner {
     );
     const startedAt = new Date();
     const result = await this.runListPipelineInternal(source);
-    const completedAt = new Date();
     return this.resultsService.create({
       startedAt,
-      completedAt,
+      completedAt: new Date(),
       ...result,
     });
   }

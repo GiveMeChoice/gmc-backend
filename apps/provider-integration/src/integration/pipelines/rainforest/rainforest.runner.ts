@@ -1,8 +1,15 @@
+import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
+import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import {
+  DEFAULT_EXCHANGE,
+  PRODUCT_REFRESH_QUEUE,
+} from '@lib/messaging/messaging.constants';
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
-import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConsumeMessage } from 'amqplib';
 import * as csv from 'csvtojson';
+import * as uuid from 'uuid';
 import { ProviderKey } from '../../../providers/model/enum/provider-key.enum';
 import {
   EXTRACTOR_FACTORY,
@@ -15,12 +22,6 @@ import { TransformerFactory } from '../../shared/transformer/transformer.factory
 import { RainforestCategoryItem } from './dto/rainforest-category-item.dto';
 import { RainforestExtractor } from './rainforest.extractor';
 import { RainforestTransformer } from './rainforest.transformer';
-import { AmqpConnection, RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import {
-  DEFAULT_EXCHANGE,
-  PRODUCT_REFRESH_QUEUE,
-} from '@lib/messaging/messaging.constants';
-import { ConsumeMessage } from 'amqplib';
 
 @Injectable()
 export class RainforestRunner extends PipelineRunnerBase {
@@ -29,7 +30,6 @@ export class RainforestRunner extends PipelineRunnerBase {
   transformer: RainforestTransformer;
 
   constructor(
-    private readonly amqpConnection: AmqpConnection,
     private readonly productsService: ProductsService,
     @Inject(EXTRACTOR_FACTORY) extractorFactory: ExtractorFactory,
     @Inject(TRANSFORMER_FACTORY) transformerFactory: TransformerFactory,
@@ -49,46 +49,37 @@ export class RainforestRunner extends PipelineRunnerBase {
     source: ProviderSource,
   ): Promise<Partial<PipelineResult>> {
     let productsFound = 0,
-      productsLoaded = 0;
-    for (let i = 0; i < 100; i++) {
-      productsFound++;
-      productsLoaded++;
-      await this.amqpConnection.publish(
-        DEFAULT_EXCHANGE,
-        'pi.product.created',
-        {
-          productsFound,
-        },
-      );
-      Logger.debug(`Creating product: ${productsFound}`);
+      productsLoaded = 0,
+      errors = 0;
+    const id = uuid.v4();
+    Logger.debug(`Transaction ID: ${id}`);
+    try {
+      await csv()
+        .fromStream(await this.extractor.extractSource(source))
+        .subscribe(async (item: RainforestCategoryItem, lineNumber) => {
+          productsFound++;
+          try {
+            const product = this.transformer.fromSourceItem(item);
+            const existing = await this.productsService.findByProvider(
+              source.provider.key,
+              product.providerProductId,
+            );
+            if (!existing) {
+              await this.productsService.create(product);
+              productsLoaded++;
+            }
+          } catch (err) {
+            errors++;
+          }
+        });
+    } catch (err) {
+      Logger.error(err);
     }
-    // await csv()
-    //   .fromStream(
-    //     // Extract
-    //     await this.extractor.extractSource(source),
-    //   )
-    //   .subscribe(async (item: RainforestCategoryItem, lineNumber) => {
-    //     // Transform
-    //     Logger.debug(lineNumber);
-    //     productsFound++;
-    //     Logger.debug(JSON.stringify(item));
-    //     const product = this.transformer.fromSourceItem(item);
-    //     // Load
-    //     const existing = await this.productsService.findByProviderId(
-    //       source.provider.id,
-    //       product.providerProductId,
-    //     );
-    //     if (!existing) {
-    //       product.providerId = source.provider.id;
-    //       const created = await this.productsService.create(product);
-    //       productsLoaded++;
-    //       Logger.debug(`Product ${product.providerProductId} created`);
-    //       this.refresh(created);
-    //     }
-    //   });
     return {
+      id,
       productsFound,
       productsLoaded,
+      errors,
     };
   }
 
@@ -98,9 +89,7 @@ export class RainforestRunner extends PipelineRunnerBase {
     queue: PRODUCT_REFRESH_QUEUE,
   })
   async receive(msg: any, amqpMsg: ConsumeMessage) {
-    const ms = Math.random() * 10000;
-    await delay(ms);
-    Logger.debug(`Product Refreshed: ${JSON.stringify(msg)}`);
+    Logger.debug(`Product Creation Message Received: ${JSON.stringify(msg)}`);
     Logger.debug(amqpMsg.fields.routingKey);
   }
 

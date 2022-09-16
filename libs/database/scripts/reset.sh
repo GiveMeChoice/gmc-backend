@@ -5,7 +5,7 @@ SERVER="gmc_database_server";
 PW="password";
 DB="gmc_db";
 
-echo "echo stop & remove old docker [$SERVER] and starting new fresh instance of [$SERVER]"
+echo "stop & remove old docker [$SERVER] and starting new fresh instance of [$SERVER]"
 (docker kill $SERVER || :) && \
   (docker rm $SERVER || :) && \
   docker run --name $SERVER -e POSTGRES_PASSWORD=$PW \
@@ -14,7 +14,7 @@ echo "echo stop & remove old docker [$SERVER] and starting new fresh instance of
   -d postgres
 
 # wait for pg to start
-echo "sleep wait for pg-server [$SERVER] to start";
+echo "wait for pg-server [$SERVER] to start";
 sleep 3;
 
 # create the db 

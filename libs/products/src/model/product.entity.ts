@@ -1,3 +1,4 @@
+import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import {
   Column,
   CreateDateColumn,
@@ -6,18 +7,28 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { ProductStatus } from './enum/product-status.enum';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerId', 'providerProductId'], { unique: true })
+@Index(['providerKey', 'providerProductId'], { unique: true })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column()
-  providerId: string;
+  @Column({
+    type: 'enum',
+    enum: ProviderKey,
+  })
+  providerKey: ProviderKey;
 
   @Column()
   providerProductId: string;
+
+  @Column({
+    type: 'enum',
+    enum: ProductStatus,
+  })
+  status: ProductStatus;
 
   @Column({ nullable: true })
   title?: string;
