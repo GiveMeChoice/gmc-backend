@@ -4,8 +4,10 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ProviderSourceRun } from './provider-source-run.entity';
 
 @Entity({ name: 'pi_provider_source' })
 export class ProviderSource {
@@ -29,6 +31,9 @@ export class ProviderSource {
 
   @Column()
   subcategory2: string;
+
+  @OneToMany(() => ProviderSourceRun, (run: ProviderSourceRun) => run.source)
+  runs: ProviderSourceRun[];
 
   @ManyToOne(() => Provider, (provider: Provider) => provider.sources)
   @JoinColumn({ name: 'providerId' })

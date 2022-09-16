@@ -1,14 +1,14 @@
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { PipelineResult } from './integration/model/pipeline-result.entity';
-import { IntegrationService } from './integration/services/integration.service';
+import { PipelinesService } from './pipelines/pipelines.service';
+import { ProviderSourceRun } from './providers/model/provider-source-run.entity';
 
 @Controller()
 export class AppController {
   constructor(
     private readonly productsService: ProductsService,
-    private readonly integrationService: IntegrationService,
+    private readonly integrationService: PipelinesService,
   ) {}
 
   @Get('find-product')
@@ -44,7 +44,7 @@ export class AppController {
   // }
 
   @Get('integrate/:id')
-  async integrate(@Param('id') id: string): Promise<PipelineResult> {
+  async integrate(@Param('id') id: string): Promise<ProviderSourceRun> {
     return await this.integrationService.integrateSourceById(id);
   }
 }

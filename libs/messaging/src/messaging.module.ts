@@ -1,13 +1,12 @@
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
-import { DynamicModule } from '@nestjs/common';
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DEFAULT_EXCHANGE } from './messaging.constants';
+import { MessagingService } from './messaging.service';
 
-@Module({})
-export class MessagingModule {
-  static register(): DynamicModule {
-    return RabbitMQModule.forRootAsync(RabbitMQModule, {
+@Module({
+  imports: [
+    RabbitMQModule.forRootAsync(RabbitMQModule, {
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
         Logger.debug(configService.get('rabbitmq.uri'));
@@ -29,6 +28,9 @@ export class MessagingModule {
         };
       },
       inject: [ConfigService],
-    });
-  }
-}
+    }),
+  ],
+  providers: [MessagingService],
+  exports: [MessagingService],
+})
+export class MessagingModule {}

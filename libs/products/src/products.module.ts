@@ -5,7 +5,7 @@ import { Product } from './model/product.entity';
 import { ProductsService } from './products.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Product]), MessagingModule.register()],
+  imports: [TypeOrmModule.forFeature([Product]), MessagingModule],
   providers: [ProductsService],
   exports: [ProductsService],
 })

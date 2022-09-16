@@ -1,17 +1,15 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-import { DEFAULT_EXCHANGE } from '@lib/messaging/messaging.constants';
-import { Injectable, Logger } from '@nestjs/common';
+import { MessagingService } from '@lib/messaging';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { lastValueFrom } from 'rxjs';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
 import { Product } from './model/product.entity';
 
 @Injectable()
 export class ProductsService {
   constructor(
-    private readonly amqpConnection: AmqpConnection,
     private readonly dataSource: DataSource,
+    private readonly messagingService: MessagingService,
     @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
@@ -85,13 +83,12 @@ export class ProductsService {
     await queryRunner.startTransaction();
     try {
       const created = await queryRunner.manager.save(product);
-      await this.amqpConnection.publish(
-        DEFAULT_EXCHANGE,
-        'pi.product.created',
-        {
-          id: created.id,
+      await this.messagingService.sendToQueue({
+        routingKey: 'pi.product.created',
+        data: {
+          productId: created.id,
         },
-      );
+      });
       await queryRunner.commitTransaction();
       return created;
     } catch (err) {

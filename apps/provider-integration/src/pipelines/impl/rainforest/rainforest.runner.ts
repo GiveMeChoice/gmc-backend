@@ -1,21 +1,15 @@
+import { ProviderSourceRun } from '@app/provider-integration/providers/model/provider-source-run.entity';
 import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
-import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import {
-  DEFAULT_EXCHANGE,
-  PRODUCT_REFRESH_QUEUE,
-} from '@lib/messaging/messaging.constants';
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConsumeMessage } from 'amqplib';
 import * as csv from 'csvtojson';
 import * as uuid from 'uuid';
 import { ProviderKey } from '../../../providers/model/enum/provider-key.enum';
 import {
   EXTRACTOR_FACTORY,
   TRANSFORMER_FACTORY,
-} from '../../integration.constants';
-import { PipelineResult } from '../../model/pipeline-result.entity';
+} from '../../pipelines.constants';
 import { ExtractorFactory } from '../../shared/extractor/extractor.factory';
 import { PipelineRunnerBase } from '../../shared/runner/pipeline-runner.base';
 import { TransformerFactory } from '../../shared/transformer/transformer.factory';
@@ -45,14 +39,13 @@ export class RainforestRunner extends PipelineRunnerBase {
     Logger.debug(this.transformer);
   }
 
-  async runListPipelineInternal(
+  async runSourcePipelineInternal(
     source: ProviderSource,
-  ): Promise<Partial<PipelineResult>> {
+  ): Promise<Partial<ProviderSourceRun>> {
     let productsFound = 0,
       productsLoaded = 0,
       errors = 0;
     const id = uuid.v4();
-    Logger.debug(`Transaction ID: ${id}`);
     try {
       await csv()
         .fromStream(await this.extractor.extractSource(source))
@@ -81,16 +74,6 @@ export class RainforestRunner extends PipelineRunnerBase {
       productsLoaded,
       errors,
     };
-  }
-
-  @RabbitSubscribe({
-    exchange: DEFAULT_EXCHANGE,
-    routingKey: 'pi.product.*',
-    queue: PRODUCT_REFRESH_QUEUE,
-  })
-  async receive(msg: any, amqpMsg: ConsumeMessage) {
-    Logger.debug(`Product Creation Message Received: ${JSON.stringify(msg)}`);
-    Logger.debug(amqpMsg.fields.routingKey);
   }
 
   async refresh(product: Product): Promise<void> {

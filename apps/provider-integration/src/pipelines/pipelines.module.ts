@@ -1,35 +1,24 @@
 import { AwsModule } from '@lib/aws';
-import { MessagingModule } from '@lib/messaging';
 import { ProductsModule } from '@lib/products';
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProvidersModule } from '../providers/providers.module';
+import { RainforestExtractor } from './impl/rainforest/rainforest.extractor';
+import { RainforestRunner } from './impl/rainforest/rainforest.runner';
+import { RainforestTransformer } from './impl/rainforest/rainforest.transformer';
 import {
   EXTRACTOR_FACTORY,
   RUNNER_FACTORY,
   TRANSFORMER_FACTORY,
-} from './integration.constants';
-import { PipelineResult } from './model/pipeline-result.entity';
-import { RainforestExtractor } from './pipelines/rainforest/rainforest.extractor';
-import { RainforestRunner } from './pipelines/rainforest/rainforest.runner';
-import { RainforestTransformer } from './pipelines/rainforest/rainforest.transformer';
-import { IntegrationService } from './services/integration.service';
-import { PipelineResultsService } from './services/pipeline-results.service';
+} from './pipelines.constants';
+import { PipelinesService } from './pipelines.service';
 import { ExtractorFactory } from './shared/extractor/extractor.factory';
 import { PipelineRunnerFactory } from './shared/runner/pipeline-runner.factory';
 import { TransformerFactory } from './shared/transformer/transformer.factory';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PipelineResult]),
-    ProductsModule,
-    ProvidersModule,
-    AwsModule,
-    MessagingModule.register(),
-  ],
+  imports: [ProductsModule, ProvidersModule, AwsModule],
   providers: [
-    IntegrationService,
-    PipelineResultsService,
+    PipelinesService,
     RainforestRunner,
     RainforestExtractor,
     RainforestTransformer,
@@ -52,6 +41,6 @@ import { TransformerFactory } from './shared/transformer/transformer.factory';
       inject: [RainforestTransformer],
     },
   ],
-  exports: [IntegrationService],
+  exports: [PipelinesService],
 })
-export class IntegrationModule {}
+export class PipelinesModule {}
