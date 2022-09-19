@@ -4,6 +4,8 @@ import { ProviderSource } from '../../../providers/model/provider-source.entity'
 
 export interface PipelineRunner {
   providerKey: ProviderKey;
-  runSourcePipeline(source: ProviderSource): Promise<ProviderSourceRun>;
-  runProductPipeline(product): Promise<boolean>;
+  runSourcePipeline(
+    source: ProviderSource,
+  ): Promise<Partial<ProviderSourceRun>>;
+  runProductPipeline(providerProductId: string): Promise<any>;
 }

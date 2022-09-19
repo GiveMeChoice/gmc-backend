@@ -3,29 +3,41 @@ import { ProviderSource } from '@app/provider-integration/providers/model/provid
 import { ProviderSourcesService } from '@app/provider-integration/providers/services/provider-sources.service';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ProviderSourceRun } from '../providers/model/provider-source-run.entity';
+import { ProviderSourceRunsService } from '../providers/services/provider-source-runs.service';
 import { RUNNER_FACTORY } from './pipelines.constants';
 import { PipelineRunnerFactory } from './shared/runner/pipeline-runner.factory';
 
 @Injectable()
 export class PipelinesService {
   constructor(
-    private readonly productSourcesService: ProviderSourcesService,
+    private readonly sourcesService: ProviderSourcesService,
+    private readonly runsService: ProviderSourceRunsService,
     @Inject(RUNNER_FACTORY)
     private readonly pipelineRunnerFactory: PipelineRunnerFactory,
   ) {}
 
-  async integrateSourceById(sourceId: string): Promise<ProviderSourceRun> {
-    const source = await this.productSourcesService.findOne(sourceId);
-    return this.integrateSource(source);
+  async runSourcePipelineById(sourceId: string): Promise<ProviderSourceRun> {
+    const source = await this.sourcesService.findOne(sourceId);
+    return this.runSourcePipeline(source);
   }
 
-  async integrateSource(source: ProviderSource): Promise<ProviderSourceRun> {
-    Logger.debug(source);
+  async runSourcePipeline(source: ProviderSource): Promise<ProviderSourceRun> {
     const runner = this.pipelineRunnerFactory.getRunner(source.provider.key);
-    return await runner.runSourcePipeline(source);
+    const startedAt = new Date();
+    const result = await runner.runSourcePipeline(source);
+    return this.runsService.create({
+      startedAt,
+      completedAt: new Date(),
+      source,
+      ...result,
+    });
   }
 
-  async refreshProduct(provider: ProviderKey, productId: string) {
-    // do nothing
+  async runProductPipeline(
+    providerKey: ProviderKey,
+    providerProductId: string,
+  ): Promise<any> {
+    const runner = this.pipelineRunnerFactory.getRunner(providerKey);
+    return await runner.runProductPipeline(providerProductId);
   }
 }

@@ -16,3 +16,7 @@ aws:
   id:
   secret:
   region: us-east-1
+
+rainforest:
+  zip-code: SE21 8AX
+  api-key:

@@ -15,10 +15,10 @@ export class ProductsService {
 
   async exists(product: Product): Promise<boolean> {
     if (product.id) return await this.existsById(product.id);
-    if (product.providerKey && product.providerProductId)
+    if (product.providerKey && product.providerId)
       return await this.existsByProvider(
         product.providerKey,
-        product.providerProductId,
+        product.providerId,
       );
   }
 
@@ -44,7 +44,7 @@ export class ProductsService {
         .createQueryBuilder('product')
         .select('product.id')
         .where('product.providerKey = :providerKey', { providerKey })
-        .andWhere('product.providerProductId = :providerProductId', {
+        .andWhere('product.providerId = :providerProductId', {
           providerProductId,
         })
         .getRawOne())
@@ -61,7 +61,7 @@ export class ProductsService {
   ): Promise<Product> {
     return this.productsRepository.findOneBy({
       providerKey,
-      providerProductId,
+      providerId: providerProductId,
     });
   }
 
@@ -70,11 +70,9 @@ export class ProductsService {
   }
 
   async create(product: Partial<Product>): Promise<Partial<Product>> {
-    if (
-      !this.existsByProvider(product.providerKey, product.providerProductId)
-    ) {
+    if (!this.existsByProvider(product.providerKey, product.providerId)) {
       throw new Error(
-        `Provider ${product.providerKey} product ${product.providerProductId} already exists!`,
+        `Provider ${product.providerKey} product ${product.providerId} already exists!`,
       );
     }
 

@@ -6,19 +6,21 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
 } from 'typeorm';
 import { ProviderSourceRun } from './provider-source-run.entity';
 
 @Entity({ name: 'pi_provider_source' })
+@Unique(['identifier'])
 export class ProviderSource {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
-  description: string;
+  identifier: string;
 
   @Column()
-  location: string;
+  description: string;
 
   @Column()
   active: boolean;

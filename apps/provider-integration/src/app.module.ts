@@ -5,7 +5,7 @@ import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RefreshConsumer } from './consumers/refresh-product.consumer';
+import { ProductRefreshConsumer } from './consumers/product-refresh.consumer';
 import { PipelinesModule } from './pipelines/pipelines.module';
 import { ProvidersModule } from './providers/providers.module';
 
@@ -21,6 +21,6 @@ import { ProvidersModule } from './providers/providers.module';
     PipelinesModule,
   ],
   controllers: [AppController],
-  providers: [AppService, RefreshConsumer],
+  providers: [AppService, ProductRefreshConsumer],
 })
 export class AppModule {}

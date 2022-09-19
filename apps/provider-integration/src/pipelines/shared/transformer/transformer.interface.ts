@@ -3,6 +3,6 @@ import { ProviderKey } from '@app/provider-integration/providers/model/enum/prov
 
 export interface SourceTransformer<I, P> {
   providerKey: ProviderKey;
-  fromSourceItem(item: I): Partial<Product>;
-  fromProductDetail(product: P): Partial<Product>;
+  mapSourceItem(item: I): Partial<Product>;
+  mapProductDetails(product: P): Partial<Product>;
 }

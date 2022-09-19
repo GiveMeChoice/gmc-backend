@@ -1,4 +1,4 @@
-export interface RainforestCategoryItem {
+export interface RainforestApiSourceItemDto {
   id: string;
   request: {
     custom_id: string;
@@ -7,6 +7,11 @@ export interface RainforestCategoryItem {
     search_term: string;
     sort_by: string;
     page: number;
+  };
+  request_metadata: {
+    created_at: Date;
+    processed_at: Date;
+    total_time_taken: number;
   };
   success: boolean;
   result: {

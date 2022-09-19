@@ -4,6 +4,7 @@ import {
   GetObjectCommand,
   GetObjectCommandOutput,
   ListObjectsCommand,
+  PutObjectCommand,
   S3Client,
   _Object,
 } from '@aws-sdk/client-s3';
@@ -26,7 +27,7 @@ export class S3Service {
     Logger.log('Connected to AWS S3');
   }
 
-  public async listObjects(bucket: string, key: string): Promise<_Object[]> {
+  public async listObjects(key: string, bucket?: string): Promise<_Object[]> {
     const Prefix = `${key}`;
     const listCommand = new ListObjectsCommand({
       Bucket: bucket || this._defaultBucket,
@@ -38,7 +39,7 @@ export class S3Service {
       : [];
   }
 
-  public async getObjectStream(bucket: string, key: string): Promise<any> {
+  public async getObjectStream(key: string, bucket?: string): Promise<any> {
     const command = new GetObjectCommand({
       Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
@@ -52,17 +53,27 @@ export class S3Service {
     }
   }
 
-  public async getObjectContent(bucket: string, key: string, bytes: number) {
+  public async getObject(key: string, bucket?: string): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
-      Range: `bytes=0-${bytes}`,
+    });
+    const response: GetObjectCommandOutput = await this._client.send(command);
+    return response.Body ? await this.streamToString(response.Body) : '';
+  }
+
+  public async putObject(
+    key: string,
+    input: string,
+    bucket?: string,
+  ): Promise<void> {
+    const putCommand = new PutObjectCommand({
+      Key: key,
+      Body: input,
+      Bucket: bucket || this._defaultBucket,
     });
     try {
-      const response: GetObjectCommandOutput = await this._client.send(command);
-      return response.Body
-        ? await this.streamToString(response.Body)
-        : { content: '' };
+      await this._client.send(putCommand);
     } catch (e) {
       Logger.error(e);
       throw e;
@@ -84,7 +95,7 @@ export class S3Service {
     await this._client.send(copyCommand);
   }
 
-  public async deleteObject(bucket: string, key: string) {
+  public async deleteObject(key: string, bucket?: string) {
     const deleteCommand = new DeleteObjectCommand({
       Bucket: bucket || this._defaultBucket,
       Key: `${key}`,
@@ -93,16 +104,12 @@ export class S3Service {
     await this._client.send(deleteCommand);
   }
 
-  private async streamToString(stream) {
+  private async streamToString(stream): Promise<string> {
     return new Promise((resolve, reject) => {
       const chunks = [];
       stream.on('data', (chunk) => chunks.push(chunk));
       stream.on('error', reject);
-      stream.on('end', () =>
-        resolve({
-          content: Buffer.concat(chunks).toString('utf8'),
-        }),
-      );
+      stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     });
   }
 }

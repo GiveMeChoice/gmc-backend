@@ -10,7 +10,7 @@ import {
 import { ProductStatus } from './enum/product-status.enum';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerKey', 'providerProductId'], { unique: true })
+@Index(['providerKey', 'providerId'], { unique: true })
 export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
@@ -22,7 +22,7 @@ export class Product {
   providerKey: ProviderKey;
 
   @Column()
-  providerProductId: string;
+  providerId: string;
 
   @Column({
     type: 'enum',
@@ -55,6 +55,12 @@ export class Product {
 
   @Column({ nullable: true })
   link?: string;
+
+  @Column({ nullable: true })
+  description?: string;
+
+  @Column()
+  createdBySourceRunId: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdOn: Date;
