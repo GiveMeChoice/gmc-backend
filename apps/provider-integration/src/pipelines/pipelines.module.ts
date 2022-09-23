@@ -16,6 +16,7 @@ import {
 } from './pipelines.constants';
 import { PipelinesService } from './pipelines.service';
 import { ProductCacheManager } from './shared/cache/product-cache.manager';
+import { SourceCacheManager } from './shared/cache/source-cache.manager';
 import { ExtractorFactory } from './shared/extractor/extractor.factory';
 import { PipelineRunnerFactory } from './shared/runner/pipeline-runner.factory';
 import { TransformerFactory } from './shared/transformer/transformer.factory';
@@ -25,6 +26,7 @@ import { TransformerFactory } from './shared/transformer/transformer.factory';
   providers: [
     PipelinesService,
     ProductCacheManager,
+    SourceCacheManager,
     RainforestApiRunner,
     RainforestApiExtractor,
     RainforestApiTransformer,

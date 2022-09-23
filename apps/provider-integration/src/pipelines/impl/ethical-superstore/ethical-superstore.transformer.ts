@@ -1,21 +1,46 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
+import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
 import { Product } from '@lib/products/model/product.entity';
 import { Injectable } from '@nestjs/common';
+import { PipelineError } from '../../shared/exception/pipeline.error';
 import { SourceTransformer } from '../../shared/transformer/transformer.interface';
-import { EthicalSuperstoreProduct } from './dto/ethical-superstore-product.dto';
-import { EthicalSuperstoreSourceItem } from './dto/ethical-superstore-source-item.dto';
+import { EthicalSuperstoreProductDto } from './dto/ethical-superstore-product.dto';
+import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
+import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
 
 @Injectable()
 export class EthicalSuperstoreTransformer
   implements
-    SourceTransformer<EthicalSuperstoreSourceItem, EthicalSuperstoreProduct>
+    SourceTransformer<
+      EthicalSuperstoreSourceItemDto,
+      EthicalSuperstoreProductDto
+    >
 {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
-  mapSourceItem(item: EthicalSuperstoreSourceItem): Partial<Product> {
-    throw new Error('Method not implemented.');
+  mapSourceItem(item: EthicalSuperstoreSourceItemDto): Partial<Product> {
+    try {
+      const product = Product.factory(this.providerKey, item.id);
+      product.status = ProductStatus.INCOMPLETE;
+      product.sku = item.sku;
+      product.title = item.name;
+      product.price = item.price ? Number(item.price) : null;
+      product.currency = product.price ? 'GBP' : null;
+      product.brandName = item.brand;
+      product.image = item.image;
+      product.link = `${EthicalSuperstoreExtractor.BASE_URL}${item.href}`;
+      return product;
+    } catch (err) {
+      throw new PipelineError('TRANSFORM_ERROR', err);
+    }
   }
-  mapProductDetails(product: EthicalSuperstoreProduct): Partial<Product> {
-    throw new Error('Method not implemented.');
+  mapProductDetails(dto: EthicalSuperstoreProductDto): Partial<Product> {
+    try {
+      const product = Product.factory();
+      product.status = ProductStatus.COMPLETE;
+      return product;
+    } catch (err) {
+      throw new PipelineError('TRANSFORM_ERROR', err);
+    }
   }
 }

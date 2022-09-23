@@ -2,7 +2,9 @@ import { ProviderKey } from '@app/provider-integration/providers/model/enum/prov
 import { ProviderSourceRun } from '@app/provider-integration/providers/model/provider-source-run.entity';
 import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { ProductsService } from '@lib/products';
-import { Inject, Injectable } from '@nestjs/common';
+import { Product } from '@lib/products/model/product.entity';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { concatMap, lastValueFrom, map } from 'rxjs';
 import {
   EXTRACTOR_FACTORY,
   TRANSFORMER_FACTORY,
@@ -32,13 +34,55 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
     ) as EthicalSuperstoreTransformer;
   }
 
-  runSourcePipeline(
+  async runSourcePipeline(
     source: ProviderSource,
   ): Promise<Partial<ProviderSourceRun>> {
-    this._extractor.extractSource(source);
-    throw new Error('Method not implemented.');
+    const run = ProviderSourceRun.factory();
+    try {
+      await lastValueFrom(
+        this._extractor.extractSource(source).pipe(
+          map((item) => {
+            run.productsFound++;
+            return this._transformer.mapSourceItem(item);
+          }),
+          concatMap(async (product) => {
+            if (
+              !(await this.productsService.existsByProvider(
+                this.providerKey,
+                product.providerId,
+              ))
+            ) {
+              product.createdBySourceRunId = run.id;
+              await this.productsService.create(product);
+              run.productsCreated++;
+            }
+          }),
+        ),
+      );
+    } catch (err) {
+      Logger.error(err);
+      run.error = err.toString();
+    }
+    return run;
   }
-  runProductPipeline(providerProductId: string): Promise<any> {
-    throw new Error('Method not implemented.');
+
+  async runProductPipeline(product: Product): Promise<any> {
+    Logger.debug('pipeline started');
+    try {
+      const refreshed = await lastValueFrom(
+        this._extractor
+          .extractProduct(product)
+          .pipe(
+            map((extractedDto) =>
+              this._transformer.mapProductDetails(extractedDto),
+            ),
+          ),
+      );
+      await this.productsService.update(product.id, { ...refreshed });
+      Logger.debug('pipeline done');
+      return refreshed;
+    } catch (err) {
+      Logger.error(err);
+    }
   }
 }

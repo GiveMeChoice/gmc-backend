@@ -12,6 +12,11 @@ import { ProductStatus } from './enum/product-status.enum';
 @Entity({ name: 'gmc_product' })
 @Index(['providerKey', 'providerId'], { unique: true })
 export class Product {
+  constructor(providerKey?: ProviderKey, providerId?: string) {
+    this.providerKey = providerKey;
+    this.providerId = providerId;
+  }
+
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
@@ -19,16 +24,19 @@ export class Product {
     type: 'enum',
     enum: ProviderKey,
   })
-  providerKey: ProviderKey;
+  readonly providerKey: ProviderKey;
 
   @Column()
-  providerId: string;
+  readonly providerId: string;
 
   @Column({
     type: 'enum',
     enum: ProductStatus,
   })
   status: ProductStatus;
+
+  @Column({ nullable: true })
+  sku?: string;
 
   @Column({ nullable: true })
   title?: string;
@@ -51,6 +59,12 @@ export class Product {
   currency?: string;
 
   @Column({ nullable: true })
+  brandId?: string;
+
+  @Column({ nullable: true })
+  brandName?: string;
+
+  @Column({ nullable: true })
   image?: string;
 
   @Column({ nullable: true })
@@ -59,7 +73,7 @@ export class Product {
   @Column({ nullable: true })
   description?: string;
 
-  @Column()
+  @Column({ nullable: true })
   createdBySourceRunId: string;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
@@ -67,4 +81,8 @@ export class Product {
 
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedOn: Date;
+
+  public static factory(providerKey?: ProviderKey, providerId?: string) {
+    return new Product(providerKey, providerId);
+  }
 }

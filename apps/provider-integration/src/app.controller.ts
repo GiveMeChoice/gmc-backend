@@ -39,13 +39,7 @@ export class AppController {
   }
 
   @Post('integrate-product')
-  async integrateProduct(
-    @Query('provider-key') providerKey: ProviderKey,
-    @Query('product-id') productId: string,
-  ): Promise<boolean> {
-    return await this.pipelinesService.runProductPipeline(
-      providerKey,
-      productId,
-    );
+  async integrateProduct(@Query('id') id: string): Promise<ProviderSourceRun> {
+    return await this.pipelinesService.runProductPipelineById(id);
   }
 }

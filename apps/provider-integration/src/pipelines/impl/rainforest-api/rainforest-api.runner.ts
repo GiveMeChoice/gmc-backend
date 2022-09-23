@@ -2,6 +2,7 @@ import { ProviderSourceRun } from '@app/provider-integration/providers/model/pro
 import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
 import { ProductsService } from '@lib/products';
 import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
+import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import * as uuid from 'uuid';
@@ -39,62 +40,35 @@ export class RainforestApiRunner implements PipelineRunner {
   async runSourcePipeline(
     source: ProviderSource,
   ): Promise<Partial<ProviderSourceRun>> {
-    let productsFound = 0,
-      productsLoaded = 0,
-      errors = 0;
-    const runId = uuid.v4();
+    const run = ProviderSourceRun.factory();
     try {
       await csv()
         .fromStream(await this._extractor.extractSource(source))
         .subscribe(async (item: RainforestApiSourceItemDto) => {
-          productsFound++;
-          try {
-            const product = this._transformer.mapSourceItem(item);
-            if (
-              !(await this.productsService.existsByProvider(
-                source.provider.key,
-                product.providerId,
-              ))
-            ) {
-              Logger.debug(`Creating: ${product.providerId}`);
-              product.createdBySourceRunId = runId;
-              await this.productsService.create(product);
-              productsLoaded++;
-              // source => last refreshed date
-              // source => last loaded date
-              // run => fromCache?
-              // run => cacheDate
-            }
-          } catch (err) {
-            errors++;
+          run.productsFound++;
+          const product = this._transformer.mapSourceItem(item);
+          if (
+            !(await this.productsService.existsByProvider(
+              source.provider.key,
+              product.providerId,
+            ))
+          ) {
+            product.createdBySourceRunId = run.id;
+            await this.productsService.create(product);
+            run.productsCreated++;
           }
         });
     } catch (err) {
       Logger.error(err);
+      run.error = err.toString();
     }
-    return {
-      id: runId,
-      productsFound,
-      productsLoaded,
-      errors,
-    };
+    return run;
   }
 
-  async runProductPipeline(providerProductId: string): Promise<any> {
-    Logger.debug(`Starting rainforest pipeline - ASN: ${providerProductId}`);
-    const productResponse = await this._extractor.extractProduct(
-      providerProductId,
+  async runProductPipeline(product: Product): Promise<any> {
+    const refreshed = await this._transformer.mapProductDetails(
+      await this._extractor.extractProduct(product),
     );
-    const product = await this._transformer.mapProductDetails(productResponse);
-    const existing = await this.productsService.findByProvider(
-      this.providerKey,
-      providerProductId,
-    );
-    if (!existing) {
-      await this.productsService.create(product);
-    } else if (existing.status !== ProductStatus.COMPLETE) {
-      await this.productsService.update(existing.id, { ...product });
-    }
-    Logger.debug(`Rainforest pipeline COMPLETE - ASN: ${providerProductId}`);
+    await this.productsService.update(product.id, { ...refreshed });
   }
 }

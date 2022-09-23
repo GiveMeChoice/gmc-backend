@@ -5,6 +5,7 @@ import { SourceTransformer } from '../../shared/transformer/transformer.interfac
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
 import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
+import { PipelineError } from '../../shared/exception/pipeline.error';
 
 @Injectable()
 export class RainforestApiTransformer
@@ -14,24 +15,31 @@ export class RainforestApiTransformer
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
   mapSourceItem(item: RainforestApiSourceItemDto): Partial<Product> {
-    const product = new Product();
-    product.status = ProductStatus.INCOMPLETE;
-    product.providerKey = this.providerKey;
-    product.providerId = item.result.category_results.asin;
-    return product;
+    try {
+      const product = Product.factory(
+        this.providerKey,
+        item.result.category_results.asin,
+      );
+      product.status = ProductStatus.INCOMPLETE;
+      return product;
+    } catch (err) {
+      throw new PipelineError('TRANSFORM_ERROR', err);
+    }
   }
 
-  mapProductDetails(response: RainforestApiProductDto): Partial<Product> {
-    const product = new Product();
-    product.status = ProductStatus.COMPLETE;
-    product.providerKey = this.providerKey;
-    product.providerId = response.product.asin;
-    product.title = response.product.title;
-    product.rating = response.product.rating;
-    product.ratingsTotal = response.product.ratings_total;
-    product.price = response.product.buybox_winner.price.value;
-    product.currency = response.product.buybox_winner.price.currency;
-    product.image = response.product.main_image.link;
-    return product;
+  mapProductDetails(dto: RainforestApiProductDto): Partial<Product> {
+    try {
+      const product = Product.factory();
+      product.status = ProductStatus.COMPLETE;
+      product.title = dto.product.title;
+      product.rating = dto.product.rating;
+      product.ratingsTotal = dto.product.ratings_total;
+      product.price = dto.product.buybox_winner.price.value;
+      product.currency = dto.product.buybox_winner.price.currency;
+      product.image = dto.product.main_image.link;
+      return product;
+    } catch (err) {
+      throw new PipelineError('TRANSFORM_ERROR', err);
+    }
   }
 }

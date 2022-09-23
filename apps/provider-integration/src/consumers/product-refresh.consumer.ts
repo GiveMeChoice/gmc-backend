@@ -31,10 +31,10 @@ export class ProductRefreshConsumer implements Consumer<ProductCreatedEvent> {
         `product ${msg.data.productId} status is: ${product.status}`,
       );
       if (product.status === ProductStatus.INCOMPLETE) {
-        await this.pipelinesService.runProductPipeline(
-          product.providerKey,
-          product.providerId,
-        );
+        // await this.pipelinesService.runProductPipeline(
+        //   product.providerKey,
+        //   product.providerId,
+        // );
       }
     } catch (err) {
       Logger.error(msg.data.productId + ' : ' + err);
