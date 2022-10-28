@@ -40,9 +40,11 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
     const run = ProviderSourceRun.factory();
     try {
       await lastValueFrom(
+        // extract
         this._extractor.extractSource(source).pipe(
           map((item) => {
             run.productsFound++;
+            // map
             return this._transformer.mapSourceItem(item);
           }),
           concatMap(async (product) => {
@@ -52,6 +54,7 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
                 product.providerId,
               ))
             ) {
+              // load
               product.createdBySourceRunId = run.id;
               await this.productsService.create(product);
               run.productsCreated++;

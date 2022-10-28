@@ -20,3 +20,8 @@ aws:
 rainforest:
   zip-code: SE21 8AX
   api-key:
+
+elastic:
+  username: elastic
+  password: changeme
+  node: 'http://localhost:9200'

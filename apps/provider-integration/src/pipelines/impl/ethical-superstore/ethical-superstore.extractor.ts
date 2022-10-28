@@ -121,7 +121,7 @@ export class EthicalSuperstoreExtractor
   private fetchProduct(product: Product): Observable<string> {
     // const url = product.link;
     const url =
-      'http://localhost:8080/ethical-superstore/products/seedbomb.html';
+      'http://localhost:8080/ethical-superstore/products/product.html';
     Logger.debug(`Fetching Product: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
@@ -131,6 +131,7 @@ export class EthicalSuperstoreExtractor
       const dto: EthicalSuperstoreProductDto = {
         images: [],
         ethicsAndTags: [],
+        reviews: [],
       };
       const $ = load(html);
       // extract images
@@ -191,7 +192,23 @@ export class EthicalSuperstoreExtractor
             dto.reviewCount = Number($(el).text());
           }
         });
-      // reviews ??
+      if (dto.reviewCount > 0) {
+        $('#customer-reviews')
+          .next('div')
+          .children('.review')
+          .each((i, el) => {
+            dto.reviews.push({
+              author: $(el).find('[itemprop=name]').first().text(),
+              submittedOn: new Date(
+                $(el).find('[itemprop=datePublished]').first().attr('content'),
+              ),
+              rating: Number(
+                $(el).find('span[itemprop=ratingValue]').first().text(),
+              ),
+              text: $(el).find('.review-text').first().text().trim(),
+            });
+          });
+      }
       // manufacturer
       dto.manufacturer = {
         name: $('span[property=manufacturer]').first().text().trim(),
@@ -221,12 +238,23 @@ export class EthicalSuperstoreExtractor
         if ($(el).text().includes('In Stock')) dto.inStock = true;
       });
       // description
-      $('.accordion__content[itemprop=description] > p').each((i, el) => {
-        dto.productInfo.description += `${$(el)
-          .text()
-          .replace(/\s+/g, ' ')
-          .trim()}\n`;
-      });
+      dto.productInfo.description = $(
+        '.accordion__content[itemprop=description]',
+      )
+        .first()
+        .text()
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      // $('.accordion__content[itemprop=description]')
+      //   .first()
+      //   .add('.accordion__content[itemprop=description] > p')
+      //   .each((i, el) => {
+      //     dto.productInfo.description += `${$(el)
+      //       .text()
+      //       .replace(/\s+/g, ' ')
+      //       .trim()}\n`;
+      //   });
       dto.productInfo.description = dto.productInfo.description.trim();
 
       Logger.debug(dto);

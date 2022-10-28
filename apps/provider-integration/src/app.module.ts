@@ -1,4 +1,5 @@
 import { ProductsModule } from '@lib/products';
+import { SearchModule } from '@lib/search';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from 'libs/database/src';
@@ -19,6 +20,7 @@ import { ProvidersModule } from './providers/providers.module';
     ProductsModule,
     ProvidersModule,
     PipelinesModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService, ProductRefreshConsumer],
