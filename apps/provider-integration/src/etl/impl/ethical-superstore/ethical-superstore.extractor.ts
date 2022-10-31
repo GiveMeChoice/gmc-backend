@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
+import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
 import { Product } from '@lib/products/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
@@ -30,7 +30,7 @@ export class EthicalSuperstoreExtractor
   ) {}
 
   extractSource(
-    source: ProviderSource,
+    source: ProductSource,
   ): Observable<EthicalSuperstoreSourceItemDto> {
     try {
       return from(
@@ -56,7 +56,7 @@ export class EthicalSuperstoreExtractor
     }
   }
 
-  private fetchSource(source: ProviderSource): Observable<string> {
+  private fetchSource(source: ProductSource): Observable<string> {
     const url = `${EthicalSuperstoreExtractor.BASE_URL}/category/${source.identifier}?limit=192`;
     Logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
@@ -95,7 +95,7 @@ export class EthicalSuperstoreExtractor
       return from(
         this.productCacheManager.get<EthicalSuperstoreProductDto>(
           this.providerKey,
-          product.providerId,
+          product.providerProductId,
         ),
       ).pipe(
         switchMap((cachedResponse) => {
@@ -106,7 +106,7 @@ export class EthicalSuperstoreExtractor
                 tap((extractedProduct) => {
                   this.productCacheManager.put<EthicalSuperstoreProductDto>(
                     this.providerKey,
-                    product.providerId,
+                    product.providerProductId,
                     extractedProduct,
                   );
                 }),

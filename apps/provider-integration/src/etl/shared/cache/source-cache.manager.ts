@@ -1,20 +1,20 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
+import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
 import { Injectable } from '@nestjs/common';
 import { AbstractCacheManager } from './abstract-cache.manager';
 import { CachedResponse } from './interface/cached-response.interface';
 
 @Injectable()
 export class SourceCacheManager extends AbstractCacheManager {
-  async get<T>(source: ProviderSource): Promise<CachedResponse<T>> {
+  async get<T>(source: ProductSource): Promise<CachedResponse<T>> {
     return await this.getInternal(
-      this.buildSourceKey(source.provider.key, source.identifier),
+      this.buildSourceKey(source.provider.id, source.identifier),
     );
   }
 
-  async put<T>(source: ProviderSource, data: T): Promise<void> {
+  async put<T>(source: ProductSource, data: T): Promise<void> {
     await this.putInternal(
-      this.buildSourceKey(source.provider.key, source.identifier),
+      this.buildSourceKey(source.provider.id, source.identifier),
       data,
     );
   }

@@ -4,42 +4,99 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { ProductStatus } from './enum/product-status.enum';
+import { nanoid } from 'nanoid';
+import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerKey', 'providerId'], { unique: true })
+@Index(['providerId', 'providerProductId'], { unique: true })
+@Unique(['shortId'])
 export class Product {
-  constructor(providerKey?: ProviderKey, providerId?: string) {
-    this.providerKey = providerKey;
+  constructor(providerId?: ProviderKey, providerProductId?: string) {
     this.providerId = providerId;
+    this.providerProductId = providerProductId;
+    this.shortId = nanoid(11);
   }
-
+  public static factory(providerKey?: ProviderKey, providerId?: string) {
+    return new Product(providerKey, providerId);
+  }
+  /* 
+  ///////////////////////
+    HEADER DATA
+  ///////////////////////
+  */
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
   @Column({
     type: 'enum',
     enum: ProviderKey,
+    enumName: 'pi_provider_id_enum',
   })
-  readonly providerKey: ProviderKey;
+  readonly providerId: ProviderKey;
 
   @Column()
-  readonly providerId: string;
+  readonly providerProductId: string;
+
+  @Column()
+  readonly shortId: string;
 
   @Column({
     type: 'enum',
     enum: ProductStatus,
+    enumName: 'gmc_product_status_enum',
   })
   status: ProductStatus;
 
+  @Column({ type: 'timestamptz' })
+  statusAt: Date;
+
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
+
+  /* 
+  ///////////////////////
+    INTEGRATION METADATA
+  ///////////////////////
+  */
+  @ManyToOne(() => ProductSource, (source: ProductSource) => source.products)
+  @JoinColumn({ name: 'sourceId' })
+  source: ProductSource;
+
+  @Column({ type: 'timestamptz' })
+  lastRefreshedAt: Date;
+
+  @Column()
+  lastRefreshedBy: string;
+
+  @Column({ type: 'timestamptz' })
+  lastFoundAt: Date;
+
+  @Column()
+  lastFoundBy: string;
+
+  /* 
+  ///////////////////////
+    PRODUCT INFORMATION
+  ///////////////////////
+  */
   @Column({ nullable: true })
   sku?: string;
 
   @Column({ nullable: true })
   title?: string;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({
     type: 'decimal',
@@ -71,18 +128,5 @@ export class Product {
   link?: string;
 
   @Column({ nullable: true })
-  description?: string;
-
-  @Column({ nullable: true })
   createdBySourceRunId: string;
-
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  createdOn: Date;
-
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  updatedOn: Date;
-
-  public static factory(providerKey?: ProviderKey, providerId?: string) {
-    return new Product(providerKey, providerId);
-  }
 }

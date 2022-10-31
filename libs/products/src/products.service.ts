@@ -15,10 +15,10 @@ export class ProductsService {
 
   async exists(product: Product): Promise<boolean> {
     if (product.id) return await this.existsById(product.id);
-    if (product.providerKey && product.providerId)
+    if (product.providerProductId && product.providerProductId)
       return await this.existsByProvider(
-        product.providerKey,
         product.providerId,
+        product.providerProductId,
       );
   }
 
@@ -60,8 +60,8 @@ export class ProductsService {
     providerProductId: string,
   ): Promise<Product> {
     return this.productsRepository.findOneBy({
-      providerKey,
-      providerId: providerProductId,
+      providerId: providerKey,
+      providerProductId: providerProductId,
     });
   }
 
@@ -70,9 +70,9 @@ export class ProductsService {
   }
 
   async create(product: Partial<Product>): Promise<Partial<Product>> {
-    if (!this.existsByProvider(product.providerKey, product.providerId)) {
+    if (!this.existsByProvider(product.providerId, product.providerProductId)) {
       throw new Error(
-        `Provider ${product.providerKey} product ${product.providerId} already exists!`,
+        `Provider ${product.providerProductId} product ${product.providerProductId} already exists!`,
       );
     }
 

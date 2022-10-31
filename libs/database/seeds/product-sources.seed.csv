@@ -1,4 +1,4 @@
-providerKey,category,subcategory1,subcategory2,identifier,description,active
+providerId,category,subcategory1,subcategory2,identifier,description,active
 rainforest-api,grocery,,,3655F471,Grocery,true
 rainforest-api,stripbooks,,,i/stripbooks,Books,true
 rainforest-api,drugstore,,,i/drugstore,Health & Personal Care,true

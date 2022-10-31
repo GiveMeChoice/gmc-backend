@@ -1,21 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProviderSource } from '../model/provider-source.entity';
+import { ProductSource } from '../model/product-source.entity';
 
 @Injectable()
-export class ProviderSourcesService {
+export class ProductSourcesService {
   constructor(
-    @InjectRepository(ProviderSource)
-    private productSourcesRepo: Repository<ProviderSource>,
+    @InjectRepository(ProductSource)
+    private productSourcesRepo: Repository<ProductSource>,
   ) {}
 
-  findOne(id: string): Promise<ProviderSource> {
+  findOne(id: string): Promise<ProductSource> {
     return this.productSourcesRepo.findOne({
       where: { id },
       relations: {
         provider: true,
       },
     });
+  }
+
+  monitorSources() {
+    //
   }
 }

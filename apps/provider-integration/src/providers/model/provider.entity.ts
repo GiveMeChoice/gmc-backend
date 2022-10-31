@@ -1,31 +1,25 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  Unique,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 import { ProviderKey } from './enum/provider-key.enum';
-import { ProviderSource } from './provider-source.entity';
+import { ProductSource } from './product-source.entity';
 
 @Entity({ name: 'pi_provider' })
-@Unique(['key'])
 export class Provider {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  // @PrimaryGeneratedColumn('uuid')
+  // id: string;
 
-  @Column({
+  @PrimaryColumn({
     type: 'enum',
     enum: ProviderKey,
+    enumName: 'pi_provider_id_enum',
   })
-  key: ProviderKey;
+  id: ProviderKey;
 
   @Column()
   description: string;
 
   @OneToMany(
-    () => ProviderSource,
-    (productSource: ProviderSource) => productSource.provider,
+    () => ProductSource,
+    (productSource: ProductSource) => productSource.provider,
   )
-  sources: ProviderSource[];
+  sources: ProductSource[];
 }

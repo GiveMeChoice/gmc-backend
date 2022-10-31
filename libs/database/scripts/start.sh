@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 SERVER="gmc_database_server";

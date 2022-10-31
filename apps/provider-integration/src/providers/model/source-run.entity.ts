@@ -6,21 +6,28 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { v4 } from 'uuid';
-import { ProviderSource } from './provider-source.entity';
+import { ProductSource } from './product-source.entity';
 
-@Entity({ name: 'pi_provider_source_run' })
-export class ProviderSourceRun {
+@Entity({ name: 'pi_source_run' })
+export class SourceRun {
   constructor() {
     this.id = v4();
-    this.success = true;
+    this.completed = true;
     this.productsFound = 0;
     this.productsCreated = 0;
   }
   @PrimaryGeneratedColumn('uuid')
   readonly id!: string;
 
+  @ManyToOne(() => ProductSource, (source: ProductSource) => source.runs)
+  @JoinColumn({ name: 'sourceId' })
+  source: ProductSource;
+
   @Column({ default: true })
-  success: boolean;
+  completed: boolean;
+
+  @Column({ nullable: true })
+  errorMessage?: string;
 
   @Column({ default: 0 })
   productsFound: number;
@@ -28,8 +35,11 @@ export class ProviderSourceRun {
   @Column({ default: 0 })
   productsCreated: number;
 
-  @Column({ nullable: true })
-  error?: string;
+  @Column({ default: 0 })
+  productsRefreshed: number;
+
+  @Column({ default: 0 })
+  productFailures: number;
 
   @Column()
   startedAt: Date;
@@ -37,11 +47,7 @@ export class ProviderSourceRun {
   @Column()
   completedAt: Date;
 
-  @ManyToOne(() => ProviderSource, (source: ProviderSource) => source.runs)
-  @JoinColumn({ name: 'sourceId' })
-  source: ProviderSource;
-
   public static factory() {
-    return new ProviderSourceRun();
+    return new SourceRun();
   }
 }

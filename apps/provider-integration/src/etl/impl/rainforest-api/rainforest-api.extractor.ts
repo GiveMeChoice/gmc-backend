@@ -1,9 +1,9 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
+import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
 import { S3Service } from '@lib/aws/services/s3.service';
 import { Product } from '@lib/products/model/product.entity';
 import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom, map, Observable, tap } from 'rxjs';
 import { Readable } from 'stream';
@@ -32,7 +32,7 @@ export class RainforestApiExtractor
   }
 
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
-  async extractSource(source: ProviderSource): Promise<Readable> {
+  async extractSource(source: ProductSource): Promise<Readable> {
     try {
       const sourceKey = await lastValueFrom(
         this.fetchLatestCollectionResultKey(source.identifier),
@@ -69,16 +69,16 @@ export class RainforestApiExtractor
       const cachedResponse =
         await this.cacheManager.get<RainforestApiProductDto>(
           this.providerKey,
-          product.providerId,
+          product.providerProductId,
         );
       return cachedResponse
         ? cachedResponse.data
         : await lastValueFrom(
-            this.fetchProduct(product.providerId).pipe(
+            this.fetchProduct(product.providerProductId).pipe(
               tap((data) =>
                 this.cacheManager.put(
                   this.providerKey,
-                  product.providerId,
+                  product.providerProductId,
                   data,
                 ),
               ),

@@ -1,11 +1,11 @@
-import { Product } from '@lib/products/model/product.entity';
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { Injectable, Logger } from '@nestjs/common';
-import { SourceTransformer } from '../../shared/transformer/transformer.interface';
-import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
-import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
 import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
+import { Product } from '@lib/products/model/product.entity';
+import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
+import { SourceTransformer } from '../../shared/transformer/transformer.interface';
+import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
+import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 
 @Injectable()
 export class RainforestApiTransformer

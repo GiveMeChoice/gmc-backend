@@ -1,22 +1,19 @@
 import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProviderSourceRun } from '@app/provider-integration/providers/model/provider-source-run.entity';
-import { ProviderSource } from '@app/provider-integration/providers/model/provider-source.entity';
+import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { SourceRun } from '@app/provider-integration/providers/model/source-run.entity';
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { concatMap, lastValueFrom, map } from 'rxjs';
-import {
-  EXTRACTOR_FACTORY,
-  TRANSFORMER_FACTORY,
-} from '../../pipelines.constants';
+import { EXTRACTOR_FACTORY, TRANSFORMER_FACTORY } from '../../etl.constants';
 import { ExtractorFactory } from '../../shared/extractor/extractor.factory';
-import { PipelineRunner } from '../../shared/runner/pipeline-runner.interface';
+import { Pipeline } from '../../shared/pipeline/pipeline.interface';
 import { TransformerFactory } from '../../shared/transformer/transformer.factory';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
 import { EthicalSuperstoreTransformer } from './ethical-superstore.transformer';
 
 @Injectable()
-export class EthicalSuperstoreRunner implements PipelineRunner {
+export class EthicalSuperstorePipeline implements Pipeline {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
   private readonly _extractor: EthicalSuperstoreExtractor;
   private readonly _transformer: EthicalSuperstoreTransformer;
@@ -34,10 +31,8 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
     ) as EthicalSuperstoreTransformer;
   }
 
-  async runSourcePipeline(
-    source: ProviderSource,
-  ): Promise<Partial<ProviderSourceRun>> {
-    const run = ProviderSourceRun.factory();
+  async run(source: ProductSource): Promise<Partial<SourceRun>> {
+    const run = SourceRun.factory();
     try {
       await lastValueFrom(
         // extract
@@ -51,7 +46,7 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
             if (
               !(await this.productsService.existsByProvider(
                 this.providerKey,
-                product.providerId,
+                product.providerProductId,
               ))
             ) {
               // load
@@ -64,13 +59,12 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
       );
     } catch (err) {
       Logger.error(err);
-      run.error = err.toString();
+      run.errorMessage = err.toString();
     }
     return run;
   }
 
-  async runProductPipeline(product: Product): Promise<any> {
-    Logger.debug('pipeline started');
+  async refreshProduct(product: Product): Promise<any> {
     try {
       const refreshed = await lastValueFrom(
         this._extractor
@@ -82,7 +76,6 @@ export class EthicalSuperstoreRunner implements PipelineRunner {
           ),
       );
       await this.productsService.update(product.id, { ...refreshed });
-      Logger.debug('pipeline done');
       return refreshed;
     } catch (err) {
       Logger.error(err);

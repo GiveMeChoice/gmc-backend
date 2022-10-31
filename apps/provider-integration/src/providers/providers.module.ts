@@ -1,27 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProvidersController } from './controllers/providers.controller';
-import { ProviderSourceRun } from './model/provider-source-run.entity';
-import { ProviderSource } from './model/provider-source.entity';
+import { SourceRun } from './model/source-run.entity';
+import { ProductSource } from './model/product-source.entity';
 import { Provider } from './model/provider.entity';
-import { ProviderSourceRunsService } from './services/provider-source-runs.service';
-import { ProviderSourcesService } from './services/provider-sources.service';
+import { SourceRunsService } from './services/source-runs.service';
+import { ProductSourcesService } from './services/product-sources.service';
 import { ProvidersService } from './services/providers.service';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Provider, ProviderSource, ProviderSourceRun]),
-  ],
+  imports: [TypeOrmModule.forFeature([Provider, ProductSource, SourceRun])],
   controllers: [ProvidersController],
-  providers: [
-    ProvidersService,
-    ProviderSourcesService,
-    ProviderSourceRunsService,
-  ],
-  exports: [
-    ProvidersService,
-    ProviderSourcesService,
-    ProviderSourceRunsService,
-  ],
+  providers: [ProvidersService, ProductSourcesService, SourceRunsService],
+  exports: [ProvidersService, ProductSourcesService, SourceRunsService],
 })
 export class ProvidersModule {}

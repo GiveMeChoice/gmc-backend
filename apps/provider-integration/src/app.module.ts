@@ -7,7 +7,7 @@ import configuration from '../config/configuration';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ProductRefreshConsumer } from './consumers/product-refresh.consumer';
-import { PipelinesModule } from './pipelines/pipelines.module';
+import { EtlModule } from './etl/etl.module';
 import { ProvidersModule } from './providers/providers.module';
 
 @Module({
@@ -19,7 +19,7 @@ import { ProvidersModule } from './providers/providers.module';
     DatabaseModule,
     ProductsModule,
     ProvidersModule,
-    PipelinesModule,
+    EtlModule,
     SearchModule,
   ],
   controllers: [AppController],

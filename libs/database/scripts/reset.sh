@@ -1,4 +1,5 @@
 #!/bin/bash
+
 set -e
 
 SERVER="gmc_database_server";
@@ -24,3 +25,7 @@ docker exec -i $SERVER psql -U postgres $DB -c "\dt"
 
 # show result
 echo "DATABASE $DB RESET"
+
+# generate initial migrations file
+echo "GENERATING init MIGRATIONS"
+bash ./libs/database/scripts/migration-generate.sh init
