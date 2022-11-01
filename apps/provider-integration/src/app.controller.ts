@@ -14,7 +14,7 @@ export class AppController {
   @Get('find-product')
   async findProduct(@Query() params: any): Promise<string> {
     const { providerKey, providerId } = params;
-    return (await this.productsService.existsByProvider(
+    return (await this.productsService.existsByProviderId(
       providerKey,
       providerId,
     ))

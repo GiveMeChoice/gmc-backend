@@ -26,6 +26,6 @@ docker exec -i $SERVER psql -U postgres $DB -c "\dt"
 # show result
 echo "DATABASE $DB RESET"
 
-# generate initial migrations file
+# generate init migration file
 echo "GENERATING init MIGRATIONS"
-bash ./libs/database/scripts/migration-generate.sh init
+npm run typeorm-d migration:generate -- ./libs/database/migrations/init -t 1000000000001

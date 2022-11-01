@@ -13,15 +13,6 @@ export class ProductsService {
     @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
-  async exists(product: Product): Promise<boolean> {
-    if (product.id) return await this.existsById(product.id);
-    if (product.providerProductId && product.providerProductId)
-      return await this.existsByProvider(
-        product.providerId,
-        product.providerProductId,
-      );
-  }
-
   async existsById(id: string): Promise<boolean> {
     return (
       id &&
@@ -33,8 +24,8 @@ export class ProductsService {
     );
   }
 
-  async existsByProvider(
-    providerKey: ProviderKey,
+  async existsByProviderId(
+    providerKey: string,
     providerProductId: string,
   ): Promise<boolean> {
     return (
@@ -60,7 +51,7 @@ export class ProductsService {
     providerProductId: string,
   ): Promise<Product> {
     return this.productsRepository.findOneBy({
-      providerId: providerKey,
+      providerKey: providerKey,
       providerProductId: providerProductId,
     });
   }
@@ -70,7 +61,9 @@ export class ProductsService {
   }
 
   async create(product: Partial<Product>): Promise<Partial<Product>> {
-    if (!this.existsByProvider(product.providerId, product.providerProductId)) {
+    if (
+      !this.existsByProviderId(product.providerKey, product.providerProductId)
+    ) {
       throw new Error(
         `Provider ${product.providerProductId} product ${product.providerProductId} already exists!`,
       );

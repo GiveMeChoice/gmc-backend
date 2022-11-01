@@ -17,6 +17,11 @@ export class SourceMonitorJob implements Job<void> {
   })
   execute(): Promise<void> {
     Logger.log('RUNNING THE SOURCE MONITOR');
+
+    // get active providers
+
+    // get
+
     return null;
   }
 }

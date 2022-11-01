@@ -8,13 +8,13 @@ import { CachedResponse } from './interface/cached-response.interface';
 export class SourceCacheManager extends AbstractCacheManager {
   async get<T>(source: ProductSource): Promise<CachedResponse<T>> {
     return await this.getInternal(
-      this.buildSourceKey(source.provider.id, source.identifier),
+      this.buildSourceKey(source.provider.key, source.identifier),
     );
   }
 
   async put<T>(source: ProductSource, data: T): Promise<void> {
     await this.putInternal(
-      this.buildSourceKey(source.provider.id, source.identifier),
+      this.buildSourceKey(source.provider.key, source.identifier),
       data,
     );
   }

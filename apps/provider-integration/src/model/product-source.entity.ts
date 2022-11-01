@@ -1,5 +1,4 @@
 import { Provider } from '@app/provider-integration/model/provider.entity';
-import { Product } from '@lib/products/model/product.entity';
 import {
   Column,
   Entity,
@@ -9,7 +8,6 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { ProviderKey } from './enum/provider-key.enum';
 import { SourceRun } from './source-run.entity';
 
 @Entity({ name: 'pi_product_source' })
@@ -18,12 +16,8 @@ export class ProductSource {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({
-    type: 'enum',
-    enum: ProviderKey,
-    enumName: 'pi_provider_id_enum',
-  })
-  readonly providerId: ProviderKey;
+  @Column()
+  readonly providerId: string;
 
   @Column()
   readonly identifier: string;
@@ -31,8 +25,14 @@ export class ProductSource {
   @Column()
   description: string;
 
-  @Column()
+  @Column({ default: false })
   active: boolean;
+
+  @Column({ type: 'integer', default: 0 })
+  integrationInterval: number;
+
+  @Column({ default: new Date(), nullable: false })
+  nextIntegrationDue: Date;
 
   @Column()
   category: string;

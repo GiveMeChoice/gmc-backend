@@ -41,7 +41,7 @@ export class RainforestApiPipeline implements Pipeline {
           run.productsFound++;
           const product = this._transformer.mapSourceItem(item);
           if (
-            !(await this.productsService.existsByProvider(
+            !(await this.productsService.existsByProviderId(
               source.provider.id,
               product.providerProductId,
             ))

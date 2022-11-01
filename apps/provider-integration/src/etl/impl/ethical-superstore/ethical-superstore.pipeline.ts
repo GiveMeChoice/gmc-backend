@@ -44,7 +44,7 @@ export class EthicalSuperstorePipeline implements Pipeline {
           }),
           concatMap(async (product) => {
             if (
-              !(await this.productsService.existsByProvider(
+              !(await this.productsService.existsByProviderId(
                 this.providerKey,
                 product.providerProductId,
               ))

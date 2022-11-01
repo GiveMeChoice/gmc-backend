@@ -10,6 +10,10 @@ export class ProductSourcesService {
     private productSourcesRepo: Repository<ProductSource>,
   ) {}
 
+  findAll(): Promise<ProductSource[]> {
+    return this.productSourcesRepo.find();
+  }
+
   findOne(id: string): Promise<ProductSource> {
     return this.productSourcesRepo.findOne({
       where: { id },

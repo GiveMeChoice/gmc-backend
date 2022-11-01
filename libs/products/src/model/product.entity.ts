@@ -1,24 +1,22 @@
+import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
+import { nanoid } from 'nanoid';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
-  JoinColumn,
-  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { ProductStatus } from './enum/product-status.enum';
-import { nanoid } from 'nanoid';
-import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerId', 'providerProductId'], { unique: true })
+@Index(['providerKey', 'providerProductId'], { unique: true })
 @Unique(['shortId'])
 export class Product {
-  constructor(providerId?: ProviderKey, providerProductId?: string) {
-    this.providerId = providerId;
+  constructor(providerKey?: ProviderKey, providerProductId?: string) {
+    this.providerKey = providerKey;
     this.providerProductId = providerProductId;
     this.shortId = nanoid(11);
   }
@@ -33,12 +31,8 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({
-    type: 'enum',
-    enum: ProviderKey,
-    enumName: 'pi_provider_id_enum',
-  })
-  readonly providerId: ProviderKey;
+  @Column()
+  readonly providerKey: string;
 
   @Column()
   readonly providerProductId: string;
