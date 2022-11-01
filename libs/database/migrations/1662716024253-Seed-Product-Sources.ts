@@ -1,5 +1,5 @@
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
-import { Provider } from '@app/provider-integration/providers/model/provider.entity';
+import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { Provider } from '@app/provider-integration/model/provider.entity';
 import { Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import * as path from 'path';

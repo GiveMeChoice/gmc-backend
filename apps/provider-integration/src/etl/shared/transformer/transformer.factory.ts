@@ -1,4 +1,4 @@
-import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
+import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Logger } from '@nestjs/common';
 import { SourceTransformer } from './transformer.interface';
 

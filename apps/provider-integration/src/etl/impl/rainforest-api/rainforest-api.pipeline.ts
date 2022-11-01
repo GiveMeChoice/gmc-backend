@@ -1,10 +1,10 @@
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
-import { SourceRun } from '@app/provider-integration/providers/model/source-run.entity';
+import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { SourceRun } from '@app/provider-integration/model/source-run.entity';
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
-import { ProviderKey } from '../../../providers/model/enum/provider-key.enum';
+import { ProviderKey } from '../../../model/enum/provider-key.enum';
 import { EXTRACTOR_FACTORY, TRANSFORMER_FACTORY } from '../../etl.constants';
 import { ExtractorFactory } from '../../shared/extractor/extractor.factory';
 import { Pipeline } from '../../shared/pipeline/pipeline.interface';

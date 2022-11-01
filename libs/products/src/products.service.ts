@@ -1,4 +1,4 @@
-import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
+import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { MessagingService } from '@lib/messaging';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';

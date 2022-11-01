@@ -1,4 +1,4 @@
-import { Provider } from '@app/provider-integration/providers/model/provider.entity';
+import { Provider } from '@app/provider-integration/model/provider.entity';
 import { Product } from '@lib/products/model/product.entity';
 import {
   Column,
@@ -45,9 +45,6 @@ export class ProductSource {
 
   @OneToMany(() => SourceRun, (run: SourceRun) => run.source)
   runs: SourceRun[];
-
-  @OneToMany(() => Product, (product: Product) => product.source)
-  products: Product[];
 
   @ManyToOne(() => Provider, (provider: Provider) => provider.sources)
   @JoinColumn({ name: 'providerId' })

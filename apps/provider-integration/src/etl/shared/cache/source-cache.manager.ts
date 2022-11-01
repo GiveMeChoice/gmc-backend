@@ -1,5 +1,5 @@
-import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
+import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Injectable } from '@nestjs/common';
 import { AbstractCacheManager } from './abstract-cache.manager';
 import { CachedResponse } from './interface/cached-response.interface';

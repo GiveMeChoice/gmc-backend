@@ -1,4 +1,3 @@
-import { ProviderKey } from '@app/provider-integration/providers/model/enum/provider-key.enum';
 import {
   Column,
   CreateDateColumn,
@@ -12,7 +11,7 @@ import {
 } from 'typeorm';
 import { ProductStatus } from './enum/product-status.enum';
 import { nanoid } from 'nanoid';
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 
 @Entity({ name: 'gmc_product' })
 @Index(['providerId', 'providerProductId'], { unique: true })
@@ -68,9 +67,8 @@ export class Product {
     INTEGRATION METADATA
   ///////////////////////
   */
-  @ManyToOne(() => ProductSource, (source: ProductSource) => source.products)
-  @JoinColumn({ name: 'sourceId' })
-  source: ProductSource;
+  @Column()
+  productSourceId: string;
 
   @Column({ type: 'timestamptz' })
   lastRefreshedAt: Date;

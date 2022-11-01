@@ -1,4 +1,4 @@
-import { Provider } from '@app/provider-integration/providers/model/provider.entity';
+import { Provider } from '@app/provider-integration/model/provider.entity';
 import { Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import * as path from 'path';

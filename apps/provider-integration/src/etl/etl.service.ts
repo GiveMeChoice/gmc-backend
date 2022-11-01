@@ -1,8 +1,8 @@
-import { ProductSource } from '@app/provider-integration/providers/model/product-source.entity';
+import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable } from '@nestjs/common';
-import { SourceRun } from '../providers/model/source-run.entity';
-import { SourceRunsService } from '../providers/services/source-runs.service';
+import { SourceRun } from '../model/source-run.entity';
+import { SourceRunsService } from '../services/source-runs.service';
 import { PIPELINE_FACTORY } from './etl.constants';
 import { PipelineFactory } from './shared/pipeline/pipeline.factory';
 

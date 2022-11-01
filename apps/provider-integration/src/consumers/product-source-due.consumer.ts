@@ -7,8 +7,8 @@ import {
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { EtlService } from '../etl/etl.service';
-import { ProductSourceDueEvent } from '../providers/events/product-source-due.event';
-import { ProductSourcesService } from '../providers/services/product-sources.service';
+import { ProductSourceDueEvent } from '../events/product-source-due.event';
+import { ProductSourcesService } from '../services/product-sources.service';
 
 @Injectable()
 export class ProductSourceDueConsumer
