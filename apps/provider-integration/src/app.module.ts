@@ -5,12 +5,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ProductRefreshConsumer } from './consumers/product-refresh.consumer';
-import { JobsController } from './controllers/jobs.controller';
-import { ProductSourcesController } from './controllers/product-sources.controller';
-import { ProvidersController } from './controllers/providers.controller';
+import { IntegrationController } from './api/controllers/integration.controller';
+import { IntegrationService } from './services/integration.service';
+import { IntegrateProductConsumer } from './consumers/integrate-product.consumer';
+import { JobsController } from './api/controllers/jobs.controller';
+import { ProductSourcesController } from './api/controllers/product-sources.controller';
+import { ProvidersController } from './api/controllers/providers.controller';
 import { EtlModule } from './etl/etl.module';
 import { SourceMonitorJob } from './jobs/source-monitor.job';
 import { ProductSource } from './model/product-source.entity';
@@ -20,6 +20,8 @@ import { JobsService } from './services/jobs.service';
 import { ProductSourcesService } from './services/product-sources.service';
 import { ProvidersService } from './services/providers.service';
 import { SourceRunsService } from './services/source-runs.service';
+import { MessagingModule } from '@lib/messaging';
+import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
 
 @Module({
   imports: [
@@ -30,19 +32,21 @@ import { SourceRunsService } from './services/source-runs.service';
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([Provider, ProductSource, SourceRun]),
     DatabaseModule,
-    ProductsModule,
+    MessagingModule,
     // SearchModule,
+    ProductsModule,
     forwardRef(() => EtlModule),
   ],
   controllers: [
-    AppController,
+    IntegrationController,
     ProvidersController,
     ProductSourcesController,
     JobsController,
   ],
   providers: [
-    AppService,
-    ProductRefreshConsumer,
+    IntegrationService,
+    IntegrateProductConsumer,
+    IntegrateSourceConsumer,
     ProvidersService,
     ProductSourcesService,
     SourceRunsService,

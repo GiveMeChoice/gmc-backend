@@ -1,5 +1,5 @@
 export enum ProductStatus {
-  INCOMPLETE = 'incomplete',
-  COMPLETE = 'complete',
-  EXPIRED = 'expired',
+  INCOMPLETE = 'INCOMPLETE',
+  COMPLETE = 'COMPLETE',
+  EXPIRED = 'EXPIRED',
 }

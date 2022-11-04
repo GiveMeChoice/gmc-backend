@@ -27,9 +27,7 @@
     "db:seed": "bash ./libs/database/scripts/migration-seed.sh",
     "db:migrate": "npm run typeorm-d migration:run",
     "db:revert": "npm run typeorm-d migration:revert",
-    "db:sync": "npm run typeorm-d migration:run && bash ./libs/database/scripts/migration-generate.sh sync && npm run typeorm-d migration:run",
-    "rabbitmq:reset": "bash ./libs/messaging/scripts/reset.sh",
-    "rabbitmq:start": "bash ./libs/messaging/scripts/start.sh"
+    "db:sync": "npm run typeorm-d migration:run && bash ./libs/database/scripts/migration-generate.sh sync && npm run typeorm-d migration:run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.165.0",
@@ -44,6 +42,7 @@
     "@nestjs/typeorm": "^9.0.1",
     "cheerio": "^1.0.0-rc.12",
     "csvtojson": "^2.0.10",
+    "moment": "^2.29.4",
     "nanoid": "3.3.4",
     "pg": "^8.8.0",
     "reflect-metadata": "^0.1.13",

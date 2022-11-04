@@ -18,7 +18,7 @@ export class ProvidersService {
     return this.providersRepo.findOneBy({ id });
   }
 
-  findAllActive(): Promise<Provider[]> {
+  findActive(): Promise<Provider[]> {
     return this.providersRepo.find({ where: { active: true } });
   }
 

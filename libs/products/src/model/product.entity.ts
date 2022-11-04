@@ -40,16 +40,6 @@ export class Product {
   @Column()
   readonly shortId: string;
 
-  @Column({
-    type: 'enum',
-    enum: ProductStatus,
-    enumName: 'gmc_product_status_enum',
-  })
-  status: ProductStatus;
-
-  @Column({ type: 'timestamptz' })
-  statusAt: Date;
-
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
@@ -61,6 +51,15 @@ export class Product {
     INTEGRATION METADATA
   ///////////////////////
   */
+  @Column({
+    type: 'enum',
+    enum: ProductStatus,
+    enumName: 'gmc_product_status_enum',
+  })
+  status: ProductStatus;
+
+  @Column({ type: 'timestamptz' })
+  statusAt: Date;
   @Column()
   productSourceId: string;
 

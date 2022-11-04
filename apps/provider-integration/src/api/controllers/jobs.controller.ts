@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Logger, Param, Post } from '@nestjs/common';
-import { JobStatus } from '../jobs/interface/job-status.interface';
-import { JobKey } from '../jobs/job-key.enum';
-import { JobsService } from '../services/jobs.service';
+import { JobStatus } from '../../jobs/interface/job-status.interface';
+import { JobKey } from '../../jobs/job-key.enum';
+import { JobsService } from '../../services/jobs.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Controller('jobs')

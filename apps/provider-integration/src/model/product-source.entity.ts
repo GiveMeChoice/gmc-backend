@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { ProductSourceStatus } from './enum/product-source-status';
 import { SourceRun } from './source-run.entity';
 
 @Entity({ name: 'pi_product_source' })
@@ -22,6 +23,14 @@ export class ProductSource {
   @Column()
   readonly identifier: string;
 
+  @Column({
+    type: 'enum',
+    enum: ProductSourceStatus,
+    enumName: 'pi_product_source_status_enum',
+    default: ProductSourceStatus.READY,
+  })
+  status: ProductSourceStatus;
+
   @Column()
   description: string;
 
@@ -29,10 +38,10 @@ export class ProductSource {
   active: boolean;
 
   @Column({ type: 'integer', default: 0 })
-  integrationInterval: number;
+  runIntervalHours: number;
 
-  @Column({ default: new Date(), nullable: false })
-  nextIntegrationDue: Date;
+  @Column({ nullable: true })
+  lastRunDate: Date;
 
   @Column()
   category: string;

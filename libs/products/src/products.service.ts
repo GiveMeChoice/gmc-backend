@@ -9,7 +9,7 @@ import { Product } from './model/product.entity';
 export class ProductsService {
   constructor(
     private readonly dataSource: DataSource,
-    private readonly messagingService: MessagingService,
+    // private readonly messagingService: MessagingService,
     @InjectRepository(Product) private productsRepository: Repository<Product>,
   ) {}
 
@@ -74,12 +74,12 @@ export class ProductsService {
     await queryRunner.startTransaction();
     try {
       const created = await queryRunner.manager.save(product);
-      await this.messagingService.sendToQueue({
-        routingKey: 'pi.product.created',
-        data: {
-          productId: created.id,
-        },
-      });
+      // await this.messagingService.sendToQueue({
+      //   routingKey: 'pi.product.created',
+      //   data: {
+      //     productId: created.id,
+      //   },
+      // });
       await queryRunner.commitTransaction();
       return created;
     } catch (err) {

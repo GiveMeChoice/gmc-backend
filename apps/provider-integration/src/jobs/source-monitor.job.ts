@@ -1,12 +1,17 @@
+import { MessagingService } from '@lib/messaging';
 import { Injectable, Logger } from '@nestjs/common';
-import { JobKey } from './job-key.enum';
-import { Job } from './interface/job.interface';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { IntegrateSourceCommand } from '../messages/integrate-source.command';
 import { ProductSourcesService } from '../services/product-sources.service';
+import { Job } from './interface/job.interface';
+import { JobKey } from './job-key.enum';
 
 @Injectable()
 export class SourceMonitorJob implements Job<void> {
-  constructor(private readonly productSourcesService: ProductSourcesService) {}
+  constructor(
+    private readonly sourcesService: ProductSourcesService,
+    private readonly messagingService: MessagingService,
+  ) {}
 
   getName() {
     return JobKey.SOURCE_MONITOR;
@@ -15,13 +20,15 @@ export class SourceMonitorJob implements Job<void> {
   @Cron(CronExpression.EVERY_10_SECONDS, {
     name: JobKey.SOURCE_MONITOR,
   })
-  execute(): Promise<void> {
+  async execute(): Promise<void> {
     Logger.log('RUNNING THE SOURCE MONITOR');
-
-    // get active providers
-
-    // get
-
+    for (const source of await this.sourcesService.findAllDue()) {
+      await this.messagingService.sendToQueue(
+        new IntegrateSourceCommand({
+          productSourceId: source.id,
+        }),
+      );
+    }
     return null;
   }
 }

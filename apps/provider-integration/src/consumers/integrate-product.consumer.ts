@@ -1,18 +1,17 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Consumer } from '@lib/messaging/interface/consumer.interface';
-import {
-  DEFAULT_EXCHANGE,
-  PRODUCT_REFRESH_QUEUE,
-} from '@lib/messaging/messaging.constants';
+import { DEFAULT_EXCHANGE } from '@lib/messaging/messaging.constants';
 import { ProductsService } from '@lib/products';
-import { ProductCreatedEvent } from '@lib/products/events/product-created.event';
 import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { EtlService } from '../etl/etl.service';
+import { IntegrateProductCommand } from '../messages/integrate-product.command';
 
 @Injectable()
-export class ProductRefreshConsumer implements Consumer<ProductCreatedEvent> {
+export class IntegrateProductConsumer
+  implements Consumer<IntegrateProductCommand>
+{
   constructor(
     private readonly productsService: ProductsService,
     private readonly pipelinesService: EtlService,
@@ -20,10 +19,10 @@ export class ProductRefreshConsumer implements Consumer<ProductCreatedEvent> {
 
   @RabbitSubscribe({
     exchange: DEFAULT_EXCHANGE,
-    routingKey: 'pi.product.*',
-    queue: PRODUCT_REFRESH_QUEUE,
+    routingKey: IntegrateProductCommand.ROUTING_KEY,
+    queue: IntegrateProductCommand.QUEUE,
   })
-  async receive(msg: ProductCreatedEvent, amqpMsg: ConsumeMessage) {
+  async receive(msg: IntegrateProductCommand, amqpMsg: ConsumeMessage) {
     Logger.debug(`Product Created Message Received: ${msg.data.productId}`);
     try {
       const product = await this.productsService.findOne(msg.data.productId);

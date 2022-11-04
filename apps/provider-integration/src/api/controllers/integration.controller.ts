@@ -1,11 +1,10 @@
 import { ProductsService } from '@lib/products';
 import { Product } from '@lib/products/model/product.entity';
-import { Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { EtlService } from './etl/etl.service';
-import { SourceRun } from './model/source-run.entity';
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { EtlService } from '../../etl/etl.service';
 
 @Controller()
-export class AppController {
+export class IntegrationController {
   constructor(
     private readonly productsService: ProductsService,
     private readonly pipelinesService: EtlService,

@@ -32,7 +32,7 @@ export class EthicalSuperstorePipeline implements Pipeline {
   }
 
   async run(source: ProductSource): Promise<Partial<SourceRun>> {
-    const run = SourceRun.factory();
+    const run = SourceRun.factory(source);
     try {
       await lastValueFrom(
         // extract

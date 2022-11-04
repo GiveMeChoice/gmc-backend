@@ -13,4 +13,5 @@ export const MigrationDataSource = new DataSource({
   database: process.env['datasource.databse'] || 'gmc_db',
   migrations: ['./libs/database/migrations/*.ts'],
   entities: ['./**/*.entity.*'],
+  migrationsTransactionMode: 'each',
 });

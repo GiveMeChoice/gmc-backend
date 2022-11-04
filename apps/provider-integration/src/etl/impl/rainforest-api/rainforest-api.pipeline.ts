@@ -33,7 +33,7 @@ export class RainforestApiPipeline implements Pipeline {
   }
 
   async run(source: ProductSource): Promise<Partial<SourceRun>> {
-    const run = SourceRun.factory();
+    const run = SourceRun.factory(source);
     try {
       await csv()
         .fromStream(await this._extractor.extractSource(source))
