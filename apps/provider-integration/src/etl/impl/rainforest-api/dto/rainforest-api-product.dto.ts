@@ -1,11 +1,31 @@
 export interface RainforestApiProductDto {
-  request_metadata: {
-    created_at: Date;
-    processed_at: Date;
-    total_time_taken: number;
-    amazon_url: string;
+  // unused
+  request_info: any;
+  request_parameters: any;
+  request_metadata: any;
+  sponsored_products: any;
+  frequently_bought_together: any;
+  compare_with_similar: any;
+  also_viewed: any;
+  also_bought: any;
+  // keep
+  brand_store: {
+    id: string;
+    link: string;
+  };
+  climate_pledge_friendly: {
+    text: string;
+    image: string;
   };
   product: {
+    // unused
+    variants: any;
+    videos: any;
+    videos_flat: any;
+    feature_bullets_flat: [string];
+    specifications: any;
+    specifications_flat: any;
+    // keep
     title: string;
     asin: string;
     link: string;
@@ -55,6 +75,25 @@ export interface RainforestApiProductDto {
         value: string;
       },
     ];
+    top_reviews: [
+      {
+        id: string;
+        title: string;
+        body: string;
+        body_html: string;
+        link: string;
+        rating: number;
+        date: {
+          raw: string;
+          utc: string;
+        };
+        profile: {
+          name: string;
+          link: string;
+          id: string;
+        };
+      },
+    ];
     buybox_winner: {
       new_offers_from: {
         symbol: string;
@@ -91,13 +130,5 @@ export interface RainforestApiProductDto {
         raw: string;
       };
     };
-  };
-  climate_pledge_friendly: {
-    text: string;
-    image: string;
-  };
-  brand_store: {
-    id: string;
-    link: string;
   };
 }

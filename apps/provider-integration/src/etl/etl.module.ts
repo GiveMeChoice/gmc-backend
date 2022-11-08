@@ -1,14 +1,9 @@
 import { AwsModule } from '@lib/aws';
+import { MessagingModule } from '@lib/messaging';
 import { ProductsModule } from '@lib/products';
 import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
 import { AppModule } from '../app.module';
-import {
-  EXTRACTOR_FACTORY,
-  PIPELINE_FACTORY,
-  TRANSFORMER_FACTORY,
-} from './etl.constants';
-import { EtlService } from './etl.service';
 import { EthicalSuperstoreExtractor } from './impl/ethical-superstore/ethical-superstore.extractor';
 import { EthicalSuperstorePipeline } from './impl/ethical-superstore/ethical-superstore.pipeline';
 import { EthicalSuperstoreTransformer } from './impl/ethical-superstore/ethical-superstore.transformer';
@@ -17,14 +12,28 @@ import { RainforestApiPipeline } from './impl/rainforest-api/rainforest-api.pipe
 import { RainforestApiTransformer } from './impl/rainforest-api/rainforest-api.transformer';
 import { ProductCacheManager } from './shared/cache/product-cache.manager';
 import { SourceCacheManager } from './shared/cache/source-cache.manager';
-import { ExtractorFactory } from './shared/extractor/extractor.factory';
-import { PipelineFactory } from './shared/pipeline/pipeline.factory';
-import { TransformerFactory } from './shared/transformer/transformer.factory';
+import {
+  ExtractorContainer,
+  EXTRACTOR_CONTAINER,
+} from './shared/extractor/extractor.container';
+import {
+  PipelineContainer,
+  PIPELINE_CONTAINER,
+} from './shared/pipeline/pipeline.container';
+import {
+  TransformerContainer,
+  TRANSFORMER_CONTAINER,
+} from './shared/transformer/transformer.container';
 
 @Module({
-  imports: [forwardRef(() => AppModule), ProductsModule, AwsModule, HttpModule],
+  imports: [
+    forwardRef(() => AppModule),
+    ProductsModule,
+    AwsModule,
+    HttpModule,
+    MessagingModule,
+  ],
   providers: [
-    EtlService,
     ProductCacheManager,
     SourceCacheManager,
     RainforestApiPipeline,
@@ -34,30 +43,30 @@ import { TransformerFactory } from './shared/transformer/transformer.factory';
     EthicalSuperstoreExtractor,
     EthicalSuperstoreTransformer,
     {
-      provide: PIPELINE_FACTORY,
+      provide: PIPELINE_CONTAINER,
       useFactory: (
-        rainforestRunner: RainforestApiPipeline,
-        ethicalRunner: EthicalSuperstorePipeline,
-      ) => new PipelineFactory([rainforestRunner, ethicalRunner]),
+        rainforestPipeline: RainforestApiPipeline,
+        ethicalPipeline: EthicalSuperstorePipeline,
+      ) => new PipelineContainer([rainforestPipeline, ethicalPipeline]),
       inject: [RainforestApiPipeline, EthicalSuperstorePipeline],
     },
     {
-      provide: EXTRACTOR_FACTORY,
+      provide: EXTRACTOR_CONTAINER,
       useFactory: (
         rainforestExtractor: RainforestApiExtractor,
         ethicalExtractor: EthicalSuperstoreExtractor,
-      ) => new ExtractorFactory([rainforestExtractor, ethicalExtractor]),
+      ) => new ExtractorContainer([rainforestExtractor, ethicalExtractor]),
       inject: [RainforestApiExtractor, EthicalSuperstoreExtractor],
     },
     {
-      provide: TRANSFORMER_FACTORY,
+      provide: TRANSFORMER_CONTAINER,
       useFactory: (
         rainforestTranformer: RainforestApiTransformer,
         ethicalTransformer: EthicalSuperstoreTransformer,
-      ) => new TransformerFactory([rainforestTranformer, ethicalTransformer]),
+      ) => new TransformerContainer([rainforestTranformer, ethicalTransformer]),
       inject: [RainforestApiTransformer, EthicalSuperstoreTransformer],
     },
   ],
-  exports: [EtlService],
+  exports: [PIPELINE_CONTAINER, EXTRACTOR_CONTAINER],
 })
 export class EtlModule {}

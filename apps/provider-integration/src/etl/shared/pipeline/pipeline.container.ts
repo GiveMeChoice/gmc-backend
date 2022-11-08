@@ -2,14 +2,18 @@ import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.e
 import { Injectable, Logger } from '@nestjs/common';
 import { Pipeline } from './pipeline.interface';
 
+export const PIPELINE_CONTAINER = 'PIPELINE_CONTAINER';
+
 @Injectable()
-export class PipelineFactory {
-  constructor(private readonly runners: Pipeline[]) {}
+export class PipelineContainer {
+  constructor(private readonly pipelines: Pipeline[]) {}
 
   public getPipeline(providerKey: ProviderKey): Pipeline {
     try {
-      const runner = this.runners.find((r) => r.providerKey === providerKey);
-      if (runner) return runner;
+      const pipeline = this.pipelines.find(
+        (r) => r.providerKey === providerKey,
+      );
+      if (pipeline) return pipeline;
     } catch (e) {
       Logger.error(e);
     }

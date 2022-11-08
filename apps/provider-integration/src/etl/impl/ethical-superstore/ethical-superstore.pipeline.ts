@@ -1,28 +1,33 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { SourceRun } from '@app/provider-integration/model/source-run.entity';
-import { ProductsService } from '@lib/products';
+import { ProductIntegrationStatus } from '@lib/products/model/enum/product-status.enum';
 import { Product } from '@lib/products/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { concatMap, lastValueFrom, map } from 'rxjs';
-import { EXTRACTOR_FACTORY, TRANSFORMER_FACTORY } from '../../etl.constants';
-import { ExtractorFactory } from '../../shared/extractor/extractor.factory';
-import { Pipeline } from '../../shared/pipeline/pipeline.interface';
-import { TransformerFactory } from '../../shared/transformer/transformer.factory';
+import {
+  ExtractorContainer,
+  EXTRACTOR_CONTAINER,
+} from '../../shared/extractor/extractor.container';
+import { PipelineBase } from '../../shared/pipeline/pipeline.base';
+import {
+  TransformerContainer,
+  TRANSFORMER_CONTAINER,
+} from '../../shared/transformer/transformer.container';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
 import { EthicalSuperstoreTransformer } from './ethical-superstore.transformer';
 
 @Injectable()
-export class EthicalSuperstorePipeline implements Pipeline {
+export class EthicalSuperstorePipeline extends PipelineBase {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
   private readonly _extractor: EthicalSuperstoreExtractor;
   private readonly _transformer: EthicalSuperstoreTransformer;
 
   constructor(
-    private readonly productsService: ProductsService,
-    @Inject(EXTRACTOR_FACTORY) extractorFactory: ExtractorFactory,
-    @Inject(TRANSFORMER_FACTORY) transformerFactory: TransformerFactory,
+    @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
+    @Inject(TRANSFORMER_CONTAINER) transformerFactory: TransformerContainer,
   ) {
+    super();
     this._extractor = extractorFactory.getExtractor(
       this.providerKey,
     ) as EthicalSuperstoreExtractor;
@@ -31,29 +36,15 @@ export class EthicalSuperstorePipeline implements Pipeline {
     ) as EthicalSuperstoreTransformer;
   }
 
-  async run(source: ProductSource): Promise<Partial<SourceRun>> {
-    const run = SourceRun.factory(source);
+  async execute(run: SourceRun): Promise<SourceRun> {
     try {
       await lastValueFrom(
-        // extract
-        this._extractor.extractSource(source).pipe(
+        this._extractor.extractSource(run.source).pipe(
           map((item) => {
-            run.productsFound++;
-            // map
             return this._transformer.mapSourceItem(item);
           }),
-          concatMap(async (product) => {
-            if (
-              !(await this.productsService.existsByProviderId(
-                this.providerKey,
-                product.providerProductId,
-              ))
-            ) {
-              // load
-              product.createdBySourceRunId = run.id;
-              await this.productsService.create(product);
-              run.productsCreated++;
-            }
+          concatMap(async (sourceProduct) => {
+            run = await this.loadSourceProduct(sourceProduct, run);
           }),
         ),
       );
@@ -64,21 +55,42 @@ export class EthicalSuperstorePipeline implements Pipeline {
     return run;
   }
 
-  async refreshProduct(product: Product): Promise<any> {
-    try {
-      const refreshed = await lastValueFrom(
-        this._extractor
-          .extractProduct(product)
-          .pipe(
-            map((extractedDto) =>
-              this._transformer.mapProductDetails(extractedDto),
-            ),
+  protected applySourceUpdate(
+    existing: Product,
+    source: Partial<Product>,
+  ): Product {
+    existing.price = source.price;
+    return existing;
+  }
+
+  protected needsRefresh(
+    sourceProduct: Partial<Product>,
+    existingProduct: Product,
+  ): boolean {
+    return sourceProduct.price && sourceProduct.price != existingProduct.price;
+  }
+
+  async refreshProduct(
+    product: Product,
+    source: ProductSource,
+    runId: string,
+    skipCache: boolean,
+  ): Promise<any> {
+    const refreshed = await lastValueFrom(
+      this._extractor
+        .extractProduct(product, skipCache)
+        .pipe(
+          map((extractedDto) =>
+            this._transformer.mapProductDetails(extractedDto),
           ),
-      );
-      await this.productsService.update(product.id, { ...refreshed });
-      return refreshed;
-    } catch (err) {
-      Logger.error(err);
-    }
+        ),
+    );
+    refreshed.integrationStatus = ProductIntegrationStatus.LIVE;
+    refreshed.hasIntegrationError = false;
+    refreshed.errorMessage = null;
+    refreshed.refreshedByRunId = runId;
+    refreshed.refreshedAt = new Date();
+    refreshed.expiresAt = super.renewExpirationDate(source);
+    return refreshed;
   }
 }

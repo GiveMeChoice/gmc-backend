@@ -9,10 +9,10 @@ export abstract class AbstractCacheManager {
   protected async getInternal<T>(key: string): Promise<CachedResponse<T>> {
     try {
       const cachedRaw = await this.s3Service.getObject(key);
-      Logger.debug('cache hit');
+      Logger.debug('cache hit: ' + key);
       return JSON.parse(cachedRaw) as CachedResponse<T>;
     } catch (err) {
-      Logger.debug('cache miss');
+      Logger.debug('cache miss: ' + key);
       return null;
     }
   }
@@ -23,6 +23,6 @@ export abstract class AbstractCacheManager {
       data,
     };
     await this.s3Service.putObject(key, JSON.stringify(toCache));
-    Logger.debug('cache save');
+    Logger.debug('cache save: ' + key);
   }
 }

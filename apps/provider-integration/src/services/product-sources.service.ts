@@ -53,11 +53,26 @@ export class ProductSourcesService {
 
   async completeRun(run: SourceRun): Promise<SourceRun> {
     run.completedAt = new Date();
-    run.source.lastRunDate = new Date();
-    run.source.status = run.errorMessage
-      ? ProductSourceStatus.DOWN
-      : ProductSourceStatus.READY;
+    run.source.lastRunAt = new Date();
+    if (run.errorMessage) {
+      run.source.status = ProductSourceStatus.DOWN;
+      run.source.retryCount++;
+    } else {
+      run.source.status = ProductSourceStatus.READY;
+      run.source.retryCount = 0;
+    }
     return await this.runService.save(run);
+  }
+
+  async canRetry(id: string): Promise<boolean> {
+    const { retryCount, retryLimit } = await this.productSourcesRepo.findOne({
+      select: {
+        retryCount: true,
+        retryLimit: true,
+      },
+      where: { id },
+    });
+    return retryLimit == 0 || retryCount < retryLimit;
   }
 
   async isDue(id: string): Promise<any> {
@@ -90,8 +105,8 @@ export class ProductSourcesService {
   private isIntegrationIntervalPassed(source: ProductSource): boolean {
     return (
       source.runIntervalHours &&
-      (!source.lastRunDate ||
-        moment(source.lastRunDate)
+      (!source.lastRunAt ||
+        moment(source.lastRunAt)
           .add(source.runIntervalHours, 'hours')
           .isSameOrBefore(moment()))
     );

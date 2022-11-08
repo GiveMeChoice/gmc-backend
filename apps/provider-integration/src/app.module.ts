@@ -7,12 +7,12 @@ import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
 import { IntegrationController } from './api/controllers/integration.controller';
 import { IntegrationService } from './services/integration.service';
-import { IntegrateProductConsumer } from './consumers/integrate-product.consumer';
+import { RefreshProductConsumer } from './consumers/refresh-product.consumer';
 import { JobsController } from './api/controllers/jobs.controller';
 import { ProductSourcesController } from './api/controllers/product-sources.controller';
 import { ProvidersController } from './api/controllers/providers.controller';
 import { EtlModule } from './etl/etl.module';
-import { SourceMonitorJob } from './jobs/source-monitor.job';
+import { SourceDueMonitorJob } from './jobs/source-due-monitor.job';
 import { ProductSource } from './model/product-source.entity';
 import { Provider } from './model/provider.entity';
 import { SourceRun } from './model/source-run.entity';
@@ -22,6 +22,9 @@ import { ProvidersService } from './services/providers.service';
 import { SourceRunsService } from './services/source-runs.service';
 import { MessagingModule } from '@lib/messaging';
 import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
+import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
+import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
+import { TasksService } from './services/tasks.service';
 
 @Module({
   imports: [
@@ -44,14 +47,27 @@ import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
     JobsController,
   ],
   providers: [
-    IntegrationService,
-    IntegrateProductConsumer,
+    // messaging
+    RefreshProductConsumer,
     IntegrateSourceConsumer,
+    // services
+    IntegrationService,
     ProvidersService,
     ProductSourcesService,
     SourceRunsService,
     JobsService,
-    SourceMonitorJob,
+    TasksService,
+    // jobs
+    SourceDueMonitorJob,
+    ProductExpiredMonitorJob,
+    {
+      provide: JOB_CONTAINER,
+      useFactory: (
+        sourceDueMonitorJob: SourceDueMonitorJob,
+        productExpiredMonitorJob: ProductExpiredMonitorJob,
+      ) => new JobContainer([sourceDueMonitorJob, productExpiredMonitorJob]),
+      inject: [SourceDueMonitorJob, ProductExpiredMonitorJob],
+    },
   ],
   exports: [ProvidersService, ProductSourcesService, SourceRunsService],
 })

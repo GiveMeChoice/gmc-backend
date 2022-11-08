@@ -1,5 +1,4 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
 import { Product } from '@lib/products/model/product.entity';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
@@ -20,7 +19,9 @@ export class RainforestApiTransformer
         this.providerKey,
         item.result.category_results.asin,
       );
-      product.status = ProductStatus.INCOMPLETE;
+      product.price = Number(item.result.category_results.price.value);
+      product.currency = item.result.category_results.price.currency;
+      product.title = item.result.category_results.title;
       return product;
     } catch (err) {
       throw new PipelineError('TRANSFORM_ERROR', err);
@@ -30,10 +31,11 @@ export class RainforestApiTransformer
   mapProductDetails(dto: RainforestApiProductDto): Partial<Product> {
     try {
       const product = Product.factory();
-      product.status = ProductStatus.COMPLETE;
       product.title = dto.product.title;
       product.rating = dto.product.rating;
       product.ratingsTotal = dto.product.ratings_total;
+      product.brandName = dto.product.brand;
+      product.link = dto.product.link;
       product.price = dto.product.buybox_winner.price.value;
       product.currency = dto.product.buybox_winner.price.currency;
       product.image = dto.product.main_image.link;

@@ -1,43 +1,39 @@
-import { ProductsService } from '@lib/products';
+import { SourceRun } from '@app/provider-integration/model/source-run.entity';
+import { IntegrationService } from '@app/provider-integration/services/integration.service';
 import { Product } from '@lib/products/model/product.entity';
-import { Controller, Get, Param, Query } from '@nestjs/common';
-import { EtlService } from '../../etl/etl.service';
+import { Controller, Post, Query } from '@nestjs/common';
 
 @Controller()
 export class IntegrationController {
-  constructor(
-    private readonly productsService: ProductsService,
-    private readonly pipelinesService: EtlService,
-  ) {}
+  constructor(private readonly integrationService: IntegrationService) {}
 
-  @Get('find-product')
-  async findProduct(@Query() params: any): Promise<string> {
-    const { providerKey, providerId } = params;
-    return (await this.productsService.existsByProviderId(
-      providerKey,
-      providerId,
-    ))
-      ? 'true'
-      : 'false';
+  @Post('integrate-source')
+  async integrateSource(@Query('id') sourceId: string): Promise<SourceRun> {
+    return await this.integrationService.inegrateSource(sourceId);
   }
 
-  @Get('product/:id')
-  async getProduct(@Param('id') id: string): Promise<Product> {
-    return await this.productsService.findOne(id);
+  @Post('integrate-product')
+  async integrateProduct(
+    @Query('id') productId: string,
+    @Query('skip-cache') skipCache: boolean,
+  ): Promise<Product> {
+    return await this.integrationService.refreshProduct(
+      productId,
+      'REST_API',
+      skipCache,
+    );
   }
 
-  @Get('product/:id/exists')
-  async existsProduct(@Param('id') id: string): Promise<string> {
-    return (await this.productsService.existsById(id)) ? 'true' : 'false';
+  @Post('extract-product')
+  async extractProduct(
+    @Query('id') productId: string,
+    @Query('skip-cache') skipCache: boolean,
+  ): Promise<any> {
+    return await this.integrationService.extractProduct(productId, skipCache);
   }
 
-  // @Post('integrate-source')
-  // async integrateSource(@Query('id') id: string): Promise<SourceRun> {
-  //   return await this.pipelinesService.runSourcePipelineById(id);
-  // }
-
-  // @Post('integrate-product')
-  // async integrateProduct(@Query('id') id: string): Promise<SourceRun> {
-  //   return await this.pipelinesService.runProductPipelineById(id);
+  // @Post('map-product')
+  // async mapProduct(@Query('id') productId: string): Promise<any> {
+  //   return await this.integrationService.mapProduct(productId);
   // }
 }

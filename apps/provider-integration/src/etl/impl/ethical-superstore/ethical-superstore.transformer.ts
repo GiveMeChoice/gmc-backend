@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductStatus } from '@lib/products/model/enum/product-status.enum';
+import { ProductIntegrationStatus } from '@lib/products/model/enum/product-status.enum';
 import { Product } from '@lib/products/model/product.entity';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
@@ -21,7 +21,6 @@ export class EthicalSuperstoreTransformer
   mapSourceItem(item: EthicalSuperstoreSourceItemDto): Partial<Product> {
     try {
       const product = Product.factory(this.providerKey, item.id);
-      product.status = ProductStatus.INCOMPLETE;
       product.sku = item.sku;
       product.title = item.name;
       product.price = item.price ? Number(item.price) : null;
@@ -37,7 +36,7 @@ export class EthicalSuperstoreTransformer
   mapProductDetails(dto: EthicalSuperstoreProductDto): Partial<Product> {
     try {
       const product = Product.factory();
-      product.status = ProductStatus.COMPLETE;
+      product.rating = dto.rating;
       return product;
     } catch (err) {
       throw new PipelineError('TRANSFORM_ERROR', err);

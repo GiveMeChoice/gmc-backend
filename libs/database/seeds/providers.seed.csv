@@ -1,3 +1,3 @@
-key,description
-rainforest-api,An awesome API for a really big internet store
-ethical-superstore,www.EthicalSuperstore.com
+key,description,active
+rainforest-api,An awesome API for a really big internet store,true
+ethical-superstore,www.EthicalSuperstore.com,true

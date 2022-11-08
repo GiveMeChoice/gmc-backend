@@ -5,16 +5,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { v4 } from 'uuid';
 import { ProductSource } from './product-source.entity';
 
 @Entity({ name: 'pi_source_run' })
 export class SourceRun {
   constructor(source: ProductSource) {
-    // this.id = v4();
-    // this.completed = true;
-    // this.productsFound = 0;
-    // this.productsCreated = 0;
     this.source = source;
   }
 
@@ -24,28 +19,40 @@ export class SourceRun {
   @ManyToOne(() => ProductSource, (source: ProductSource) => source.runs, {
     cascade: true,
   })
-  @JoinColumn({ name: 'sourceId' })
+  @JoinColumn({ name: 'source_id' })
   source: ProductSource;
 
-  @Column({ default: 0 })
-  productsFound: number;
+  @Column({ name: 'found_count', default: 0 })
+  foundCount: number;
 
-  @Column({ default: 0 })
-  productsCreated: number;
+  @Column({ name: 'owned_count', default: 0 })
+  ownedCount: number;
 
-  @Column({ default: 0 })
-  productsRefreshed: number;
+  @Column({ name: 'created_count', default: 0 })
+  createdCount: number;
 
-  @Column({ default: 0 })
-  productFailures: number;
+  @Column({ name: 'adopted_count', default: 0 })
+  adoptedCount: number;
 
-  @Column()
+  @Column({ name: 'stale_count', default: 0 })
+  staleCount: number;
+
+  @Column({ name: 'keep_alive_signal_count', default: 0 })
+  keepAliveSignalCount: number;
+
+  @Column({ name: 'refresh_signal_count', default: 0 })
+  refreshSignalCount: number;
+
+  @Column({ name: 'failure_count', default: 0 })
+  failureCount: number;
+
+  @Column({ name: 'started_at', type: 'timestamptz' })
   startedAt: Date;
 
-  @Column({ nullable: true })
+  @Column({ name: 'completed_at', type: 'timestamptz', nullable: true })
   completedAt: Date;
 
-  @Column({ nullable: true })
+  @Column({ name: 'error_message', nullable: true })
   errorMessage?: string;
 
   public static factory(source: ProductSource) {

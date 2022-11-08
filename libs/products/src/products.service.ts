@@ -1,8 +1,8 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { MessagingService } from '@lib/messaging';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository, UpdateResult } from 'typeorm';
+import { ProductIntegrationStatus } from './model/enum/product-status.enum';
 import { Product } from './model/product.entity';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class ProductsService {
     );
   }
 
-  async existsByProviderId(
+  async existsByProvider(
     providerKey: string,
     providerProductId: string,
   ): Promise<boolean> {
@@ -35,7 +35,7 @@ export class ProductsService {
         .createQueryBuilder('product')
         .select('product.id')
         .where('product.providerKey = :providerKey', { providerKey })
-        .andWhere('product.providerId = :providerProductId', {
+        .andWhere('product.providerProductId = :providerProductId', {
           providerProductId,
         })
         .getRawOne())
@@ -44,6 +44,19 @@ export class ProductsService {
 
   findAll(): Promise<Product[]> {
     return this.productsRepository.find();
+  }
+
+  async updateAllExpired(): Promise<number> {
+    const raw = await this.productsRepository
+      .createQueryBuilder()
+      .update(Product)
+      .set({
+        integrationStatus: ProductIntegrationStatus.EXPIRED,
+        expiresAt: null,
+      })
+      .where('expiresAt < :now', { now: new Date() })
+      .execute();
+    return raw.affected;
   }
 
   findByProvider(
@@ -60,9 +73,23 @@ export class ProductsService {
     return this.productsRepository.findOneBy({ id });
   }
 
+  async getStatus(id: string): Promise<ProductIntegrationStatus> {
+    const { integrationStatus: status } = await this.productsRepository.findOne(
+      {
+        select: {
+          integrationStatus: true,
+        },
+        where: {
+          id,
+        },
+      },
+    );
+    return status;
+  }
+
   async create(product: Partial<Product>): Promise<Partial<Product>> {
     if (
-      !this.existsByProviderId(product.providerKey, product.providerProductId)
+      !this.existsByProvider(product.providerKey, product.providerProductId)
     ) {
       throw new Error(
         `Provider ${product.providerProductId} product ${product.providerProductId} already exists!`,
@@ -90,8 +117,21 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, updates: Partial<Product>): Promise<UpdateResult> {
-    return await this.productsRepository.update(id, updates);
+  async update(id: string, updates: Partial<Product>): Promise<Product> {
+    return (
+      await this.productsRepository
+        .createQueryBuilder()
+        .update({
+          ...updates,
+        })
+        .where({ id })
+        .returning('*')
+        .execute()
+    ).raw[0];
+  }
+
+  async save(product: Product): Promise<Product> {
+    return await this.productsRepository.save(product);
   }
 
   async remove(id: string): Promise<void> {

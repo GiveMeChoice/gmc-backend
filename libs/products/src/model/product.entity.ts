@@ -9,7 +9,7 @@ import {
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { ProductStatus } from './enum/product-status.enum';
+import { ProductIntegrationStatus } from './enum/product-status.enum';
 
 @Entity({ name: 'gmc_product' })
 @Index(['providerKey', 'providerProductId'], { unique: true })
@@ -31,19 +31,27 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column()
+  @Column({ name: 'provider_key' })
   readonly providerKey: string;
 
-  @Column()
+  @Column({ name: 'provider_product_id' })
   readonly providerProductId: string;
 
-  @Column()
+  @Column({ name: 'short_id' })
   readonly shortId: string;
 
-  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   updatedAt: Date;
 
   /* 
@@ -52,28 +60,36 @@ export class Product {
   ///////////////////////
   */
   @Column({
+    name: 'integration_status',
     type: 'enum',
-    enum: ProductStatus,
-    enumName: 'gmc_product_status_enum',
+    enum: ProductIntegrationStatus,
+    enumName: 'gmc_product_integration_status_enum',
   })
-  status: ProductStatus;
+  integrationStatus: ProductIntegrationStatus;
 
-  @Column({ type: 'timestamptz' })
-  statusAt: Date;
-  @Column()
-  productSourceId: string;
+  @Column({ name: 'source_id' })
+  sourceId: string;
 
-  @Column({ type: 'timestamptz' })
-  lastRefreshedAt: Date;
+  @Column({ name: 'created_by_run_id' })
+  createdByRunId: string;
 
-  @Column()
-  lastRefreshedBy: string;
+  @Column({ name: 'refreshed_by_run_id', nullable: true })
+  refreshedByRunId: string;
 
-  @Column({ type: 'timestamptz' })
-  lastFoundAt: Date;
+  @Column({ name: 'refreshed_at', type: 'timestamptz', nullable: true })
+  refreshedAt: Date;
 
-  @Column()
-  lastFoundBy: string;
+  @Column({ name: 'expires_at', type: 'timestamptz', nullable: true })
+  expiresAt: Date;
+
+  @Column({ name: 'keep_alive_count', type: 'integer', default: 0 })
+  keepAliveCount: number;
+
+  @Column({ name: 'has_integration_error', default: false })
+  hasIntegrationError: boolean;
+
+  @Column({ name: 'error_message', nullable: true })
+  errorMessage: string;
 
   /* 
   ///////////////////////
@@ -97,7 +113,7 @@ export class Product {
   })
   rating?: number;
 
-  @Column({ nullable: true })
+  @Column({ name: 'ratings_total', nullable: true })
   ratingsTotal?: number;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
@@ -106,10 +122,10 @@ export class Product {
   @Column({ nullable: true })
   currency?: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'brand_id', nullable: true })
   brandId?: string;
 
-  @Column({ nullable: true })
+  @Column({ name: 'brand_name', nullable: true })
   brandName?: string;
 
   @Column({ nullable: true })
@@ -117,7 +133,4 @@ export class Product {
 
   @Column({ nullable: true })
   link?: string;
-
-  @Column({ nullable: true })
-  createdBySourceRunId: string;
 }

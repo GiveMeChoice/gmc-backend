@@ -17,7 +17,7 @@ export class ProductSource {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column()
+  @Column({ name: 'provider_id' })
   readonly providerId: string;
 
   @Column()
@@ -37,25 +37,38 @@ export class ProductSource {
   @Column({ default: false })
   active: boolean;
 
-  @Column({ type: 'integer', default: 0 })
+  @Column({ name: 'run_interval_hours', type: 'integer', default: 0 })
   runIntervalHours: number;
 
-  @Column({ nullable: true })
-  lastRunDate: Date;
+  @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
+  lastRunAt: Date;
+
+  @Column({ name: 'retry_count', type: 'integer', default: 0 })
+  retryCount: number;
+
+  @Column({ name: 'retry_limit', type: 'integer', default: 5 })
+  retryLimit: number;
+
+  /* 
+    Will trigger auto-hard product refresh after set number of keep alive signals.
+    Use with caution...
+  */
+  @Column({ name: 'product_keep_alive_limit', type: 'integer', nullable: true })
+  productKeepAliveLimit: number;
 
   @Column()
   category: string;
 
-  @Column()
+  @Column({ name: 'subcategory_1' })
   subcategory1: string;
 
-  @Column()
+  @Column({ name: 'subcategory_2' })
   subcategory2: string;
 
   @OneToMany(() => SourceRun, (run: SourceRun) => run.source)
   runs: SourceRun[];
 
   @ManyToOne(() => Provider, (provider: Provider) => provider.sources)
-  @JoinColumn({ name: 'providerId' })
+  @JoinColumn({ name: 'provider_id' })
   provider: Provider;
 }

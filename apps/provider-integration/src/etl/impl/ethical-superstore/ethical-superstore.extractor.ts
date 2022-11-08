@@ -90,13 +90,18 @@ export class EthicalSuperstoreExtractor
     };
   }
 
-  extractProduct(product: Product): Observable<EthicalSuperstoreProductDto> {
+  extractProduct(
+    product: Product,
+    skipCache: boolean,
+  ): Observable<EthicalSuperstoreProductDto> {
     try {
       return from(
-        this.productCacheManager.get<EthicalSuperstoreProductDto>(
-          this.providerKey,
-          product.providerProductId,
-        ),
+        skipCache
+          ? null
+          : this.productCacheManager.get<EthicalSuperstoreProductDto>(
+              this.providerKey,
+              product.providerProductId,
+            ),
       ).pipe(
         switchMap((cachedResponse) => {
           return cachedResponse
@@ -119,9 +124,7 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchProduct(product: Product): Observable<string> {
-    // const url = product.link;
-    const url =
-      'http://localhost:8080/ethical-superstore/products/product.html';
+    const url = product.link;
     Logger.debug(`Fetching Product: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
@@ -256,9 +259,6 @@ export class EthicalSuperstoreExtractor
       //       .trim()}\n`;
       //   });
       dto.productInfo.description = dto.productInfo.description.trim();
-
-      Logger.debug(dto);
-      throw new Error('thats all m8');
       return dto;
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);

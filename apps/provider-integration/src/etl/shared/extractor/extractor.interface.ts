@@ -6,5 +6,5 @@ export interface Extractor<S, P> {
   providerKey: ProviderKey;
 
   extractSource(source: ProductSource): S;
-  extractProduct(product: Product): P;
+  extractProduct(product: Product, skipCache: boolean): P;
 }

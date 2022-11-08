@@ -2,8 +2,10 @@ import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.e
 import { Injectable, Logger } from '@nestjs/common';
 import { Extractor } from './extractor.interface';
 
+export const EXTRACTOR_CONTAINER = 'EXTRACTOR_CONTAINER';
+
 @Injectable()
-export class ExtractorFactory {
+export class ExtractorContainer {
   constructor(private readonly extractors: Extractor<any, any>[]) {}
 
   public getExtractor(providerKey: ProviderKey) {

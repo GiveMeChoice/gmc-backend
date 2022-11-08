@@ -1,5 +1,5 @@
-export enum ProductStatus {
-  INCOMPLETE = 'INCOMPLETE',
-  COMPLETE = 'COMPLETE',
+export enum ProductIntegrationStatus {
+  PENDING = 'PENDING',
+  LIVE = 'LIVE',
   EXPIRED = 'EXPIRED',
 }

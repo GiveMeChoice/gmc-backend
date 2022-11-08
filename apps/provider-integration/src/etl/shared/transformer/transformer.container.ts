@@ -2,7 +2,9 @@ import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.e
 import { Logger } from '@nestjs/common';
 import { SourceTransformer } from './transformer.interface';
 
-export class TransformerFactory {
+export const TRANSFORMER_CONTAINER = 'TRANSFORMER_CONTAINER';
+
+export class TransformerContainer {
   constructor(private readonly transformers: SourceTransformer<any, any>[]) {}
 
   public getTransformer(providerKey: ProviderKey) {

@@ -24,7 +24,7 @@ export interface RainforestApiSourceItemDto {
       rating: number;
       ratings_total: number;
       is_prime: boolean;
-      sponspored: boolean;
+      sponsored: boolean;
       price: {
         currency: string;
         value: number;

@@ -56,7 +56,7 @@ export class RainforestApiExtractor
         },
       )
       .pipe(
-        map((res) => res.data.collection.results_count),
+        map((res) => res.data.collection.next_result_set_id - 1),
         map(
           (resultId) =>
             `${collectionId}/Collection_Results_${collectionId}_${resultId}_Page_1_bb6d6dbffba33cbcecd3f56639ac8792d2ddd200.csv`,
@@ -64,13 +64,17 @@ export class RainforestApiExtractor
       );
   }
 
-  async extractProduct(product: Product): Promise<RainforestApiProductDto> {
+  async extractProduct(
+    product: Product,
+    skipCache: boolean,
+  ): Promise<RainforestApiProductDto> {
     try {
-      const cachedResponse =
-        await this.cacheManager.get<RainforestApiProductDto>(
-          this.providerKey,
-          product.providerProductId,
-        );
+      const cachedResponse = skipCache
+        ? null
+        : await this.cacheManager.get<RainforestApiProductDto>(
+            this.providerKey,
+            product.providerProductId,
+          );
       return cachedResponse
         ? cachedResponse.data
         : await lastValueFrom(
@@ -79,7 +83,7 @@ export class RainforestApiExtractor
                 this.cacheManager.put(
                   this.providerKey,
                   product.providerProductId,
-                  data,
+                  this.removeUnusedElements(data),
                 ),
               ),
             ),
@@ -87,6 +91,29 @@ export class RainforestApiExtractor
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);
     }
+  }
+
+  private removeUnusedElements(
+    dto: RainforestApiProductDto,
+  ): RainforestApiProductDto {
+    delete dto.request_info;
+    delete dto.request_parameters;
+    delete dto.request_metadata;
+    delete dto.sponsored_products;
+    delete dto.frequently_bought_together;
+    delete dto.compare_with_similar;
+    delete dto.also_viewed;
+    delete dto.also_bought;
+    delete dto.product.variants;
+    delete dto.product.videos;
+    delete dto.product.videos_flat;
+    delete dto.product.feature_bullets_flat;
+    delete dto.product.specifications;
+    delete dto.product.specifications_flat;
+    if (dto.product.top_reviews) {
+      dto.product.top_reviews.forEach((r) => delete r.body_html);
+    }
+    return dto;
   }
 
   private fetchProduct(asin: string): Observable<RainforestApiProductDto> {
