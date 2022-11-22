@@ -1,6 +1,8 @@
+import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { FindProvidersDto } from '../api/dto/find-providers.dto';
 import { ProviderKey } from '../model/enum/provider-key.enum';
 import { Provider } from '../model/provider.entity';
 
@@ -9,6 +11,13 @@ export class ProvidersService {
   constructor(
     @InjectRepository(Provider) private providersRepo: Repository<Provider>,
   ) {}
+
+  find(
+    findDto: FindProvidersDto,
+    pageRequest?: PageRequest,
+  ): Promise<Provider[]> {
+    return this.providersRepo.find({ ...pageRequest, where: { ...findDto } });
+  }
 
   findAll(): Promise<Provider[]> {
     return this.providersRepo.find();

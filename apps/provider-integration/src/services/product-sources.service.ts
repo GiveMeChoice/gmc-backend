@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { PageRequest } from '@lib/database/interface/page-request.interface';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Repository } from 'typeorm';
@@ -15,7 +16,16 @@ export class ProductSourcesService {
     private readonly runService: SourceRunsService,
   ) {}
 
+  find(
+    dto: Partial<ProductSource>,
+    pageRequest?: PageRequest,
+  ): Promise<ProductSource[]> {
+    Logger.debug('find');
+    return this.productSourcesRepo.find({ ...pageRequest, where: { ...dto } });
+  }
+
   findAll(): Promise<ProductSource[]> {
+    Logger.debug('find all');
     return this.productSourcesRepo.find();
   }
 

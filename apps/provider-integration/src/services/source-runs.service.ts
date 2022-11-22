@@ -2,6 +2,7 @@ import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { FindSourcesDto } from '../api/dto/find-sources.dto';
 import { SourceRun } from '../model/source-run.entity';
 
 @Injectable()
@@ -10,6 +11,16 @@ export class SourceRunsService {
     @InjectRepository(SourceRun)
     private readonly runRepository: Repository<SourceRun>,
   ) {}
+
+  async find(
+    findDto: FindSourcesDto,
+    pageRequest?: PageRequest,
+  ): Promise<SourceRun[]> {
+    return await this.runRepository.find({
+      ...pageRequest,
+      where: { ...findDto },
+    });
+  }
 
   async findAll(pageRequest?: PageRequest): Promise<SourceRun[]> {
     return await this.runRepository.find({ ...pageRequest });

@@ -25,6 +25,7 @@ import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
 import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { TasksService } from './services/tasks.service';
+import { SourceRunsController } from './api/controllers/source-runs.controller';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { TasksService } from './services/tasks.service';
     IntegrationController,
     ProvidersController,
     ProductSourcesController,
+    SourceRunsController,
     JobsController,
   ],
   providers: [

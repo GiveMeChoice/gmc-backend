@@ -16,6 +16,9 @@ export class SourceRun {
   @PrimaryGeneratedColumn('uuid')
   readonly id!: string;
 
+  @Column({ name: 'source_id' })
+  readonly sourceId: string;
+
   @ManyToOne(() => ProductSource, (source: ProductSource) => source.runs, {
     cascade: true,
   })
