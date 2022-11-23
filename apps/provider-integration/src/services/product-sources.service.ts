@@ -20,13 +20,11 @@ export class ProductSourcesService {
     dto: Partial<ProductSource>,
     pageRequest?: PageRequest,
   ): Promise<ProductSource[]> {
-    Logger.debug('find');
     return this.productSourcesRepo.find({ ...pageRequest, where: { ...dto } });
   }
 
-  findAll(): Promise<ProductSource[]> {
-    Logger.debug('find all');
-    return this.productSourcesRepo.find();
+  findAll(pageRequest?: PageRequest): Promise<ProductSource[]> {
+    return this.productSourcesRepo.find({ ...pageRequest });
   }
 
   findOne(id: string): Promise<ProductSource> {

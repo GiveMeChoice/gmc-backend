@@ -1,20 +1,18 @@
+import { ProductSourceStatus } from '@app/provider-integration/model/enum/product-source-status';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { PartialType } from '@nestjs/mapped-types';
-import { IsInt, IsOptional } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
-export class FindSourcesDto
-  extends PartialType(ProductSource)
-  implements PageRequest
-{
+export class FindSourcesDto extends PartialType(ProductSource) {
   @IsOptional()
   providerId?: string;
 
   @IsOptional()
-  @IsInt()
-  skip: number;
+  active?: boolean;
 
   @IsOptional()
-  @IsInt()
-  take: number;
+  status?: ProductSourceStatus;
+
+  @IsOptional()
+  identifier?: string;
 }

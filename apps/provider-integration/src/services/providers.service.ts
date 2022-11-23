@@ -19,8 +19,8 @@ export class ProvidersService {
     return this.providersRepo.find({ ...pageRequest, where: { ...findDto } });
   }
 
-  findAll(): Promise<Provider[]> {
-    return this.providersRepo.find();
+  findAll(pageRequest?: PageRequest): Promise<Provider[]> {
+    return this.providersRepo.find({ ...pageRequest });
   }
 
   findOne(id: string): Promise<Provider> {
