@@ -1,22 +1,22 @@
 import { ProductsService } from '@lib/products';
 import { Injectable } from '@nestjs/common';
-import { ProductExpiredMonitorResultDto } from './dto/product-expired-monitor-result.dto';
+import { JobBase } from './shared/job-base.abstract';
+import { JobExecutionResult } from './shared/job-execution-result.interface';
 import { JobName } from './shared/job-name.enum';
-import { Job } from './shared/job.interface';
 
 @Injectable()
-export class ProductExpiredMonitorJob
-  implements Job<ProductExpiredMonitorResultDto>
-{
-  constructor(private readonly productsService: ProductsService) {}
+export class ProductExpiredMonitorJob extends JobBase {
+  constructor(private readonly productsService: ProductsService) {
+    super();
+  }
+  public lastResult: JobExecutionResult;
 
   getName() {
     return JobName.PRODUCT_EXPIRED_MONITOR;
   }
 
-  async execute(): Promise<ProductExpiredMonitorResultDto> {
-    return {
-      expiredProducts: await this.productsService.updateAllExpired(),
-    };
+  async execute() {
+    const count = await this.productsService.updateAllExpired();
+    return `Found and updated ${count} expired Products`;
   }
 }

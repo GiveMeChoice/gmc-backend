@@ -2,22 +2,24 @@ import { MessagingService } from '@lib/messaging';
 import { Injectable, Logger } from '@nestjs/common';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
 import { ProductSourcesService } from '../services/product-sources.service';
-import { SourceDueMonitorResultDto } from './dto/source-due-monitor-result.dto';
+import { JobBase } from './shared/job-base.abstract';
 import { JobName } from './shared/job-name.enum';
 import { Job } from './shared/job.interface';
 
 @Injectable()
-export class SourceDueMonitorJob implements Job<SourceDueMonitorResultDto> {
+export class SourceDueMonitorJob extends JobBase {
   constructor(
     private readonly sourcesService: ProductSourcesService,
     private readonly messagingService: MessagingService,
-  ) {}
+  ) {
+    super();
+  }
 
   getName() {
     return JobName.SOURCE_DUE_MONITOR;
   }
 
-  async execute(): Promise<SourceDueMonitorResultDto> {
+  async execute() {
     const dueSources = await this.sourcesService.findAllDue();
     for (const source of dueSources) {
       await this.messagingService.sendToQueue(
@@ -26,8 +28,6 @@ export class SourceDueMonitorJob implements Job<SourceDueMonitorResultDto> {
         }),
       );
     }
-    return {
-      sourcesDue: dueSources.length,
-    };
+    return `Found and processed ${dueSources.length} product sources`;
   }
 }

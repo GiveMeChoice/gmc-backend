@@ -1,4 +1,6 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
+import { Page } from '@lib/database/interface/page.interface';
+import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,15 +14,22 @@ export class ProvidersService {
     @InjectRepository(Provider) private providersRepo: Repository<Provider>,
   ) {}
 
-  find(
+  async find(
     findDto: FindProvidersDto,
     pageRequest?: PageRequest,
-  ): Promise<Provider[]> {
-    return this.providersRepo.find({ ...pageRequest, where: { ...findDto } });
+  ): Promise<Page<Provider>> {
+    const [data, count] = await this.providersRepo.findAndCount({
+      ...pageRequest,
+      where: { ...findDto },
+    });
+    return buildPage<Provider>(data, count, pageRequest);
   }
 
-  findAll(pageRequest?: PageRequest): Promise<Provider[]> {
-    return this.providersRepo.find({ ...pageRequest });
+  async findAll(pageRequest?: PageRequest): Promise<Page<Provider>> {
+    const [data, count] = await this.providersRepo.findAndCount({
+      ...pageRequest,
+    });
+    return buildPage<Provider>(data, count, pageRequest);
   }
 
   findOne(id: string): Promise<Provider> {
@@ -31,12 +40,8 @@ export class ProvidersService {
     return this.providersRepo.find({ where: { active: true } });
   }
 
-  getCategories(id: ProviderKey): Promise<Provider> {
-    return this.providersRepo.findOne({
-      where: { id },
-      relations: {
-        sources: true,
-      },
-    });
+  async update(id: string, updates: Partial<Provider>): Promise<Provider> {
+    await this.providersRepo.update(id, updates);
+    return this.providersRepo.findOne({ where: { id } });
   }
 }

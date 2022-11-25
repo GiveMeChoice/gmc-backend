@@ -1,6 +1,10 @@
+import { JobExecutionResult } from './job-execution-result.interface';
 import { JobName } from './job-name.enum';
 
-export interface Job<T> {
+export interface Job {
+  schedule: string;
+  lastResults: JobExecutionResult[];
+  addLast(result: JobExecutionResult): void;
   getName(): JobName;
-  execute(): Promise<T>;
+  execute(): Promise<string>;
 }

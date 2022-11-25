@@ -6,9 +6,9 @@ export const JOB_CONTAINER = 'JOB_CONTAINER';
 
 @Injectable()
 export class JobContainer {
-  constructor(private readonly jobs: Job<any>[]) {}
+  constructor(private readonly jobs: Job[]) {}
 
-  public getJob(jobName: JobName): Job<any> {
+  public getJob(jobName: JobName): Job {
     try {
       const job = this.jobs.find((j) => j.getName() === jobName);
       if (job) return job;

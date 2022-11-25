@@ -28,7 +28,10 @@ export class TransformPageRequestPipe
         pageRequest.order[query.sort] = query.direction
           ? query.direction
           : 'DESC';
+      } else {
+        pageRequest.order['id'] = 'ASC';
       }
+      Logger.debug(JSON.stringify(pageRequest));
       return pageRequest;
     } catch (err) {
       Logger.error(formatErrorMessage(err));

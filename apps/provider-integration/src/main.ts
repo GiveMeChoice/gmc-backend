@@ -11,7 +11,10 @@ import { GlobalExceptionsFilter } from './utils/global-exceptions.filter';
 
 async function bootstrap() {
   Logger.log('Starting Give Me Choice - Provider Integration Service (BETA)');
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
+  app.enableCors({
+    origin: '*',
+  });
   // exception filter
   app.useGlobalFilters(new GlobalExceptionsFilter());
   // validation

@@ -1,4 +1,6 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
+import { Page } from '@lib/database/interface/page.interface';
+import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,15 +17,19 @@ export class SourceRunsService {
   async find(
     findDto: FindSourcesDto,
     pageRequest?: PageRequest,
-  ): Promise<SourceRun[]> {
-    return await this.runRepository.find({
+  ): Promise<Page<SourceRun>> {
+    const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
       where: { ...findDto },
     });
+    return buildPage<SourceRun>(data, count, pageRequest);
   }
 
-  async findAll(pageRequest?: PageRequest): Promise<SourceRun[]> {
-    return await this.runRepository.find({ ...pageRequest });
+  async findAll(pageRequest?: PageRequest): Promise<Page<SourceRun>> {
+    const [data, count] = await this.runRepository.findAndCount({
+      ...pageRequest,
+    });
+    return buildPage<SourceRun>(data, count, pageRequest);
   }
 
   async findBySource(

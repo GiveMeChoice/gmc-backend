@@ -35,6 +35,6 @@ export class JobsController {
 
   @Post(':job/reschedule')
   reschedule(@Param('job') job: JobName, @Body('cron') cron: CronExpression) {
-    return this.jobsSerivce.updateCron(job, cron);
+    return this.jobsSerivce.rescheduleCron(job, cron);
   }
 }

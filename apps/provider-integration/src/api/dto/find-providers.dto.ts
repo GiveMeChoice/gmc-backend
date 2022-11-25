@@ -9,7 +9,7 @@ export class FindProvidersDto extends PartialType(Provider) {
 
   @IsOptional()
   key?: ProviderKey;
-  
+
   @IsOptional()
   active?: boolean;
 }

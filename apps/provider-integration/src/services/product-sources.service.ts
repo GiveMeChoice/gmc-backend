@@ -1,5 +1,7 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
-import { Injectable, Logger } from '@nestjs/common';
+import { Page } from '@lib/database/interface/page.interface';
+import { buildPage } from '@lib/database/utils/build-page';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Repository } from 'typeorm';
@@ -16,15 +18,22 @@ export class ProductSourcesService {
     private readonly runService: SourceRunsService,
   ) {}
 
-  find(
-    dto: Partial<ProductSource>,
+  async find(
+    findDto: Partial<ProductSource>,
     pageRequest?: PageRequest,
-  ): Promise<ProductSource[]> {
-    return this.productSourcesRepo.find({ ...pageRequest, where: { ...dto } });
+  ): Promise<Page<ProductSource>> {
+    const [data, count] = await this.productSourcesRepo.findAndCount({
+      ...pageRequest,
+      where: { ...findDto },
+    });
+    return buildPage<ProductSource>(data, count, pageRequest);
   }
 
-  findAll(pageRequest?: PageRequest): Promise<ProductSource[]> {
-    return this.productSourcesRepo.find({ ...pageRequest });
+  async findAll(pageRequest?: PageRequest): Promise<Page<ProductSource>> {
+    const [data, count] = await this.productSourcesRepo.findAndCount({
+      ...pageRequest,
+    });
+    return buildPage<ProductSource>(data, count, pageRequest);
   }
 
   findOne(id: string): Promise<ProductSource> {
@@ -40,16 +49,8 @@ export class ProductSourcesService {
     id: string,
     updates: Partial<ProductSource>,
   ): Promise<ProductSource> {
-    return (
-      await this.productSourcesRepo
-        .createQueryBuilder()
-        .update({
-          ...updates,
-        })
-        .where({ id })
-        .returning('*')
-        .execute()
-    ).raw[0];
+    await this.productSourcesRepo.update(id, updates);
+    return this.productSourcesRepo.findOne({ where: { id } });
   }
 
   async startRun(source: ProductSource): Promise<SourceRun> {

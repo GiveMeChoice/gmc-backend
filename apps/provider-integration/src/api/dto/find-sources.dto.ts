@@ -5,6 +5,9 @@ import { IsOptional } from 'class-validator';
 
 export class FindSourcesDto extends PartialType(ProductSource) {
   @IsOptional()
+  id?: string;
+
+  @IsOptional()
   providerId?: string;
 
   @IsOptional()
