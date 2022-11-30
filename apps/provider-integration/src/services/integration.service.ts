@@ -41,7 +41,7 @@ export class IntegrationService {
       const pipeline = this.pipelineContainer.getPipeline(
         run.source.provider.key,
       );
-      // run = await pipeline.execute(run);
+      run = await pipeline.execute(run);
     } catch (err) {
       run.errorMessage = formatErrorMessage(err);
       Logger.error(
@@ -63,12 +63,12 @@ export class IntegrationService {
       const pipeline = this.pipelineContainer.getPipeline(
         product.providerKey as ProviderKey,
       );
-       const updates = await pipeline.refreshProduct(
-         product,
-         source,
-         runId,
-         skipCache,
-       );
+      const updates = await pipeline.refreshProduct(
+        product,
+        source,
+        runId,
+        skipCache,
+      );
       return await this.productsService.update(productId, updates);
     } catch (err) {
       product.hasIntegrationError = true;

@@ -26,6 +26,7 @@ import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { TasksService } from './services/tasks.service';
 import { SourceRunsController } from './api/controllers/source-runs.controller';
+import { ProductsController } from './api/controllers/products.controller';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { SourceRunsController } from './api/controllers/source-runs.controller';
     ProductSourcesController,
     SourceRunsController,
     JobsController,
+    ProductsController,
   ],
   providers: [
     // messaging

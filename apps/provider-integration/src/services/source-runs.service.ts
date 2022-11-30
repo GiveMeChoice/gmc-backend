@@ -3,7 +3,7 @@ import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { FindSourcesDto } from '../api/dto/find-sources.dto';
 import { SourceRun } from '../model/source-run.entity';
 
@@ -21,6 +21,16 @@ export class SourceRunsService {
     const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
       where: { ...findDto },
+      relations: {
+        source: true,
+      },
+      select: {
+        source: {
+          providerId: true,
+          identifier: true,
+          description: true,
+        },
+      },
     });
     return buildPage<SourceRun>(data, count, pageRequest);
   }

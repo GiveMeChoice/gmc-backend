@@ -4,7 +4,7 @@ import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { ProductSourceStatus } from '../model/enum/product-source-status';
 import { ProductSource } from '../model/product-source.entity';
 import { SourceRun } from '../model/source-run.entity';
@@ -24,7 +24,10 @@ export class ProductSourcesService {
   ): Promise<Page<ProductSource>> {
     const [data, count] = await this.productSourcesRepo.findAndCount({
       ...pageRequest,
-      where: { ...findDto },
+      where: {
+        ...findDto,
+        identifier: Like(`%${findDto.identifier ? findDto.identifier : ''}%`),
+      },
     });
     return buildPage<ProductSource>(data, count, pageRequest);
   }

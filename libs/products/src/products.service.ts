@@ -1,7 +1,10 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { Injectable, Logger } from '@nestjs/common';
+import { PageRequest } from '@lib/database/interface/page-request.interface';
+import { Page } from '@lib/database/interface/page.interface';
+import { buildPage } from '@lib/database/utils/build-page';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository, UpdateResult } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { ProductIntegrationStatus } from './model/enum/product-status.enum';
 import { Product } from './model/product.entity';
 
@@ -10,13 +13,26 @@ export class ProductsService {
   constructor(
     private readonly dataSource: DataSource,
     // private readonly messagingService: MessagingService,
-    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Product) private productsRepo: Repository<Product>,
   ) {}
+
+  async find(
+    findDto: Partial<Product>,
+    pageRequest?: PageRequest,
+  ): Promise<Page<Product>> {
+    const [data, count] = await this.productsRepo.findAndCount({
+      ...pageRequest,
+      where: {
+        ...findDto,
+      },
+    });
+    return buildPage<Product>(data, count, pageRequest);
+  }
 
   async existsById(id: string): Promise<boolean> {
     return (
       id &&
-      (await this.productsRepository
+      (await this.productsRepo
         .createQueryBuilder('product')
         .select('product.id')
         .where('product.id = :id', { id })
@@ -31,7 +47,7 @@ export class ProductsService {
     return (
       providerKey &&
       providerProductId &&
-      (await this.productsRepository
+      (await this.productsRepo
         .createQueryBuilder('product')
         .select('product.id')
         .where('product.providerKey = :providerKey', { providerKey })
@@ -43,11 +59,11 @@ export class ProductsService {
   }
 
   findAll(): Promise<Product[]> {
-    return this.productsRepository.find();
+    return this.productsRepo.find();
   }
 
   async updateAllExpired(): Promise<number> {
-    const raw = await this.productsRepository
+    const raw = await this.productsRepo
       .createQueryBuilder()
       .update(Product)
       .set({
@@ -63,27 +79,25 @@ export class ProductsService {
     providerKey: ProviderKey,
     providerProductId: string,
   ): Promise<Product> {
-    return this.productsRepository.findOneBy({
+    return this.productsRepo.findOneBy({
       providerKey: providerKey,
       providerProductId: providerProductId,
     });
   }
 
   findOne(id: string): Promise<Product> {
-    return this.productsRepository.findOneBy({ id });
+    return this.productsRepo.findOneBy({ id });
   }
 
   async getStatus(id: string): Promise<ProductIntegrationStatus> {
-    const { integrationStatus: status } = await this.productsRepository.findOne(
-      {
-        select: {
-          integrationStatus: true,
-        },
-        where: {
-          id,
-        },
+    const { integrationStatus: status } = await this.productsRepo.findOne({
+      select: {
+        integrationStatus: true,
       },
-    );
+      where: {
+        id,
+      },
+    });
     return status;
   }
 
@@ -119,7 +133,7 @@ export class ProductsService {
 
   async update(id: string, updates: Partial<Product>): Promise<Product> {
     return (
-      await this.productsRepository
+      await this.productsRepo
         .createQueryBuilder()
         .update({
           ...updates,
@@ -131,10 +145,10 @@ export class ProductsService {
   }
 
   async save(product: Product): Promise<Product> {
-    return await this.productsRepository.save(product);
+    return await this.productsRepo.save(product);
   }
 
   async remove(id: string): Promise<void> {
-    await this.productsRepository.delete(id);
+    await this.productsRepo.delete(id);
   }
 }
