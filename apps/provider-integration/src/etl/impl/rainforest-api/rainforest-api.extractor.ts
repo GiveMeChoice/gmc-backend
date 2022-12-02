@@ -1,7 +1,7 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { S3Service } from '@lib/aws/services/s3.service';
-import { Product } from '@lib/products/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -13,10 +13,21 @@ import { Extractor } from '../../shared/extractor/extractor.interface';
 import { RainforestApiCollectionDto } from './dto/rainforest-api-collection.dto';
 import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
 
+type SourceKey = {
+  key: string;
+  runDate: Date;
+};
+
+export type SourceStream = {
+  stream: Readable;
+  runDate: Date;
+};
+
 @Injectable()
 export class RainforestApiExtractor
-  implements Extractor<Promise<Readable>, Promise<RainforestApiProductDto>>
+  implements Extractor<Promise<SourceStream>, Promise<RainforestApiProductDto>>
 {
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   public static readonly BASE_URL = 'https://api.rainforestapi.com';
   private readonly _apiKey: string;
   private readonly _zipCode: string;
@@ -31,13 +42,18 @@ export class RainforestApiExtractor
     this._zipCode = configService.get('rainforest.zip-code');
   }
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
-  async extractSource(source: ProductSource): Promise<Readable> {
+  async extractSource(source: ProductSource): Promise<SourceStream> {
     try {
       const sourceKey = await lastValueFrom(
         this.fetchLatestCollectionResultKey(source.identifier),
       );
-      return await this.s3Service.getObjectStream(sourceKey, this.providerKey);
+      return {
+        stream: await this.s3Service.getObjectStream(
+          sourceKey.key,
+          this.providerKey,
+        ),
+        runDate: sourceKey.runDate,
+      };
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);
     }
@@ -45,7 +61,7 @@ export class RainforestApiExtractor
 
   private fetchLatestCollectionResultKey(
     collectionId: string,
-  ): Observable<string> {
+  ): Observable<SourceKey> {
     return this.httpService
       .get<RainforestApiCollectionDto>(
         `${RainforestApiExtractor.BASE_URL}/collections/${collectionId}/`,
@@ -56,11 +72,13 @@ export class RainforestApiExtractor
         },
       )
       .pipe(
-        map((res) => res.data.collection.next_result_set_id - 1),
-        map(
-          (resultId) =>
-            `${collectionId}/Collection_Results_${collectionId}_${resultId}_Page_1_bb6d6dbffba33cbcecd3f56639ac8792d2ddd200.csv`,
-        ),
+        map((res) => res.data.collection),
+        map((collection) => ({
+          key: `${collectionId}/Collection_Results_${collectionId}_${
+            collection.next_result_set_id - 1
+          }_Page_1_bb6d6dbffba33cbcecd3f56639ac8792d2ddd200.csv`,
+          runDate: collection.last_run,
+        })),
       );
   }
 

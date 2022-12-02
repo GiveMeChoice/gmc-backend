@@ -1,7 +1,5 @@
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
-import { ProductIntegrationStatus } from '@lib/products/model/enum/product-status.enum';
-import { Product } from '@lib/products/model/product.entity';
+import { ProductRun } from '@app/provider-integration/model/product-run.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
@@ -37,10 +35,12 @@ export class RainforestApiPipeline extends PipelineBase {
     ) as RainforestApiTransformer;
   }
 
-  async execute(run: SourceRun): Promise<SourceRun> {
+  async execute(run: ProductRun): Promise<ProductRun> {
     try {
+      const sourceStream = await this._extractor.extractSource(run.source);
+      run.sourceDate = sourceStream.runDate;
       await csv()
-        .fromStream(await this._extractor.extractSource(run.source))
+        .fromStream(sourceStream.stream)
         .subscribe(async (item: RainforestApiSourceItemDto) => {
           if (
             // only pull items from source that have a listed price and are not sponsored
@@ -58,33 +58,24 @@ export class RainforestApiPipeline extends PipelineBase {
     return run;
   }
 
-  protected needsRefresh(
+  protected isProductStale(
     sourceProduct: Partial<Product>,
     existingProduct: Product,
   ): boolean {
     return sourceProduct.price && sourceProduct.price != existingProduct.price;
   }
 
-  protected applySourceUpdate(existing: Product, source: Partial<Product>) {
+  protected applySourceRefresh(existing: Product, source: Partial<Product>) {
     existing.price = source.price;
     return existing;
   }
 
   async refreshProduct(
     product: Product,
-    source: ProductSource,
-    runId: string,
     skipCache: boolean,
   ): Promise<Partial<Product>> {
-    const refreshed = await this._transformer.mapProductDetails(
+    return await this._transformer.mapProductDetails(
       await this._extractor.extractProduct(product, skipCache),
     );
-    refreshed.integrationStatus = ProductIntegrationStatus.LIVE;
-    refreshed.hasIntegrationError = false;
-    refreshed.errorMessage = null;
-    refreshed.refreshedByRunId = runId;
-    refreshed.refreshedAt = new Date();
-    refreshed.expiresAt = super.renewExpirationDate(source);
-    return refreshed;
   }
 }

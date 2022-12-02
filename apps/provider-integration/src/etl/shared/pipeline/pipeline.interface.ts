@@ -1,16 +1,13 @@
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
-import { Product } from '@lib/products/model/product.entity';
+import { ProductRun } from '@app/provider-integration/model/product-run.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
 
 export interface Pipeline {
   providerKey: ProviderKey;
 
-  execute(run: SourceRun): Promise<SourceRun>;
+  execute(run: ProductRun): Promise<ProductRun>;
   refreshProduct(
     product: Product,
-    source: ProductSource,
-    runId: string,
     skipCache: boolean,
   ): Promise<Partial<Product>>;
 }

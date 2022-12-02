@@ -1,19 +1,19 @@
 category,subcategory1,subcategory2,identifier,description,active
-grocery,,,3655F471,Grocery,true
-stripbooks,,,i/stripbooks,Books,true
-drugstore,,,i/drugstore,Health & Personal Care,true
-kitchen,,,i/kitchen,Home & Kitchen,true
-beauty,,,i/beauty,Beauty,true
-office-products,,,i/office-products,Stationery & Office Supplies,true
-electronics,,,i/electronics,Electronics & Photo,true
-computers,,,i/computers,Computers & Accessories,true
-sports,,,i/sports,Sports & Outdoors,true
-industrial,,,i/industrial,Industrial & Scientific,true
-baby,,,i/baby,Baby,true
-toys,,,i/toys,Toys & Games,true
-outdoor,,,i/outdoor,Garden & Outdoors,true
-fashion,,,i/fashion,Fashion,true
-diy,,,i/diy,DIY & Tools,true
-pets,,,D7F6E89A,Pet Supplies,true
-automotive,,,i/automotive,Car & Motorbike,true
-misc,,,i/misc,Everything Else,true
+grocery,,,3655F471,Grocery,false
+stripbooks,,,i/stripbooks,Books,false
+drugstore,,,i/drugstore,Health & Personal Care,false
+kitchen,,,i/kitchen,Home & Kitchen,false
+beauty,,,i/beauty,Beauty,false
+office-products,,,i/office-products,Stationery & Office Supplies,false
+electronics,,,i/electronics,Electronics & Photo,false
+computers,,,i/computers,Computers & Accessories,false
+sports,,,i/sports,Sports & Outdoors,false
+industrial,,,i/industrial,Industrial & Scientific,false
+baby,,,i/baby,Baby,false
+toys,,,i/toys,Toys & Games,false
+outdoor,,,i/outdoor,Garden & Outdoors,false
+fashion,,,i/fashion,Fashion,false
+diy,,,i/diy,DIY & Tools,false
+pets,,,D7F6E89A,Pet Supplies,false
+automotive,,,i/automotive,Car & Motorbike,false
+misc,,,i/misc,Everything Else,false

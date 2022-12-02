@@ -1,6 +1,5 @@
 import { AwsModule } from '@lib/aws';
 import { MessagingModule } from '@lib/messaging';
-import { ProductsModule } from '@lib/products';
 import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
 import { AppModule } from '../app.module';
@@ -28,7 +27,6 @@ import {
 @Module({
   imports: [
     forwardRef(() => AppModule),
-    ProductsModule,
     AwsModule,
     HttpModule,
     MessagingModule,
@@ -67,6 +65,6 @@ import {
       inject: [RainforestApiTransformer, EthicalSuperstoreTransformer],
     },
   ],
-  exports: [PIPELINE_CONTAINER, EXTRACTOR_CONTAINER],
+  exports: [PIPELINE_CONTAINER, EXTRACTOR_CONTAINER, TRANSFORMER_CONTAINER],
 })
 export class EtlModule {}

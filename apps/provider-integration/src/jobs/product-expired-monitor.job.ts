@@ -1,5 +1,5 @@
-import { ProductsService } from '@lib/products';
 import { Injectable } from '@nestjs/common';
+import { ProductsService } from '../services/products.service';
 import { JobBase } from './shared/job-base.abstract';
 import { JobExecutionResult } from './shared/job-execution-result.interface';
 import { JobName } from './shared/job-name.enum';

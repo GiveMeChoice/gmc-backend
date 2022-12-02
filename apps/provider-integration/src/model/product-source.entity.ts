@@ -9,7 +9,8 @@ import {
   Unique,
 } from 'typeorm';
 import { ProductSourceStatus } from './enum/product-source-status';
-import { SourceRun } from './source-run.entity';
+import { Product } from './product.entity';
+import { ProductRun } from './product-run.entity';
 
 @Entity({ name: 'pi_product_source' })
 @Unique(['providerId', 'identifier'])
@@ -43,18 +44,14 @@ export class ProductSource {
   @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
   lastRunAt: Date;
 
+  @Column({ name: 'owned_count', default: 0 })
+  ownedCount: number;
+
   @Column({ name: 'retry_count', type: 'integer', default: 0 })
   retryCount: number;
 
-  @Column({ name: 'retry_limit', type: 'integer', default: 5 })
+  @Column({ name: 'retry_limit', type: 'integer', default: 3 })
   retryLimit: number;
-
-  /* 
-    Will trigger auto-hard product refresh after set number of keep alive signals.
-    Use with caution...
-  */
-  @Column({ name: 'product_keep_alive_limit', type: 'integer', nullable: true })
-  productKeepAliveLimit: number;
 
   @Column()
   category: string;
@@ -65,8 +62,11 @@ export class ProductSource {
   @Column({ name: 'subcategory_2' })
   subcategory2: string;
 
-  @OneToMany(() => SourceRun, (run: SourceRun) => run.source)
-  runs: SourceRun[];
+  @OneToMany(() => ProductRun, (run: ProductRun) => run.source)
+  runs: ProductRun[];
+
+  @OneToMany(() => Product, (product: Product) => product.source)
+  products: Product[];
 
   @ManyToOne(() => Provider, (provider: Provider) => provider.sources)
   @JoinColumn({ name: 'provider_id' })

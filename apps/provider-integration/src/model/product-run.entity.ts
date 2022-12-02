@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 import { ProductSource } from './product-source.entity';
 
-@Entity({ name: 'pi_source_run' })
-export class SourceRun {
+@Entity({ name: 'pi_product_run' })
+export class ProductRun {
   constructor(source: ProductSource) {
     this.source = source;
   }
@@ -37,6 +37,12 @@ export class SourceRun {
   @Column({ name: 'adopted_count', default: 0 })
   adoptedCount: number;
 
+  @Column({ name: 'foreign_count', default: 0 })
+  foreignCount: number;
+
+  @Column({ name: 'pending_count', default: 0 })
+  pendingCount: number;
+
   @Column({ name: 'stale_count', default: 0 })
   staleCount: number;
 
@@ -49,16 +55,25 @@ export class SourceRun {
   @Column({ name: 'failure_count', default: 0 })
   failureCount: number;
 
-  @Column({ name: 'started_at', type: 'timestamptz' })
-  startedAt: Date;
+  @Column({ name: 'run_at', type: 'timestamptz' })
+  runAt: Date;
 
-  @Column({ name: 'completed_at', type: 'timestamptz', nullable: true })
-  completedAt: Date;
+  @Column({ name: 'source_date', type: 'timestamptz', nullable: true })
+  sourceDate: Date;
+
+  @Column({
+    name: 'run_time',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  runTime: number;
 
   @Column({ name: 'error_message', nullable: true })
   errorMessage?: string;
 
   public static factory(source: ProductSource) {
-    return new SourceRun(source);
+    return new ProductRun(source);
   }
 }

@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { Product } from '@lib/products/model/product.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
 import { SourceTransformer } from '../../shared/transformer/transformer.interface';
@@ -15,10 +15,9 @@ export class RainforestApiTransformer
 
   mapSourceItem(item: RainforestApiSourceItemDto): Partial<Product> {
     try {
-      const product = Product.factory(
-        this.providerKey,
-        item.result.category_results.asin,
-      );
+      const product: Partial<Product> = {
+        providerProductId: item.result.category_results.asin,
+      };
       product.price = Number(item.result.category_results.price.value);
       product.currency = item.result.category_results.price.currency;
       product.title = item.result.category_results.title;
@@ -30,7 +29,7 @@ export class RainforestApiTransformer
 
   mapProductDetails(dto: RainforestApiProductDto): Partial<Product> {
     try {
-      const product = Product.factory();
+      const product: Partial<Product> = {};
       product.title = dto.product.title;
       product.rating = dto.product.rating;
       product.ratingsTotal = dto.product.ratings_total;

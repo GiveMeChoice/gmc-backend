@@ -1,12 +1,12 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Consumer } from '@lib/messaging/interface/consumer.interface';
 import { DEFAULT_EXCHANGE } from '@lib/messaging/messaging.constants';
-import { ProductsService } from '@lib/products';
-import { ProductIntegrationStatus } from '@lib/products/model/enum/product-status.enum';
+import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { RefreshProductCommand } from '../messages/refresh-product.command';
 import { IntegrationService } from '../services/integration.service';
+import { ProductsService } from '../services/products.service';
 
 @Injectable()
 export class RefreshProductConsumer implements Consumer<RefreshProductCommand> {
@@ -34,6 +34,10 @@ export class RefreshProductConsumer implements Consumer<RefreshProductCommand> {
           data.productId,
           data.runId,
           data.skipCache,
+        );
+      } else {
+        Logger.debug(
+          `Product is NOT in PENDING status (will not be refreshed): ${data.productId}`,
         );
       }
       Logger.debug(

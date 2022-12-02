@@ -1,27 +1,36 @@
-import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { nanoid } from 'nanoid';
 import {
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { shortId } from '../utils/short-id';
 import { ProductIntegrationStatus } from './enum/product-status.enum';
+import { ProductSource } from './product-source.entity';
+import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerKey', 'providerProductId'], { unique: true })
+@Index(['providerId', 'providerProductId'], { unique: true })
 @Unique(['shortId'])
 export class Product {
-  constructor(providerKey?: ProviderKey, providerProductId?: string) {
-    this.providerKey = providerKey;
+  constructor(providerId: string, providerProductId: string) {
+    this.providerId = providerId;
     this.providerProductId = providerProductId;
-    this.shortId = nanoid(11);
   }
-  public static factory(providerKey?: ProviderKey, providerId?: string) {
-    return new Product(providerKey, providerId);
+  public static factory(
+    providerId: string,
+    providerProductId: string,
+    data: Partial<Product>,
+  ) {
+    const product = new Product(providerId, providerProductId);
+    product.shortId = shortId();
+    Object.assign(product, data);
+    return product;
   }
   /* 
   ///////////////////////
@@ -31,14 +40,14 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({ name: 'provider_key' })
-  readonly providerKey: string;
+  @Column({ name: 'provider_id' })
+  readonly providerId: string;
 
   @Column({ name: 'provider_product_id' })
   readonly providerProductId: string;
 
   @Column({ name: 'short_id' })
-  readonly shortId: string;
+  shortId: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -54,6 +63,10 @@ export class Product {
   })
   updatedAt: Date;
 
+  @ManyToOne(() => Provider, (provider: Provider) => provider.products)
+  @JoinColumn({ name: 'provider_id' })
+  provider: Provider;
+
   /* 
   ///////////////////////
     INTEGRATION METADATA
@@ -68,7 +81,7 @@ export class Product {
   integrationStatus: ProductIntegrationStatus;
 
   @Column({ name: 'source_id' })
-  sourceId: string;
+  readonly sourceId: string;
 
   @Column({ name: 'created_by_run_id' })
   createdByRunId: string;
@@ -90,6 +103,10 @@ export class Product {
 
   @Column({ name: 'error_message', nullable: true })
   errorMessage: string;
+
+  @ManyToOne(() => ProductSource, (source: ProductSource) => source.products)
+  @JoinColumn({ name: 'source_id' })
+  source: ProductSource;
 
   /* 
   ///////////////////////

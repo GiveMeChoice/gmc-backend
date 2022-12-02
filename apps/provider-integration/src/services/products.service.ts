@@ -1,12 +1,12 @@
-import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { isUUID } from 'class-validator';
 import { DataSource, Repository } from 'typeorm';
-import { ProductIntegrationStatus } from './model/enum/product-status.enum';
-import { Product } from './model/product.entity';
+import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
+import { Product } from '../model/product.entity';
 
 @Injectable()
 export class ProductsService {
@@ -25,6 +25,15 @@ export class ProductsService {
       where: {
         ...findDto,
       },
+      relations: {
+        source: true,
+      },
+      select: {
+        source: {
+          identifier: true,
+          description: true,
+        },
+      },
     });
     return buildPage<Product>(data, count, pageRequest);
   }
@@ -41,16 +50,16 @@ export class ProductsService {
   }
 
   async existsByProvider(
-    providerKey: string,
+    providerId: string,
     providerProductId: string,
   ): Promise<boolean> {
     return (
-      providerKey &&
+      providerId &&
       providerProductId &&
       (await this.productsRepo
         .createQueryBuilder('product')
         .select('product.id')
-        .where('product.providerKey = :providerKey', { providerKey })
+        .where('product.providerId = :providerId', { providerId })
         .andWhere('product.providerProductId = :providerProductId', {
           providerProductId,
         })
@@ -58,8 +67,11 @@ export class ProductsService {
     );
   }
 
-  findAll(): Promise<Product[]> {
-    return this.productsRepo.find();
+  async findAll(pageRequest?: PageRequest): Promise<Page<Product>> {
+    const [data, count] = await this.productsRepo.findAndCount({
+      ...pageRequest,
+    });
+    return buildPage<Product>(data, count, pageRequest);
   }
 
   async updateAllExpired(): Promise<number> {
@@ -76,17 +88,20 @@ export class ProductsService {
   }
 
   findByProvider(
-    providerKey: ProviderKey,
-    providerProductId: string,
+    providerId: string,
+    providerProductId?: string,
   ): Promise<Product> {
     return this.productsRepo.findOneBy({
-      providerKey: providerKey,
-      providerProductId: providerProductId,
+      providerId,
+      providerProductId,
     });
   }
 
   findOne(id: string): Promise<Product> {
-    return this.productsRepo.findOneBy({ id });
+    return this.productsRepo.findOne({
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+      relations: { provider: true, source: true },
+    });
   }
 
   async getStatus(id: string): Promise<ProductIntegrationStatus> {
@@ -101,14 +116,18 @@ export class ProductsService {
     return status;
   }
 
-  async create(product: Partial<Product>): Promise<Partial<Product>> {
-    if (
-      !this.existsByProvider(product.providerKey, product.providerProductId)
-    ) {
+  async create(
+    providerId: string,
+    providerProductId: string,
+    data: Partial<Product>,
+  ): Promise<Partial<Product>> {
+    if (!this.existsByProvider(providerId, providerProductId)) {
       throw new Error(
-        `Provider ${product.providerProductId} product ${product.providerProductId} already exists!`,
+        `Provider ${providerProductId} product ${providerProductId} already exists!`,
       );
     }
+
+    const product = Product.factory(providerId, providerProductId, data);
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -132,16 +151,8 @@ export class ProductsService {
   }
 
   async update(id: string, updates: Partial<Product>): Promise<Product> {
-    return (
-      await this.productsRepo
-        .createQueryBuilder()
-        .update({
-          ...updates,
-        })
-        .where({ id })
-        .returning('*')
-        .execute()
-    ).raw[0];
+    await this.productsRepo.update(id, updates);
+    return await this.findOne(id);
   }
 
   async save(product: Product): Promise<Product> {

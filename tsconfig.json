@@ -18,8 +18,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@lib/products": ["libs/products/src"],
-      "@lib/products/*": ["libs/products/src/*"],
       "@app/provider-integration": ["apps/provider-integration/src"],
       "@app/provider-integration/*": ["apps/provider-integration/src/*"],
       "@lib/aws": ["libs/aws/src"],

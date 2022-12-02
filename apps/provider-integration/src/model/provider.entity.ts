@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { ProviderKey } from './enum/provider-key.enum';
 import { ProductSource } from './product-source.entity';
+import { Product } from './product.entity';
 
 @Entity({ name: 'pi_provider' })
 @Unique(['key'])
@@ -32,4 +33,7 @@ export class Provider {
     (productSource: ProductSource) => productSource.provider,
   )
   sources: ProductSource[];
+
+  @OneToMany(() => Product, (product: Product) => product.provider)
+  products: Product;
 }

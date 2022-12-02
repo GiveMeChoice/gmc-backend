@@ -27,7 +27,7 @@
     "db:seed": "bash ./libs/database/scripts/migration-seed.sh",
     "db:migrate": "npm run typeorm-d migration:run",
     "db:revert": "npm run typeorm-d migration:revert",
-    "db:sync": "npm run typeorm-d migration:run && bash ./libs/database/scripts/migration-generate.sh sync && npm run typeorm-d migration:run"
+    "db:sync": "bash ./libs/database/scripts/migration-generate.sh sync"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.165.0",
@@ -100,7 +100,6 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@lib/products(|/.*)$": "<rootDir>/libs/products/src/$1",
       "^@lib/aws(|/.*)$": "<rootDir>/libs/aws/src/$1",
       "^@lib/database(|/.*)$": "<rootDir>/libs/database/src/$1",
       "^@lib/messaging(|/.*)$": "<rootDir>/libs/messaging/src/$1",

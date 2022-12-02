@@ -1,5 +1,5 @@
-import { Product } from '@lib/products/model/product.entity';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
+import { Product } from '@app/provider-integration/model/product.entity';
 
 export interface SourceTransformer<I, P> {
   providerKey: ProviderKey;

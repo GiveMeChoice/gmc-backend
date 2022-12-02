@@ -1,8 +1,7 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
+import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
-import { ProductIntegrationStatus } from '@lib/products/model/enum/product-status.enum';
-import { Product } from '@lib/products/model/product.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { concatMap, lastValueFrom, map } from 'rxjs';
 import {
@@ -36,8 +35,9 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     ) as EthicalSuperstoreTransformer;
   }
 
-  async execute(run: SourceRun): Promise<SourceRun> {
+  async execute(run: ProductRun): Promise<ProductRun> {
     try {
+      run.sourceDate = new Date();
       await lastValueFrom(
         this._extractor.extractSource(run.source).pipe(
           map((item) => {
@@ -55,7 +55,7 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     return run;
   }
 
-  protected applySourceUpdate(
+  protected applySourceRefresh(
     existing: Product,
     source: Partial<Product>,
   ): Product {
@@ -63,20 +63,16 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     return existing;
   }
 
-  protected needsRefresh(
-    sourceProduct: Partial<Product>,
+  protected isProductStale(
     existingProduct: Product,
+    sourceProduct: Partial<Product>,
+    source: ProductSource,
   ): boolean {
     return sourceProduct.price && sourceProduct.price != existingProduct.price;
   }
 
-  async refreshProduct(
-    product: Product,
-    source: ProductSource,
-    runId: string,
-    skipCache: boolean,
-  ): Promise<any> {
-    const refreshed = await lastValueFrom(
+  async refreshProduct(product: Product, skipCache: boolean): Promise<any> {
+    return await lastValueFrom(
       this._extractor
         .extractProduct(product, skipCache)
         .pipe(
@@ -85,12 +81,5 @@ export class EthicalSuperstorePipeline extends PipelineBase {
           ),
         ),
     );
-    refreshed.integrationStatus = ProductIntegrationStatus.LIVE;
-    refreshed.hasIntegrationError = false;
-    refreshed.errorMessage = null;
-    refreshed.refreshedByRunId = runId;
-    refreshed.refreshedAt = new Date();
-    refreshed.expiresAt = super.renewExpirationDate(source);
-    return refreshed;
   }
 }

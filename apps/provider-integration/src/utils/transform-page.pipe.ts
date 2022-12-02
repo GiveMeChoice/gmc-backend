@@ -11,7 +11,7 @@ import { formatErrorMessage } from './format-error-message';
 export class TransformPageRequestPipe
   implements PipeTransform<string, PageRequest>
 {
-  private static readonly DEFAULT_PAGE_SIZE = 30;
+  private static readonly DEFAULT_PAGE_SIZE = 20;
 
   transform(query: any, metadata: ArgumentMetadata): PageRequest {
     try {

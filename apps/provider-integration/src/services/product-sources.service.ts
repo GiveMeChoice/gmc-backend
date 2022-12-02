@@ -6,23 +6,23 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Like, Repository } from 'typeorm';
 import { ProductSourceStatus } from '../model/enum/product-source-status';
+import { ProductRun } from '../model/product-run.entity';
 import { ProductSource } from '../model/product-source.entity';
-import { SourceRun } from '../model/source-run.entity';
-import { SourceRunsService } from './source-runs.service';
+import { ProductRunsService } from './product-runs.service';
 
 @Injectable()
 export class ProductSourcesService {
   constructor(
     @InjectRepository(ProductSource)
-    private productSourcesRepo: Repository<ProductSource>,
-    private readonly runService: SourceRunsService,
+    private sourcesRepo: Repository<ProductSource>,
+    private readonly runsService: ProductRunsService,
   ) {}
 
   async find(
     findDto: Partial<ProductSource>,
     pageRequest?: PageRequest,
   ): Promise<Page<ProductSource>> {
-    const [data, count] = await this.productSourcesRepo.findAndCount({
+    const [data, count] = await this.sourcesRepo.findAndCount({
       ...pageRequest,
       where: {
         ...findDto,
@@ -33,14 +33,14 @@ export class ProductSourcesService {
   }
 
   async findAll(pageRequest?: PageRequest): Promise<Page<ProductSource>> {
-    const [data, count] = await this.productSourcesRepo.findAndCount({
+    const [data, count] = await this.sourcesRepo.findAndCount({
       ...pageRequest,
     });
     return buildPage<ProductSource>(data, count, pageRequest);
   }
 
   findOne(id: string): Promise<ProductSource> {
-    return this.productSourcesRepo.findOne({
+    return this.sourcesRepo.findOne({
       where: { id },
       relations: {
         provider: true,
@@ -52,32 +52,38 @@ export class ProductSourcesService {
     id: string,
     updates: Partial<ProductSource>,
   ): Promise<ProductSource> {
-    await this.productSourcesRepo.update(id, updates);
-    return this.productSourcesRepo.findOne({ where: { id } });
+    await this.sourcesRepo.update(id, updates);
+    return this.sourcesRepo.findOne({ where: { id } });
   }
 
-  async startRun(source: ProductSource): Promise<SourceRun> {
+  async startRun(source: ProductSource): Promise<ProductRun> {
     source.status = ProductSourceStatus.BUSY;
-    const run = SourceRun.factory(source);
-    run.startedAt = new Date();
-    return await this.runService.create(run);
+    const run = ProductRun.factory(source);
+    run.runAt = new Date();
+    return await this.runsService.create(run);
   }
 
-  async completeRun(run: SourceRun): Promise<SourceRun> {
-    run.completedAt = new Date();
+  async completeRun(run: ProductRun): Promise<ProductRun> {
+    run.runTime = moment().diff(run.runAt, 'seconds', true);
     run.source.lastRunAt = new Date();
     if (run.errorMessage) {
-      run.source.status = ProductSourceStatus.DOWN;
       run.source.retryCount++;
+      if (run.source.retryCount >= run.source.retryLimit) {
+        run.source.status = ProductSourceStatus.DOWN;
+      } else {
+        run.source.status = ProductSourceStatus.READY;
+      }
     } else {
+      run.source.ownedCount =
+        run.ownedCount + run.createdCount + run.adoptedCount;
       run.source.status = ProductSourceStatus.READY;
       run.source.retryCount = 0;
     }
-    return await this.runService.save(run);
+    return await this.runsService.save(run);
   }
 
-  async canRetry(id: string): Promise<boolean> {
-    const { retryCount, retryLimit } = await this.productSourcesRepo.findOne({
+  async canRetryById(id: string): Promise<boolean> {
+    const { retryCount, retryLimit } = await this.sourcesRepo.findOne({
       select: {
         retryCount: true,
         retryLimit: true,
@@ -87,9 +93,13 @@ export class ProductSourcesService {
     return retryLimit == 0 || retryCount < retryLimit;
   }
 
-  async isDue(id: string): Promise<any> {
-    return this.isIntegrationIntervalPassed(
-      await this.productSourcesRepo.findOne({
+  canRetry(source: ProductSource): boolean {
+    return source.retryLimit == 0 || source.retryCount < source.retryLimit;
+  }
+
+  async isDueById(id: string): Promise<boolean> {
+    return this.isDue(
+      await this.sourcesRepo.findOne({
         where: {
           id,
           active: true,
@@ -101,20 +111,7 @@ export class ProductSourcesService {
     );
   }
 
-  async findAllDue(): Promise<ProductSource[]> {
-    return (
-      await this.productSourcesRepo.find({
-        where: {
-          active: true,
-          provider: {
-            active: true,
-          },
-        },
-      })
-    ).filter(this.isIntegrationIntervalPassed);
-  }
-
-  private isIntegrationIntervalPassed(source: ProductSource): boolean {
+  isDue(source: ProductSource): boolean {
     return (
       source.runIntervalHours &&
       (!source.lastRunAt ||
@@ -122,5 +119,18 @@ export class ProductSourcesService {
           .add(source.runIntervalHours, 'hours')
           .isSameOrBefore(moment()))
     );
+  }
+
+  async findAllDue(): Promise<ProductSource[]> {
+    return (
+      await this.sourcesRepo.find({
+        where: {
+          active: true,
+          provider: {
+            active: true,
+          },
+        },
+      })
+    ).filter(this.isDue);
   }
 }

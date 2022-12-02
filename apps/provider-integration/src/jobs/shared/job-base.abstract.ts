@@ -4,7 +4,7 @@ import { Job } from './job.interface';
 
 export abstract class JobBase implements Job {
   constructor() {
-    this.schedule = 'DEFAULT';
+    this.schedule = 'EVERY_YEAR';
   }
   schedule: string;
   lastResults: JobExecutionResult[] = [];
