@@ -1,21 +1,14 @@
-import {
-  ExtractorContainer,
-  EXTRACTOR_CONTAINER,
-} from '@app/provider-integration/etl/shared/extractor/extractor.container';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { IntegrationService } from '@app/provider-integration/services/integration.service';
-import { ProductSourcesService } from '@app/provider-integration/services/product-sources.service';
-import { Controller, Inject, Logger, Post, Query } from '@nestjs/common';
-import { lastValueFrom } from 'rxjs';
+import { ProductsService } from '@app/provider-integration/services/products.service';
+import { Controller, Logger, Post, Query } from '@nestjs/common';
 
 @Controller()
 export class IntegrationController {
   constructor(
     private readonly integrationService: IntegrationService,
-    @Inject(EXTRACTOR_CONTAINER)
-    private readonly extractorContainer: ExtractorContainer,
-    private readonly sourcesService: ProductSourcesService,
+    private readonly productsService: ProductsService,
   ) {}
 
   @Post('integrate-source')
@@ -26,28 +19,38 @@ export class IntegrationController {
   @Post('refresh-product')
   async refreshProduct(
     @Query('id') productId: string,
-    @Query('skip-cache') skipCache: boolean,
+    @Query('skipCache') skipCache: boolean,
   ): Promise<Product> {
-    return await this.integrationService.refreshProduct(
+    Logger.debug(
+      `Refresh ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
+    );
+    await this.integrationService.refreshProduct(
       productId,
       'REST_API',
       skipCache,
     );
+    return this.productsService.findOneExternal(productId);
   }
 
   @Post('extract-product')
   async extractProduct(
     @Query('id') productId: string,
-    @Query('skip-cache') skipCache: boolean,
+    @Query('skipCache') skipCache: boolean,
   ): Promise<any> {
+    Logger.debug(
+      `Extract ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
+    );
     return await this.integrationService.extractProduct(productId, skipCache);
   }
 
   @Post('map-product')
   async mapProduct(
     @Query('id') productId: string,
-    @Query('skip-cache') skipCache: boolean,
+    @Query('skipCache') skipCache: boolean,
   ): Promise<any> {
+    Logger.debug(
+      `Map ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
+    );
     return await this.integrationService.mapProduct(productId, skipCache);
   }
 }

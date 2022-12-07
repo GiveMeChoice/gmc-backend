@@ -35,5 +35,5 @@ export class Provider {
   sources: ProductSource[];
 
   @OneToMany(() => Product, (product: Product) => product.provider)
-  products: Product;
+  products: Product[];
 }

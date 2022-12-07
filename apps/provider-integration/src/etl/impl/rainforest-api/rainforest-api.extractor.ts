@@ -9,6 +9,7 @@ import { lastValueFrom, map, Observable, tap } from 'rxjs';
 import { Readable } from 'stream';
 import { ProductCacheManager } from '../../shared/cache/product-cache.manager';
 import { PipelineError } from '../../shared/exception/pipeline.error';
+import { ExtractResult } from '../../shared/extractor/extract-result.interface';
 import { Extractor } from '../../shared/extractor/extractor.interface';
 import { RainforestApiCollectionDto } from './dto/rainforest-api-collection.dto';
 import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
@@ -25,7 +26,11 @@ export type SourceStream = {
 
 @Injectable()
 export class RainforestApiExtractor
-  implements Extractor<Promise<SourceStream>, Promise<RainforestApiProductDto>>
+  implements
+    Extractor<
+      Promise<SourceStream>,
+      Promise<ExtractResult<RainforestApiProductDto>>
+    >
 {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   public static readonly BASE_URL = 'https://api.rainforestapi.com';
@@ -85,7 +90,7 @@ export class RainforestApiExtractor
   async extractProduct(
     product: Product,
     skipCache: boolean,
-  ): Promise<RainforestApiProductDto> {
+  ): Promise<ExtractResult<RainforestApiProductDto>> {
     try {
       const cachedResponse = skipCache
         ? null
@@ -94,14 +99,23 @@ export class RainforestApiExtractor
             product.providerProductId,
           );
       return cachedResponse
-        ? cachedResponse.data
+        ? {
+            sourceDate: cachedResponse.retrievedAt,
+            fromCache: true,
+            data: cachedResponse.data,
+          }
         : await lastValueFrom(
             this.fetchProduct(product.providerProductId).pipe(
-              tap((data) =>
+              map((data) => ({
+                sourceDate: new Date(),
+                fromCache: false,
+                data,
+              })),
+              tap((result) =>
                 this.cacheManager.put(
                   this.providerKey,
                   product.providerProductId,
-                  this.removeUnusedElements(data),
+                  this.removeUnusedElements(result.data),
                 ),
               ),
             ),

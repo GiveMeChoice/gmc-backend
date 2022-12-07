@@ -4,10 +4,21 @@ import { Product } from '@app/provider-integration/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { Element, load } from 'cheerio';
-import { from, map, mergeMap, Observable, of, switchMap, tap } from 'rxjs';
+import { data } from 'cheerio/lib/api/attributes';
+import {
+  from,
+  lastValueFrom,
+  map,
+  mergeMap,
+  Observable,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
 import { ProductCacheManager } from '../../shared/cache/product-cache.manager';
 import { SourceCacheManager } from '../../shared/cache/source-cache.manager';
 import { PipelineError } from '../../shared/exception/pipeline.error';
+import { ExtractResult } from '../../shared/extractor/extract-result.interface';
 import { Extractor } from '../../shared/extractor/extractor.interface';
 import { EthicalSuperstoreProductDto } from './dto/ethical-superstore-product.dto';
 import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
@@ -17,7 +28,7 @@ export class EthicalSuperstoreExtractor
   implements
     Extractor<
       Observable<EthicalSuperstoreSourceItemDto>,
-      Observable<EthicalSuperstoreProductDto>
+      Promise<ExtractResult<EthicalSuperstoreProductDto>>
     >
 {
   public static readonly BASE_URL = 'https://www.ethicalsuperstore.com';
@@ -90,34 +101,40 @@ export class EthicalSuperstoreExtractor
     };
   }
 
-  extractProduct(
+  async extractProduct(
     product: Product,
     skipCache: boolean,
-  ): Observable<EthicalSuperstoreProductDto> {
+  ): Promise<ExtractResult<EthicalSuperstoreProductDto>> {
     try {
-      return from(
-        skipCache
-          ? null
-          : this.productCacheManager.get<EthicalSuperstoreProductDto>(
-              this.providerKey,
-              product.providerProductId,
-            ),
-      ).pipe(
-        switchMap((cachedResponse) => {
-          return cachedResponse
-            ? of(cachedResponse.data)
-            : this.fetchProduct(product).pipe(
-                map((html) => this.extractProductFromHtml(html)),
-                tap((extractedProduct) => {
-                  this.productCacheManager.put<EthicalSuperstoreProductDto>(
-                    this.providerKey,
-                    product.providerProductId,
-                    extractedProduct,
-                  );
-                }),
-              );
-        }),
-      );
+      let cachedResponse = null;
+      if (!skipCache) {
+        cachedResponse =
+          await this.productCacheManager.get<EthicalSuperstoreProductDto>(
+            this.providerKey,
+            product.providerProductId,
+          );
+      }
+      if (cachedResponse) {
+        return {
+          sourceDate: cachedResponse.retrievedAt,
+          fromCache: true,
+          data: cachedResponse.data,
+        };
+      } else {
+        const extractedData = this.extractProductFromHtml(
+          await lastValueFrom(this.fetchProduct(product)),
+        );
+        this.productCacheManager.put<EthicalSuperstoreProductDto>(
+          this.providerKey,
+          product.providerProductId,
+          extractedData,
+        );
+        return {
+          sourceDate: new Date(),
+          fromCache: false,
+          data: extractedData,
+        };
+      }
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);
     }

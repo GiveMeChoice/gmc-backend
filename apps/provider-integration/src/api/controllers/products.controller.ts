@@ -27,7 +27,7 @@ export class ProductsController {
 
   @Get(':id')
   async getOne(@Param('id') id): Promise<Product> {
-    return await this.productsService.findOne(id);
+    return await this.productsService.findOneExternal(id);
   }
 
   @Post('search')

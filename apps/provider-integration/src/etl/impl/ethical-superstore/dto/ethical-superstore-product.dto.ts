@@ -24,14 +24,16 @@ export interface EthicalSuperstoreProductDto {
     url: string;
     isPrimary: boolean;
   }[];
-  ethicsAndTags?: {
-    title: string;
-    href: string;
-    icon: string;
-  }[];
+  ethicsAndTags?: EthicalSuperstoreEthicsAndTagsDto[];
   manufacturer?: {
     name: string;
     logo: string;
     description: string;
   };
+}
+
+export interface EthicalSuperstoreEthicsAndTagsDto {
+  title: string;
+  href: string;
+  icon: string;
 }

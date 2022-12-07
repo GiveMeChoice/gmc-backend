@@ -72,14 +72,7 @@ export class EthicalSuperstorePipeline extends PipelineBase {
   }
 
   async refreshProduct(product: Product, skipCache: boolean): Promise<any> {
-    return await lastValueFrom(
-      this._extractor
-        .extractProduct(product, skipCache)
-        .pipe(
-          map((extractedDto) =>
-            this._transformer.mapProductDetails(extractedDto),
-          ),
-        ),
-    );
+    const extracted = await this._extractor.extractProduct(product, skipCache);
+    return await this._transformer.mapProductDetails(extracted);
   }
 }

@@ -1,15 +1,23 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
+import { Label } from '@app/provider-integration/model/label.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
+import { ExtractResult } from '../../shared/extractor/extract-result.interface';
 import { SourceTransformer } from '../../shared/transformer/transformer.interface';
-import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
+import {
+  RainforestApiClimatePledgeFriendlyDto,
+  RainforestApiProductDto,
+} from './dto/rainforest-api-product.dto';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 
 @Injectable()
 export class RainforestApiTransformer
   implements
-    SourceTransformer<RainforestApiSourceItemDto, RainforestApiProductDto>
+    SourceTransformer<
+      RainforestApiSourceItemDto,
+      ExtractResult<RainforestApiProductDto>
+    >
 {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
@@ -27,20 +35,36 @@ export class RainforestApiTransformer
     }
   }
 
-  mapProductDetails(dto: RainforestApiProductDto): Partial<Product> {
+  mapProductDetails(
+    extracted: ExtractResult<RainforestApiProductDto>,
+  ): Partial<Product> {
+    const { data, sourceDate } = extracted;
     try {
       const product: Partial<Product> = {};
-      product.title = dto.product.title;
-      product.rating = dto.product.rating;
-      product.ratingsTotal = dto.product.ratings_total;
-      product.brandName = dto.product.brand;
-      product.link = dto.product.link;
-      product.price = dto.product.buybox_winner.price.value;
-      product.currency = dto.product.buybox_winner.price.currency;
-      product.image = dto.product.main_image.link;
+      product.title = data.product.title;
+      product.rating = data.product.rating;
+      product.ratingsTotal = data.product.ratings_total;
+      product.brandName = data.product.brand;
+      product.link = data.product.link;
+      product.price = data.product.buybox_winner.price.value;
+      product.currency = 'USD';
+      // product.currency = data.product.buybox_winner.price.currency;
+      product.image = data.product.main_image.link;
+      product.labels = this.mapLabels(data.climate_pledge_friendly) as Label[];
       return product;
     } catch (err) {
       throw new PipelineError('TRANSFORM_ERROR', err);
     }
+  }
+
+  private mapLabels(
+    climatePledge: RainforestApiClimatePledgeFriendlyDto,
+  ): Partial<Label>[] {
+    return [
+      {
+        title: climatePledge.text,
+        icon: climatePledge.image,
+      },
+    ];
   }
 }

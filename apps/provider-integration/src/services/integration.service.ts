@@ -70,13 +70,15 @@ export class IntegrationService {
     try {
       const pipeline = this.pipelineContainer.getPipeline(product.provider.key);
       product = await this.productsService.update(
-        productId,
+        product.id,
+        product.providerId,
         await pipeline.refreshProduct(product, skipCache),
       );
       product.hasIntegrationError = false;
       product.errorMessage = null;
       product.refreshedAt = new Date();
       product.expiresAt = renewExpirationDate(product.source);
+      product.keepAliveCount = 0;
       product.refreshedByRunId = runId;
       product.integrationStatus = ProductIntegrationStatus.LIVE;
     } catch (err) {

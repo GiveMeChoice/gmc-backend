@@ -4,6 +4,8 @@ import {
   Entity,
   Index,
   JoinColumn,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
@@ -11,6 +13,7 @@ import {
 } from 'typeorm';
 import { shortId } from '../utils/short-id';
 import { ProductIntegrationStatus } from './enum/product-status.enum';
+import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
 import { Provider } from './provider.entity';
 
@@ -150,4 +153,21 @@ export class Product {
 
   @Column({ nullable: true })
   link?: string;
+
+  @ManyToMany(() => Label, (label) => label.products, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+  })
+  @JoinTable({
+    name: 'gmc_product_label',
+    joinColumn: {
+      name: 'product',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'label',
+      referencedColumnName: 'id',
+    },
+  })
+  labels: Label[];
 }

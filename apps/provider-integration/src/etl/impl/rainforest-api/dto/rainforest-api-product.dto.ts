@@ -13,10 +13,7 @@ export interface RainforestApiProductDto {
     id: string;
     link: string;
   };
-  climate_pledge_friendly: {
-    text: string;
-    image: string;
-  };
+  climate_pledge_friendly: RainforestApiClimatePledgeFriendlyDto;
   product: {
     // unused
     variants: any;
@@ -131,4 +128,9 @@ export interface RainforestApiProductDto {
       };
     };
   };
+}
+
+export interface RainforestApiClimatePledgeFriendlyDto {
+  text: string;
+  image: string;
 }

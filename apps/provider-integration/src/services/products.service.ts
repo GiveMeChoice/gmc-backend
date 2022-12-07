@@ -1,19 +1,23 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import { DataSource, Repository } from 'typeorm';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
+import { Label } from '../model/label.entity';
 import { Product } from '../model/product.entity';
+import { LabelsService } from './labels.service';
 
 @Injectable()
 export class ProductsService {
   constructor(
     private readonly dataSource: DataSource,
     // private readonly messagingService: MessagingService,
-    @InjectRepository(Product) private productsRepo: Repository<Product>,
+    @InjectRepository(Product)
+    private readonly productsRepo: Repository<Product>,
+    private readonly labelsService: LabelsService,
   ) {}
 
   async find(
@@ -104,6 +108,22 @@ export class ProductsService {
     });
   }
 
+  findOneExternal(id: string): Promise<Product> {
+    return this.productsRepo.findOne({
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+      relations: { labels: true, source: true, provider: true },
+      select: {
+        source: {
+          identifier: true,
+          description: true,
+        },
+        provider: {
+          key: true,
+        },
+      },
+    });
+  }
+
   async getStatus(id: string): Promise<ProductIntegrationStatus> {
     const { integrationStatus: status } = await this.productsRepo.findOne({
       select: {
@@ -125,6 +145,9 @@ export class ProductsService {
       throw new Error(
         `Provider ${providerProductId} product ${providerProductId} already exists!`,
       );
+    }
+    if (data.labels) {
+      data.labels = await this.normalizeLabels(providerId, data);
     }
 
     const product = Product.factory(providerId, providerProductId, data);
@@ -150,8 +173,21 @@ export class ProductsService {
     }
   }
 
-  async update(id: string, updates: Partial<Product>): Promise<Product> {
-    await this.productsRepo.update(id, updates);
+  async update(
+    id: string,
+    providerId: string,
+    updates: Partial<Product>,
+  ): Promise<Product> {
+    if (updates.labels) {
+      updates.labels = await this.normalizeLabels(providerId, updates);
+    }
+    Logger.debug('About to update :o!');
+    Logger.debug(JSON.stringify(updates.labels));
+    await this.productsRepo.save({
+      id,
+      ...updates,
+    });
+    Logger.debug('Updated.. about to find one!');
     return await this.findOne(id);
   }
 
@@ -161,5 +197,31 @@ export class ProductsService {
 
   async remove(id: string): Promise<void> {
     await this.productsRepo.delete(id);
+  }
+
+  private async normalizeLabels(
+    providerId: string,
+    data: Partial<Product>,
+  ): Promise<Label[]> {
+    const labels = [];
+    for (const label of data.labels) {
+      if (label.id) {
+        // label was already on product, dont mess with it
+        labels.push(label);
+      } else {
+        const existing = await this.labelsService.findOneByProvider(
+          providerId,
+          label.title,
+        );
+        if (existing) {
+          // assign existing label
+          labels.push(existing);
+        } else {
+          // create new label
+          labels.push(Label.factory(providerId, label.title, label));
+        }
+      }
+    }
+    return labels;
   }
 }

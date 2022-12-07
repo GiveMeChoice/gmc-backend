@@ -7,6 +7,7 @@ import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
 import { IntegrationController } from './api/controllers/integration.controller';
 import { JobsController } from './api/controllers/jobs.controller';
+import { LabelsController } from './api/controllers/labels.controller';
 import { ProductRunsController } from './api/controllers/product-runs.controller';
 import { ProductSourcesController } from './api/controllers/product-sources.controller';
 import { ProductsController } from './api/controllers/products.controller';
@@ -17,12 +18,14 @@ import { EtlModule } from './etl/etl.module';
 import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { SourceDueMonitorJob } from './jobs/source-due-monitor.job';
+import { Label } from './model/label.entity';
 import { ProductRun } from './model/product-run.entity';
 import { ProductSource } from './model/product-source.entity';
 import { Product } from './model/product.entity';
 import { Provider } from './model/provider.entity';
 import { IntegrationService } from './services/integration.service';
 import { JobsService } from './services/jobs.service';
+import { LabelsService } from './services/labels.service';
 import { ProductRunsService } from './services/product-runs.service';
 import { ProductSourcesService } from './services/product-sources.service';
 import { ProductsService } from './services/products.service';
@@ -36,7 +39,13 @@ import { TasksService } from './services/tasks.service';
       load: [configuration],
     }),
     ScheduleModule.forRoot(),
-    TypeOrmModule.forFeature([Provider, ProductSource, ProductRun, Product]),
+    TypeOrmModule.forFeature([
+      Provider,
+      ProductSource,
+      ProductRun,
+      Product,
+      Label,
+    ]),
     DatabaseModule,
     MessagingModule,
     // SearchModule,
@@ -47,6 +56,7 @@ import { TasksService } from './services/tasks.service';
     ProvidersController,
     ProductSourcesController,
     ProductRunsController,
+    LabelsController,
     JobsController,
     ProductsController,
   ],
@@ -54,12 +64,14 @@ import { TasksService } from './services/tasks.service';
     // messaging
     RefreshProductConsumer,
     IntegrateSourceConsumer,
-    // services
+    // core services
     IntegrationService,
     ProvidersService,
     ProductSourcesService,
     ProductRunsService,
     ProductsService,
+    LabelsService,
+    // helper services
     JobsService,
     TasksService,
     // jobs
