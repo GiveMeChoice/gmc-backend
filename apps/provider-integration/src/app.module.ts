@@ -5,6 +5,9 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
+import { BrandsController } from './api/controllers/brands.controller';
+import { CategoriesController } from './api/controllers/categories.controller';
+import { CategoryGroupsController } from './api/controllers/category-groups.controller';
 import { IntegrationController } from './api/controllers/integration.controller';
 import { JobsController } from './api/controllers/jobs.controller';
 import { LabelGroupsController } from './api/controllers/label-groups.controller';
@@ -19,12 +22,19 @@ import { EtlModule } from './etl/etl.module';
 import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { SourceDueMonitorJob } from './jobs/source-due-monitor.job';
+import { Brand } from './model/brand.entity';
+import { CategoryGroup } from './model/category-group.entity';
+import { Category } from './model/category.entity';
 import { LabelGroup } from './model/label-group.entity';
 import { Label } from './model/label.entity';
 import { ProductRun } from './model/product-run.entity';
 import { ProductSource } from './model/product-source.entity';
 import { Product } from './model/product.entity';
 import { Provider } from './model/provider.entity';
+import { Review } from './model/review.entity';
+import { BrandsService } from './services/brands.service';
+import { CategoriesService } from './services/categories.service';
+import { CategoryGroupsService } from './services/category-groups.service';
 import { IntegrationService } from './services/integration.service';
 import { JobsService } from './services/jobs.service';
 import { LabelGroupsService } from './services/label-groups.service';
@@ -49,6 +59,10 @@ import { TasksService } from './services/tasks.service';
       Product,
       Label,
       LabelGroup,
+      Category,
+      CategoryGroup,
+      Brand,
+      Review,
     ]),
     DatabaseModule,
     MessagingModule,
@@ -62,6 +76,9 @@ import { TasksService } from './services/tasks.service';
     ProductRunsController,
     LabelsController,
     LabelGroupsController,
+    CategoriesController,
+    CategoryGroupsController,
+    BrandsController,
     JobsController,
     ProductsController,
   ],
@@ -77,6 +94,9 @@ import { TasksService } from './services/tasks.service';
     ProductsService,
     LabelsService,
     LabelGroupsService,
+    CategoriesService,
+    CategoryGroupsService,
+    BrandsService,
     // helper services
     JobsService,
     TasksService,

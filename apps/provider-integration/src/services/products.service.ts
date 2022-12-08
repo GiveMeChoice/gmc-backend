@@ -5,9 +5,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import { DataSource, Repository } from 'typeorm';
+import { Brand } from '../model/brand.entity';
+import { Category } from '../model/category.entity';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
 import { Label } from '../model/label.entity';
 import { Product } from '../model/product.entity';
+import { BrandsService } from './brands.service';
+import { CategoriesService } from './categories.service';
 import { LabelsService } from './labels.service';
 
 @Injectable()
@@ -18,6 +22,8 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: LabelsService,
+    private readonly categoriesService: CategoriesService,
+    private readonly brandsService: BrandsService,
   ) {}
 
   async find(
@@ -111,7 +117,14 @@ export class ProductsService {
   findOneExternal(id: string): Promise<Product> {
     return this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
-      relations: { labels: true, source: true, provider: true },
+      relations: {
+        reviews: true,
+        labels: true,
+        source: true,
+        provider: true,
+        category: true,
+        brand: true,
+      },
       select: {
         source: {
           identifier: true,
@@ -146,8 +159,14 @@ export class ProductsService {
         `Provider ${providerProductId} product ${providerProductId} already exists!`,
       );
     }
+    if (data.category) {
+      data.category = await this.normalizeCategory(providerId, data.category);
+    }
+    if (data.brand) {
+      data.brand = await this.normalizeBrand(providerId, data.brand);
+    }
     if (data.labels) {
-      data.labels = await this.normalizeLabels(providerId, data);
+      data.labels = await this.normalizeLabels(providerId, data.labels);
     }
 
     const product = Product.factory(providerId, providerProductId, data);
@@ -178,11 +197,19 @@ export class ProductsService {
     providerId: string,
     updates: Partial<Product>,
   ): Promise<Product> {
+    if (updates.category) {
+      updates.category = await this.normalizeCategory(
+        providerId,
+        updates.category,
+      );
+    }
+    if (updates.brand) {
+      updates.brand = await this.normalizeBrand(providerId, updates.brand);
+    }
     if (updates.labels) {
-      updates.labels = await this.normalizeLabels(providerId, updates);
+      updates.labels = await this.normalizeLabels(providerId, updates.labels);
     }
     Logger.debug('About to update :o!');
-    Logger.debug(JSON.stringify(updates.labels));
     await this.productsRepo.save({
       id,
       ...updates,
@@ -199,12 +226,46 @@ export class ProductsService {
     await this.productsRepo.delete(id);
   }
 
+  private async normalizeCategory(
+    providerId: string,
+    category: Category,
+  ): Promise<Category> {
+    if (category.id) {
+      return category;
+    } else {
+      const existing = await this.categoriesService.findOneByProvider(
+        providerId,
+        category.title,
+      );
+      return existing
+        ? existing
+        : Category.factory(providerId, category.title, category);
+    }
+  }
+
+  private async normalizeBrand(
+    providerId: string,
+    brand: Brand,
+  ): Promise<Brand> {
+    if (brand.id) {
+      return brand;
+    } else {
+      const existing = await this.brandsService.findOneByProvider(
+        providerId,
+        brand.title,
+      );
+      return existing
+        ? existing
+        : Brand.factory(providerId, brand.title, brand);
+    }
+  }
+
   private async normalizeLabels(
     providerId: string,
-    data: Partial<Product>,
+    rawLabels: Label[],
   ): Promise<Label[]> {
     const labels = [];
-    for (const label of data.labels) {
+    for (const label of rawLabels) {
       if (label.id) {
         // label was already on product, dont mess with it
         labels.push(label);

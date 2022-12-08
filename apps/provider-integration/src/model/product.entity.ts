@@ -7,15 +7,19 @@ import {
   JoinTable,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { shortId } from '../utils/short-id';
+import { Brand } from './brand.entity';
+import { Category } from './category.entity';
 import { ProductIntegrationStatus } from './enum/product-status.enum';
 import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
 import { Provider } from './provider.entity';
+import { Review } from './review.entity';
 
 @Entity({ name: 'gmc_product' })
 @Index(['providerId', 'providerProductId'], { unique: true })
@@ -145,20 +149,38 @@ export class Product {
   @Column({ nullable: true })
   currency?: string;
 
-  @Column({ name: 'brand_id', nullable: true })
-  brandId?: string;
-
-  @Column({ name: 'brand_name', nullable: true })
-  brandName?: string;
-
   @Column({ name: 'list_image', nullable: true })
   listImage?: string;
 
   @Column({ name: 'main_image', nullable: true })
   mainImage?: string;
 
+  @Column({ name: 'secondary_image', nullable: true })
+  secondaryImage?: string;
+
   @Column({ name: 'offer_link', nullable: true })
   offerLink?: string;
+
+  @ManyToOne(() => Brand, (brand) => brand.products, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+  })
+  brand?: Brand;
+
+  @ManyToOne(() => Category, (category) => category.products, {
+    cascade: true,
+    onUpdate: 'CASCADE',
+  })
+  category?: Category;
+
+  @Column({ name: 'category_detail', nullable: true })
+  categoryDetail?: string;
+
+  @OneToMany(() => Review, (reviews) => reviews.product, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  reviews?: Review[];
 
   @ManyToMany(() => Label, (label) => label.products, {
     cascade: true,

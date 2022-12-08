@@ -13,12 +13,7 @@ export interface EthicalSuperstoreProductDto {
   };
   rating?: number;
   reviewCount?: number;
-  reviews?: {
-    author: string;
-    submittedOn: Date;
-    rating: number;
-    text: string;
-  }[];
+  reviews?: EthicalSuperstoreReviewDto[];
   inStock?: boolean;
   images?: {
     url: string;
@@ -30,6 +25,13 @@ export interface EthicalSuperstoreProductDto {
     logo: string;
     description: string;
   };
+}
+
+export interface EthicalSuperstoreReviewDto {
+  author: string;
+  submittedOn: Date;
+  rating: number;
+  text: string;
 }
 
 export interface EthicalSuperstoreEthicsAndTagsDto {

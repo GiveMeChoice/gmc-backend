@@ -1,7 +1,4 @@
-import {
-  ProductDataDto,
-  ProductRefreshDto,
-} from '@app/provider-integration/model/dto/product-data.dto';
+import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
@@ -82,7 +79,10 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return {
       sourceDate: extracted.sourceDate,
-      ...(await this._transformer.mapProductData(extracted.data)),
+      ...(await this._transformer.mapProductData(
+        extracted.data,
+        product.source,
+      )),
     };
   }
 }

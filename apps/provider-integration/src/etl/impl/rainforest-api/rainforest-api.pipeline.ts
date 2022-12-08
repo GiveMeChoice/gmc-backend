@@ -81,7 +81,10 @@ export class RainforestApiPipeline extends PipelineBase {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return {
       sourceDate: extracted.sourceDate,
-      ...(await this._transformer.mapProductData(extracted.data)),
+      ...(await this._transformer.mapProductData(
+        extracted.data,
+        product.source,
+      )),
     };
   }
 }

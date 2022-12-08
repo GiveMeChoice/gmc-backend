@@ -34,6 +34,7 @@ export interface RainforestApiProductDto {
         category_id: string;
       },
     ];
+    categories_flat: string;
     delivery_message: string;
     description: string;
     promotions_feature: string;
@@ -72,25 +73,7 @@ export interface RainforestApiProductDto {
         value: string;
       },
     ];
-    top_reviews: [
-      {
-        id: string;
-        title: string;
-        body: string;
-        body_html: string;
-        link: string;
-        rating: number;
-        date: {
-          raw: string;
-          utc: string;
-        };
-        profile: {
-          name: string;
-          link: string;
-          id: string;
-        };
-      },
-    ];
+    top_reviews: RainforestApiTopReviewDto[];
     buybox_winner: {
       new_offers_from: {
         symbol: string;
@@ -130,7 +113,30 @@ export interface RainforestApiProductDto {
   };
 }
 
+export interface RainforestApiImageDto {
+  link: string;
+  variant: string;
+}
+
 export interface RainforestApiClimatePledgeFriendlyDto {
   text: string;
   image: string;
+}
+
+export interface RainforestApiTopReviewDto {
+  id: string;
+  title: string;
+  body: string;
+  body_html: string;
+  link: string;
+  rating: number;
+  date: {
+    raw: string;
+    utc: Date;
+  };
+  profile: {
+    name: string;
+    link: string;
+    id: string;
+  };
 }

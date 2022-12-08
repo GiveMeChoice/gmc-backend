@@ -53,13 +53,13 @@ export class ProductSource {
   @Column({ name: 'retry_limit', type: 'integer', default: 3 })
   retryLimit: number;
 
-  @Column()
+  @Column({ nullable: true })
   category: string;
 
-  @Column({ name: 'subcategory_1' })
+  @Column({ name: 'subcategory_1', nullable: true })
   subcategory1: string;
 
-  @Column({ name: 'subcategory_2' })
+  @Column({ name: 'subcategory_2', nullable: true })
   subcategory2: string;
 
   @OneToMany(() => ProductRun, (run: ProductRun) => run.source)
