@@ -95,6 +95,9 @@ export class Product {
   @Column({ name: 'refreshed_at', type: 'timestamptz', nullable: true })
   refreshedAt: Date;
 
+  @Column({ name: 'source_date', type: 'timestamptz', nullable: true })
+  sourceDate: Date;
+
   @Column({ name: 'expires_at', type: 'timestamptz', nullable: true })
   expiresAt: Date;
 
@@ -113,7 +116,7 @@ export class Product {
 
   /* 
   ///////////////////////
-    PRODUCT INFORMATION
+    PRODUCT DATA
   ///////////////////////
   */
   @Column({ nullable: true })
@@ -148,11 +151,14 @@ export class Product {
   @Column({ name: 'brand_name', nullable: true })
   brandName?: string;
 
-  @Column({ nullable: true })
-  image?: string;
+  @Column({ name: 'list_image', nullable: true })
+  listImage?: string;
 
-  @Column({ nullable: true })
-  link?: string;
+  @Column({ name: 'main_image', nullable: true })
+  mainImage?: string;
+
+  @Column({ name: 'offer_link', nullable: true })
+  offerLink?: string;
 
   @ManyToMany(() => Label, (label) => label.products, {
     cascade: true,

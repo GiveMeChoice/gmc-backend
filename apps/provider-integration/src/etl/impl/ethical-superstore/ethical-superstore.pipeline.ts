@@ -1,3 +1,7 @@
+import {
+  ProductDataDto,
+  ProductRefreshDto,
+} from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
@@ -71,8 +75,14 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     return sourceProduct.price && sourceProduct.price != existingProduct.price;
   }
 
-  async refreshProduct(product: Product, skipCache: boolean): Promise<any> {
+  async refreshProduct(
+    product: Product,
+    skipCache: boolean,
+  ): Promise<ProductRefreshDto> {
     const extracted = await this._extractor.extractProduct(product, skipCache);
-    return await this._transformer.mapProductDetails(extracted);
+    return {
+      sourceDate: extracted.sourceDate,
+      ...(await this._transformer.mapProductData(extracted.data)),
+    };
   }
 }

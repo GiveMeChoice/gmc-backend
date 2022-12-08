@@ -1,51 +1,50 @@
+import {
+  ProductDataDto,
+  SourceItemDataDto,
+} from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Label } from '@app/provider-integration/model/label.entity';
-import { Product } from '@app/provider-integration/model/product.entity';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
-import { ExtractResult } from '../../shared/extractor/extract-result.interface';
 import { SourceTransformer } from '../../shared/transformer/transformer.interface';
 import {
   EthicalSuperstoreEthicsAndTagsDto,
   EthicalSuperstoreProductDto,
 } from './dto/ethical-superstore-product.dto';
 import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
-import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
+import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
 
 @Injectable()
 export class EthicalSuperstoreTransformer
   implements
     SourceTransformer<
       EthicalSuperstoreSourceItemDto,
-      ExtractResult<EthicalSuperstoreProductDto>
+      EthicalSuperstoreProductDto
     >
 {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
-  mapSourceItem(item: EthicalSuperstoreSourceItemDto): Partial<Product> {
+  mapSourceItem(item: EthicalSuperstoreSourceItemDto): SourceItemDataDto {
     try {
-      const product: Partial<Product> = {
+      const product: SourceItemDataDto = {
         providerProductId: item.id,
       };
-      product.sku = item.sku;
-      product.title = item.name;
+      // product.sku = item.sku;
+      // product.title = item.name;
+      // product.currency = product.price ? 'GBP' : null;
+      // product.brandName = item.brand;
       product.price = item.price ? Number(item.price) : null;
-      product.currency = product.price ? 'GBP' : null;
-      product.brandName = item.brand;
-      product.image = item.image;
-      product.link = `${EthicalSuperstoreExtractor.BASE_URL}${item.href}`;
+      product.listImage = item.image;
+      product.offerLink = `${ETHICAL_SUPERSTORE_BASE_URL}${item.href}`;
       return product;
     } catch (err) {
       throw new PipelineError('TRANSFORM_ERROR', err);
     }
   }
 
-  mapProductDetails(
-    extracted: ExtractResult<EthicalSuperstoreProductDto>,
-  ): Partial<Product> {
+  mapProductData(data: EthicalSuperstoreProductDto): ProductDataDto {
     try {
-      const { data, sourceDate } = extracted;
-      const product: Partial<Product> = {};
+      const product: ProductDataDto = {};
       product.rating = data.rating;
       product.labels = this.mapLabels(data.ethicsAndTags) as Label[];
       return product;
@@ -59,8 +58,8 @@ export class EthicalSuperstoreTransformer
   ): Partial<Label>[] {
     return ethicsAndTags.map((tag) => ({
       title: tag.title,
-      description: tag.href,
-      icon: `https://www.ethicalsuperstore.com${tag.icon}`,
+      infoLink: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.href}`,
+      icon: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.icon}`,
     }));
   }
 }

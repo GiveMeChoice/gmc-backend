@@ -1,10 +1,15 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
+  JoinColumn,
   ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import { LabelGroup } from './label-group.entity';
 import { Product } from './product.entity';
 
 @Entity({ name: 'gmc_label' })
@@ -34,11 +39,35 @@ export class Label {
   @Column()
   readonly title: string;
 
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+
+  @Column({ name: 'info_link', nullable: true })
+  infoLink?: string;
+
   @Column({ nullable: true })
   icon?: string;
 
   @Column({ nullable: true })
   description?: string;
+
+  @Column({ name: 'group_id', nullable: true })
+  groupId?: string;
+
+  @ManyToOne(() => LabelGroup, (group) => group.labels)
+  @JoinColumn({ name: 'group_id' })
+  group?: LabelGroup;
 
   @ManyToMany(() => Product, (product) => product.labels)
   products: Product[];

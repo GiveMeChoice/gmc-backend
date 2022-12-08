@@ -1,3 +1,4 @@
+import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { IntegrationService } from '@app/provider-integration/services/integration.service';
@@ -47,7 +48,7 @@ export class IntegrationController {
   async mapProduct(
     @Query('id') productId: string,
     @Query('skipCache') skipCache: boolean,
-  ): Promise<any> {
+  ): Promise<ProductRefreshDto> {
     Logger.debug(
       `Map ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
     );

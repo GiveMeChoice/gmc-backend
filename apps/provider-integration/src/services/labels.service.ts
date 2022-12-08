@@ -20,7 +20,31 @@ export class LabelsService {
   }
 
   findOne(id: string): Promise<Label> {
-    return this.labelsRepo.findOne({ where: { id } });
+    return this.labelsRepo.findOne({
+      where: { id },
+      relations: { group: true },
+    });
+  }
+
+  async find(
+    findDto: Partial<Label>,
+    pageRequest?: PageRequest,
+  ): Promise<Page<Label>> {
+    const [data, count] = await this.labelsRepo.findAndCount({
+      ...pageRequest,
+      where: {
+        ...findDto,
+      },
+      relations: {
+        group: true,
+      },
+      select: {
+        group: {
+          name: true,
+        },
+      },
+    });
+    return buildPage<Label>(data, count, pageRequest);
   }
 
   findOneByProvider(providerId: string, title: string) {
@@ -31,5 +55,10 @@ export class LabelsService {
 
   create(label: Partial<Label>): Promise<Label> {
     return this.labelsRepo.save(label);
+  }
+
+  async update(id: string, label: Partial<Label>): Promise<Label> {
+    await this.labelsRepo.save({ id, ...label });
+    return await this.findOne(id);
   }
 }

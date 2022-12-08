@@ -4,7 +4,6 @@ import { Product } from '@app/provider-integration/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
 import { Element, load } from 'cheerio';
-import { data } from 'cheerio/lib/api/attributes';
 import {
   from,
   lastValueFrom,
@@ -22,6 +21,7 @@ import { ExtractResult } from '../../shared/extractor/extract-result.interface';
 import { Extractor } from '../../shared/extractor/extractor.interface';
 import { EthicalSuperstoreProductDto } from './dto/ethical-superstore-product.dto';
 import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
+import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
 
 @Injectable()
 export class EthicalSuperstoreExtractor
@@ -31,7 +31,6 @@ export class EthicalSuperstoreExtractor
       Promise<ExtractResult<EthicalSuperstoreProductDto>>
     >
 {
-  public static readonly BASE_URL = 'https://www.ethicalsuperstore.com';
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
   constructor(
@@ -68,7 +67,7 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchSource(source: ProductSource): Observable<string> {
-    const url = `${EthicalSuperstoreExtractor.BASE_URL}/category/${source.identifier}?limit=192`;
+    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.identifier}?limit=192`;
     Logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
@@ -141,7 +140,7 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchProduct(product: Product): Observable<string> {
-    const url = product.link;
+    const url = product.offerLink;
     Logger.debug(`Fetching Product: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }

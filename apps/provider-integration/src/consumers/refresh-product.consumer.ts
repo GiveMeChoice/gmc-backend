@@ -30,11 +30,11 @@ export class RefreshProductConsumer implements Consumer<RefreshProductCommand> {
     try {
       const status = await this.productsService.getStatus(data.productId);
       if (status === ProductIntegrationStatus.PENDING) {
-        await this.integrationService.refreshProduct(
-          data.productId,
-          data.runId,
-          data.skipCache,
-        );
+        // await this.integrationService.refreshProduct(
+        //   data.productId,
+        //   data.runId,
+        //   data.skipCache,
+        // );
       } else {
         Logger.debug(
           `Product is NOT in PENDING status (will not be refreshed): ${data.productId}`,

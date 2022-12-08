@@ -3,7 +3,18 @@ import { LabelsService } from '@app/provider-integration/services/labels.service
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { FindLabelsDto } from '../dto/find-labels.dto';
+import { UpdateLabelDto } from '../dto/update-label.dto';
 
 @Controller('labels')
 export class LabelsController {
@@ -21,12 +32,20 @@ export class LabelsController {
     return await this.labelsService.findOne(id);
   }
 
-  // @Post('search')
-  // async search(
-  //   @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-  //   @Body() findDto: FindProductsDto,
-  // ) {
-  //   Logger.debug(JSON.stringify(findDto));
-  //   return await this.productsService.find(findDto, pageRequest);
-  // }
+  @Put(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateLabelDto,
+  ): Promise<Label> {
+    return this.labelsService.update(id, updateDto);
+  }
+
+  @Post('search')
+  async search(
+    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
+    @Body() findDto: FindLabelsDto,
+  ) {
+    Logger.debug(JSON.stringify(findDto));
+    return await this.labelsService.find(findDto, pageRequest);
+  }
 }

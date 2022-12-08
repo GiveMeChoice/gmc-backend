@@ -1,3 +1,4 @@
+import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
@@ -9,5 +10,5 @@ export interface Pipeline {
   refreshProduct(
     product: Product,
     skipCache: boolean,
-  ): Promise<Partial<Product>>;
+  ): Promise<ProductRefreshDto>;
 }

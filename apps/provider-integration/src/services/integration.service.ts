@@ -17,6 +17,7 @@ import {
   TransformerContainer,
   TRANSFORMER_CONTAINER,
 } from '../etl/shared/transformer/transformer.container';
+import { ProductRefreshDto } from '../model/dto/product-data.dto';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
 import { ProductRun } from '../model/product-run.entity';
 import { ProductSource } from '../model/product-source.entity';
@@ -100,18 +101,14 @@ export class IntegrationService {
     return await extractor.extractProduct(product, skipCache);
   }
 
-  async mapProduct(productId: string, skipCache: boolean): Promise<any> {
+  async mapProduct(
+    productId: string,
+    skipCache: boolean,
+  ): Promise<ProductRefreshDto> {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
-    const extractor = this.extractorContainer.getExtractor(
-      product.provider.key,
-    );
-    const mapper = this.transformerContainer.getTransformer(
-      product.provider.key,
-    );
-    return mapper.mapProductDetails(
-      await extractor.extractProduct(product, skipCache),
-    );
+    const pipeline = this.pipelineContainer.getPipeline(product.provider.key);
+    return await pipeline.refreshProduct(product, skipCache);
   }
 
   private validateSource(source: ProductSource) {

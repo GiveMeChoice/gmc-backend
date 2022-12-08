@@ -1,3 +1,7 @@
+import {
+  ProductDataDto,
+  ProductRefreshDto,
+} from '@app/provider-integration/model/dto/product-data.dto';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -73,9 +77,11 @@ export class RainforestApiPipeline extends PipelineBase {
   async refreshProduct(
     product: Product,
     skipCache: boolean,
-  ): Promise<Partial<Product>> {
-    return await this._transformer.mapProductDetails(
-      await this._extractor.extractProduct(product, skipCache),
-    );
+  ): Promise<ProductRefreshDto> {
+    const extracted = await this._extractor.extractProduct(product, skipCache);
+    return {
+      sourceDate: extracted.sourceDate,
+      ...(await this._transformer.mapProductData(extracted.data)),
+    };
   }
 }
