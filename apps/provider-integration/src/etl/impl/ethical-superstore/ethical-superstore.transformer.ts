@@ -4,7 +4,6 @@ import {
   ProductDataDto,
   SourceItemDataDto,
 } from '@app/provider-integration/model/dto/product-data.dto';
-import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
@@ -56,7 +55,18 @@ export class EthicalSuperstoreTransformer
       product.sku = this.mapSku(data);
 
       product.title = data.productInfo.title;
-      product.description = data.productInfo.description;
+      product.description = data.productInfo.description
+        .replace('�', '')
+        .replace('�', '')
+        .replace('�', '')
+        .replace('�', '')
+        .replace('�', '')
+        .replace('���', '•')
+        .replace('����', '•')
+        .replace('����', '•')
+        .replace('����', '•')
+        .replace('����', '•')
+        .replace('����', '•');
 
       product.rating = data.rating;
       product.ratingsTotal = data.reviewCount;

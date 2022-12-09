@@ -8,4 +8,5 @@ export interface EthicalSuperstoreSourceItemDto {
   category: string;
   list: string;
   image: string;
+  inStock: boolean;
 }

@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { CategoryGroup } from './category-group.entity';
 import { Product } from './product.entity';
+import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_category' })
 @Index(['providerId', 'title'], { unique: true })
@@ -53,6 +54,10 @@ export class Category {
 
   @Column({ name: 'group_id', nullable: true })
   groupId?: string;
+
+  @ManyToOne(() => Provider, (provider) => provider.categories)
+  @JoinColumn({ name: 'provider_id' })
+  provider: Provider;
 
   @ManyToOne(() => CategoryGroup, (group) => group.categories)
   @JoinColumn({ name: 'group_id' })

@@ -3,7 +3,8 @@ import { ProductSource } from '@app/provider-integration/model/product-source.en
 import { Product } from '@app/provider-integration/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { Element, load } from 'cheerio';
+import { Cheerio, Element, load } from 'cheerio';
+import { each } from 'cheerio/lib/api/traversing';
 import {
   from,
   lastValueFrom,
@@ -43,24 +44,28 @@ export class EthicalSuperstoreExtractor
     source: ProductSource,
   ): Observable<EthicalSuperstoreSourceItemDto> {
     try {
-      return from(
-        this.sourceCacheManager.get<EthicalSuperstoreSourceItemDto[]>(source),
-      ).pipe(
-        switchMap((cachedResponse) => {
-          return cachedResponse
-            ? of(cachedResponse.data)
-            : this.fetchSource(source).pipe(
-                map((html) => this.extractItemsFromHtml(html)),
-                tap((items) =>
-                  this.sourceCacheManager.put<EthicalSuperstoreSourceItemDto[]>(
-                    source,
-                    items,
-                  ),
-                ),
-              );
-        }),
+      return this.fetchSource(source).pipe(
+        map((html) => this.extractItemsFromHtml(html)),
         mergeMap((items) => items),
       );
+      // return from(
+      //   this.sourceCacheManager.get<EthicalSuperstoreSourceItemDto[]>(source),
+      // ).pipe(
+      //   switchMap((cachedResponse) => {
+      //     return cachedResponse
+      //       ? of(cachedResponse.data)
+      //       : this.fetchSource(source).pipe(
+      //           map((html) => this.extractItemsFromHtml(html)),
+      //           tap((items) =>
+      //             this.sourceCacheManager.put<EthicalSuperstoreSourceItemDto[]>(
+      //               source,
+      //               items,
+      //             ),
+      //           ),
+      //         );
+      //   }),
+      //   mergeMap((items) => items),
+      // );
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);
     }
@@ -77,11 +82,13 @@ export class EthicalSuperstoreExtractor
     const products = [];
     $('.cat-listing-wrapper')
       .find('.media__body')
-      .find('.view_product_link')
-      .each((i, p) => {
-        const src = $(`#p_img_${p.attribs['data-product-id']}`).attr('src');
-        p.attribs['img-src'] = src;
-        products.push(p);
+      .each((i, el) => {
+        const vpl = $(el).find('.view_product_link').get()[0];
+        const src = $(`#p_img_${vpl.attribs['data-product-id']}`).attr('src');
+        vpl.attribs['img-src'] = src;
+        const atext = $(el).find('form').children('a').first().text();
+        vpl.attribs['in-stock'] = atext.trim().toLowerCase();
+        products.push(vpl);
       });
     return products.map(this.mapItemToDto);
   }
@@ -97,6 +104,7 @@ export class EthicalSuperstoreExtractor
       category: element.attribs['data-product-category'],
       list: element.attribs['data-product-list'],
       image: element.attribs['img-src'],
+      inStock: !element.attribs['in-stock'].includes('out of stock'),
     };
   }
 
@@ -257,13 +265,19 @@ export class EthicalSuperstoreExtractor
         if ($(el).text().includes('In Stock')) dto.inStock = true;
       });
       // description
-      dto.productInfo.description = $(
-        '.accordion__content[itemprop=description]',
-      )
-        .first()
-        .text()
-        .replace(/\s+/g, ' ')
-        .trim();
+      dto.productInfo.description;
+      $('.accordion__content[itemprop=description]')
+        .children('p')
+        .each((i, el) => {
+          dto.productInfo.description += `${$(el)
+            .text()
+            .replace(/\s+/g, ' ')
+            .trim()}\n\n`;
+        });
+      // .first()
+      // .text()
+      // .replace(/\s+/g, ' ')
+      // .trim();
 
       // $('.accordion__content[itemprop=description]')
       //   .first()

@@ -5,7 +5,9 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { Category } from './category.entity';
 import { ProviderKey } from './enum/provider-key.enum';
+import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
 import { Product } from './product.entity';
 
@@ -34,6 +36,12 @@ export class Provider {
   )
   sources: ProductSource[];
 
-  @OneToMany(() => Product, (product: Product) => product.provider)
+  @OneToMany(() => Product, (product) => product.provider)
   products: Product[];
+
+  @OneToMany(() => Label, (label) => label.provider)
+  labels: Label[];
+
+  @OneToMany(() => Category, (category) => category.provider)
+  categories: Category[];
 }

@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { LabelGroup } from './label-group.entity';
 import { Product } from './product.entity';
+import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_label' })
 @Index(['providerId', 'title'], { unique: true })
@@ -64,6 +65,10 @@ export class Label {
 
   @Column({ name: 'group_id', nullable: true })
   groupId?: string;
+
+  @ManyToOne(() => Provider, (provider) => provider.labels)
+  @JoinColumn({ name: 'provider_id' })
+  provider: Provider;
 
   @ManyToOne(() => LabelGroup, (group) => group.labels)
   @JoinColumn({ name: 'group_id' })

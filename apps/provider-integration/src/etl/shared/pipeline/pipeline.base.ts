@@ -66,7 +66,7 @@ export abstract class PipelineBase implements Pipeline {
   protected async loadSourceProduct(
     sourceProduct: Partial<Product>,
     run: ProductRun,
-  ): Promise<ProductRun> {
+  ) {
     run.foundCount++;
     try {
       const existingProduct = await this.productsService.findByProvider(
@@ -181,7 +181,7 @@ export abstract class PipelineBase implements Pipeline {
     product.source = run.source;
     product.expiresAt = renewExpirationDate(run.source);
     await this.productsService.save(product);
-    await this.sendRefreshSignal(product.id, run.id, true);
+    await this.sendRefreshSignal(product.id, run.id);
   }
 
   private async sendRefreshSignal(
@@ -193,7 +193,7 @@ export abstract class PipelineBase implements Pipeline {
       new RefreshProductCommand({
         productId,
         runId,
-        skipCache: false,
+        skipCache,
       }),
     );
   }

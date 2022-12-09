@@ -41,11 +41,11 @@ export class EthicalSuperstorePipeline extends PipelineBase {
       run.sourceDate = new Date();
       await lastValueFrom(
         this._extractor.extractSource(run.source).pipe(
-          map((item) => {
-            return this._transformer.mapSourceItem(item);
-          }),
-          concatMap(async (sourceProduct) => {
-            run = await this.loadSourceProduct(sourceProduct, run);
+          concatMap(async (sourceItem) => {
+            if (sourceItem.inStock) {
+              const sourceProduct = this._transformer.mapSourceItem(sourceItem);
+              await this.loadSourceProduct(sourceProduct, run);
+            }
           }),
         ),
       );

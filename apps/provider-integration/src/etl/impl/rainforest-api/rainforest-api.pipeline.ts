@@ -52,7 +52,7 @@ export class RainforestApiPipeline extends PipelineBase {
             item.result.category_results.price.value
           ) {
             const sourceProduct = this._transformer.mapSourceItem(item);
-            run = await super.loadSourceProduct(sourceProduct, run);
+            await super.loadSourceProduct(sourceProduct, run);
           }
         });
     } catch (err) {
