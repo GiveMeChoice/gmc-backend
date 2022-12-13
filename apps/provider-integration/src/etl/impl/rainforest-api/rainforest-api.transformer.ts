@@ -8,12 +8,14 @@ import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.e
 import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Review } from '@app/provider-integration/model/review.entity';
+import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
 import { SourceTransformer } from '../../shared/transformer/transformer.interface';
 import {
   RainforestApiClimatePledgeFriendlyDto,
   RainforestApiImageDto,
+  RainforestApiPriceDto,
   RainforestApiProductDto,
   RainforestApiTopReviewDto,
 } from './dto/rainforest-api-product.dto';
@@ -52,11 +54,14 @@ export class RainforestApiTransformer
       product.ratingsTotal = data.product.ratings_total;
       product.offerLink = data.product.link;
       product.price = data.product.buybox_winner.price.value;
+      product.shippingPrice = this.mapShippingPrice(
+        data.product.buybox_winner.shipping,
+      );
       product.currency = data.product.buybox_winner.price.currency;
       product.mainImage = data.product.main_image.link;
       product.secondaryImage = this.mapSecondaryImage(data.product.images);
       product.categoryDetail = data.product.categories_flat;
-      product.description = this.mapDescription(data.product.description);
+      product.description = this.mapDescription(data);
       product.brand = this.mapBrand(data.product.brand) as Brand;
       product.category = this.mapCategory(source) as Category;
       product.reviews = this.mapReviews(data.product.top_reviews) as Review[];
@@ -64,6 +69,14 @@ export class RainforestApiTransformer
       return product;
     } catch (err) {
       throw new PipelineError('TRANSFORM_ERROR', err);
+    }
+  }
+
+  private mapShippingPrice(shipping: RainforestApiPriceDto): any {
+    if (shipping && shipping.raw) {
+      return shipping.raw === 'FREE' ? 0 : shipping.value;
+    } else {
+      return null;
     }
   }
 
@@ -78,25 +91,34 @@ export class RainforestApiTransformer
     return secImg ? secImg.link : null;
   }
 
-  private mapDescription(description: string): string {
-    if (!description) {
-      return null;
+  private mapDescription(data: RainforestApiProductDto): string {
+    if (!data.product.description) {
+      if (data.product.feature_bullets && data.product.feature_bullets.length) {
+        let dxn = '';
+        data.product.feature_bullets.forEach((bullet) => {
+          dxn += `${bullet.trim()}\n\n`;
+        });
+        return dxn.trim();
+      } else {
+        return null;
+      }
     }
-    if (description.endsWith('See more')) {
-      description = description.slice(0, -9);
+    if (data.product.description.endsWith('See more')) {
+      data.product.description = data.product.description.slice(0, -9);
     }
-    return description.trim();
+    return data.product.description.trim();
   }
 
-  private mapBrand(brand: string): Partial<Brand> {
+  private mapBrand(brandName: string): Partial<Brand> {
     return {
-      title: brand,
+      code: normalizeIdCode(brandName),
+      description: brandName,
     };
   }
 
   private mapCategory(source: ProductSource): Partial<Category> {
     return {
-      title: source.category,
+      code: normalizeIdCode(source.category),
       description: source.description,
     };
   }
@@ -131,7 +153,8 @@ export class RainforestApiTransformer
   ): Partial<Label>[] {
     return [
       {
-        title: climatePledge.text,
+        code: normalizeIdCode(climatePledge.text),
+        description: climatePledge.text,
         icon: climatePledge.image,
       },
     ];

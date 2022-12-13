@@ -1,5 +1,5 @@
 import { MessageBase } from '@lib/messaging/interface/message-base.class';
-import { RefreshProductCommandDataDto } from './dto/refresh-product-command-data.dto';
+import { RefreshProductCommandDataDto } from './dto/refresh-product-command.dto';
 
 export class RefreshProductCommand extends MessageBase<RefreshProductCommandDataDto> {
   static readonly ROUTING_KEY = 'pi.product.refresh';

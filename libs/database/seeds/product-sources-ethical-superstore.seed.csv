@@ -1,207 +1,207 @@
-category,subcategory1,subcategory2,identifier,description,active
-groceries-and-everyday,store-cupboard,breakfast-cereals,groceries-and-everyday/store-cupboard/breakfast-cereals,Breakfast cereals,false
-groceries-and-everyday,store-cupboard,herbs-and-spices,groceries-and-everyday/store-cupboard/herbs-and-spices,Herbs and spices,false
-groceries-and-everyday,store-cupboard,tinned-veg-and-pulses,groceries-and-everyday/store-cupboard/tinned-veg-and-pulses,Tinned veg and pulses,false
-groceries-and-everyday,store-cupboard,soup,groceries-and-everyday/store-cupboard/soup,Soup,false
-groceries-and-everyday,store-cupboard,coconut,groceries-and-everyday/store-cupboard/coconut,Coconut,false
-groceries-and-everyday,store-cupboard,fish-and-seafood,groceries-and-everyday/store-cupboard/fish-and-seafood,Fish and seafood,false
-groceries-and-everyday,pasta-and-noodles,pasta,groceries-and-everyday/pasta-and-noodles/pasta,Pasta,false
-groceries-and-everyday,pasta-and-noodles,noodles,groceries-and-everyday/pasta-and-noodles/noodles,Noodles,false
-groceries-and-everyday,pasta-rice-and-pulses,rice,groceries-and-everyday/pasta-rice-and-pulses/rice,Rice,false
-groceries-and-everyday,pasta-rice-and-pulses,pulses,groceries-and-everyday/pasta-rice-and-pulses/pulses,Pulses,false
-groceries-and-everyday,pasta-rice-and-pulses,beans-and-pulses-dried,groceries-and-everyday/pasta-rice-and-pulses/beans-and-pulses-dried,Beans and pulses dried,false
-groceries-and-everyday,pasta-rice-and-pulses,grains,groceries-and-everyday/pasta-rice-and-pulses/grains,Grains,false
-groceries-and-everyday,sauces-and-stock,curry-sauces,groceries-and-everyday/sauces-and-stock/curry-sauces,Curry sauces,false
-groceries-and-everyday,sauces-and-stock,pasta-sauce-and-pesto,groceries-and-everyday/sauces-and-stock/pasta-sauce-and-pesto,Pasta sauce and pesto,false
-groceries-and-everyday,sauces-and-stock,gravy-and-stock,groceries-and-everyday/sauces-and-stock/gravy-and-stock,Gravy and stock,false
-groceries-and-everyday,sauces-and-stock,cooking-sauces,groceries-and-everyday/sauces-and-stock/cooking-sauces,Cooking sauces,false
-groceries-and-everyday,jams-and-preserves,preserves,groceries-and-everyday/jams-and-preserves/preserves,Preserves,false
-groceries-and-everyday,jams-and-preserves,savoury-spreads,groceries-and-everyday/jams-and-preserves/savoury-spreads,Savoury spreads,false
-groceries-and-everyday,jams-and-preserves,chocolate-spread,groceries-and-everyday/jams-and-preserves/chocolate-spread,Chocolate spread,false
-groceries-and-everyday,condiments,table-sauces,groceries-and-everyday/condiments/table-sauces,Table sauces,false
-groceries-and-everyday,condiments,mayonnaise,groceries-and-everyday/condiments/mayonnaise,Mayonnaise,false
-groceries-and-everyday,condiments,chutney-and-relish,groceries-and-everyday/condiments/chutney-and-relish,Chutney and relish,false
-groceries-and-everyday,condiments,salt-and-pepper,groceries-and-everyday/condiments/salt-and-pepper,Salt and pepper,false
-groceries-and-everyday,deli-and-antipasti,olives,groceries-and-everyday/deli-and-antipasti/olives,Olives,false
-groceries-and-everyday,deli-and-antipasti,oils-and-vinegars,groceries-and-everyday/deli-and-antipasti/oils-and-vinegars,Oils and vinegars,false
-groceries-and-everyday,deli-and-antipasti,pate-and-dips,groceries-and-everyday/deli-and-antipasti/pate-and-dips,Pate and dips,false
-groceries-and-everyday,deli-and-antipasti,antipasti,groceries-and-everyday/deli-and-antipasti/antipasti,Antipasti,false
-groceries-and-everyday,deli-and-antipasti,salad-dressings,groceries-and-everyday/deli-and-antipasti/salad-dressings,Salad dressings,false
-groceries-and-everyday,fruit-nuts-and-seeds,fruit,groceries-and-everyday/fruit-nuts-and-seeds/fruit,Fruit,false
-groceries-and-everyday,fruit-nuts-and-seeds,nuts,groceries-and-everyday/fruit-nuts-and-seeds/nuts,Nuts,false
-groceries-and-everyday,fruit-nuts-and-seeds,seeds,groceries-and-everyday/fruit-nuts-and-seeds/seeds,Seeds,false
-groceries-and-everyday,baking-ingredients,flour,groceries-and-everyday/baking-ingredients/flour,Flour,false
-groceries-and-everyday,baking-ingredients,sugars-and-syrups,groceries-and-everyday/baking-ingredients/sugars-and-syrups,Sugars and syrups,false
-groceries-and-everyday,baking-ingredients,baking-mixes,groceries-and-everyday/baking-ingredients/baking-mixes,Baking mixes,false
-groceries-and-everyday,baking-ingredients,egg-replacers,groceries-and-everyday/baking-ingredients/egg-replacers,Egg replacers,false
-groceries-and-everyday,drinks,coffee-beans,groceries-and-everyday/drinks/coffee-beans,Coffee beans,false
-groceries-and-everyday,drinks,ground-coffee,groceries-and-everyday/drinks/ground-coffee,Ground coffee,false
-groceries-and-everyday,drinks,instant-coffee,groceries-and-everyday/drinks/instant-coffee,Instant coffee,false
-groceries-and-everyday,drinks,tea,groceries-and-everyday/drinks/tea,Tea,false
-groceries-and-everyday,drinks,green-tea,groceries-and-everyday/drinks/green-tea,Green tea,false
-groceries-and-everyday,drinks,herbal-tea,groceries-and-everyday/drinks/herbal-tea,Herbal tea,false
-groceries-and-everyday,drinks,chocolate,groceries-and-everyday/drinks/chocolate,Chocolate,false
-groceries-and-everyday,drinks,soft-drinks,groceries-and-everyday/drinks/soft-drinks,Soft drinks,false
-groceries-and-everyday,drinks,juice,groceries-and-everyday/drinks/juice,Juice,false
-groceries-and-everyday,drinks,milk-alternatives,groceries-and-everyday/drinks/milk-alternatives,Milk alternatives,false
-groceries-and-everyday,cakes-biscuits-and-snacks,biscuits,groceries-and-everyday/cakes-biscuits-and-snacks/biscuits,Biscuits,false
-groceries-and-everyday,cakes-biscuits-and-snacks,snack-bars,groceries-and-everyday/cakes-biscuits-and-snacks/snack-bars,Snack bars,false
-groceries-and-everyday,cakes-biscuits-and-snacks,snacks,groceries-and-everyday/cakes-biscuits-and-snacks/snacks,Snacks,false
-groceries-and-everyday,yoghurt,yoghurt,groceries-and-everyday/yoghurt/yoghurt,Yoghurt,false
-groceries-and-everyday,yoghurt,custard-and-jelly,groceries-and-everyday/yoghurt/custard-and-jelly,Custard and jelly,false
-groceries-and-everyday,yoghurt,cream,groceries-and-everyday/yoghurt/cream,Cream,false
-groceries-and-everyday,chocolate,chocolate-bars,groceries-and-everyday/chocolate/chocolate-bars,Chocolate bars,false
-groceries-and-everyday,chocolate,raw-chocolate,groceries-and-everyday/chocolate/raw-chocolate,Raw chocolate,false
-groceries-and-everyday,chocolate,chocolate-gifts,groceries-and-everyday/chocolate/chocolate-gifts,Chocolate gifts,false
-groceries-and-everyday,chocolate,sweets,groceries-and-everyday/chocolate/sweets,Sweets,false
-groceries-and-everyday,free-from,vegan,groceries-and-everyday/free-from/vegan,Vegan,false
-groceries-and-everyday,free-from,gluten-free,groceries-and-everyday/free-from/gluten-free,Gluten free,false
-groceries-and-everyday,free-from,no-added-sugar,groceries-and-everyday/free-from/no-added-sugar,No added sugar,false
-groceries-and-everyday,meat-alternatives,,groceries-and-everyday/meat-alternatives,Meat alternatives,false
-groceries-and-everyday,ready-meals,,groceries-and-everyday/ready-meals,Ready meals,false
-groceries-and-everyday,cheese,,groceries-and-everyday/cheese,Cheese,false
-groceries-and-everyday,world-food,african,groceries-and-everyday/world-food/african,African,false
-groceries-and-everyday,world-food,mexican,groceries-and-everyday/world-food/mexican,Mexican,false
-groceries-and-everyday,world-food,mediterannean,groceries-and-everyday/world-food/mediterannean,Mediterannean,false
-groceries-and-everyday,world-food,chinese-and-japanese,groceries-and-everyday/world-food/chinese-and-japanese,Chinese and japanese,false
-groceries-and-everyday,world-food,indian,groceries-and-everyday/world-food/indian,Indian,false
-groceries-and-everyday,world-food,thai-and-indonesian,groceries-and-everyday/world-food/thai-and-indonesian,Thai and indonesian,false
-groceries-and-everyday,wine-beer-spirits,,groceries-and-everyday/wine-beer-spirits,Wine beer spirits,false
-groceries-and-everyday,baby-food,,groceries-and-everyday/baby-food,Baby food,false
-groceries-and-everyday,plastic-free,,groceries-and-everyday/plastic-free.htm,Groceries and Everyday - Plastic free,false
-cleaning-and-household,dish-washing,washing-up-liquid,cleaning-and-household/dish-washing/washing-up-liquid,Washing up liquid,false
-cleaning-and-household,dish-washing,dish-washer,cleaning-and-household/dish-washing/dish-washer,Dish washer,false
-cleaning-and-household,cleaning,kitchen-cleaners,cleaning-and-household/cleaning/kitchen-cleaners,Kitchen cleaners,false
-cleaning-and-household,cleaning,bathroom-cleaners,cleaning-and-household/cleaning/bathroom-cleaners,Bathroom cleaners,false
-cleaning-and-household,cleaning,all-purpose-cleaners,cleaning-and-household/cleaning/all-purpose-cleaners,All purpose cleaners,false
-cleaning-and-household,cleaning,glass-cleaners-and-polish,cleaning-and-household/cleaning/glass-cleaners-and-polish,Glass cleaners and polish,false
-cleaning-and-household,cleaning,floor-cleaners,cleaning-and-household/cleaning/floor-cleaners,Floor cleaners,false
-cleaning-and-household,laundry,laundry-liquid,cleaning-and-household/laundry/laundry-liquid,Laundry liquid,false
-cleaning-and-household,laundry,washing-powder-and-tablets,cleaning-and-household/laundry/washing-powder-and-tablets,Washing powder and tablets,false
-cleaning-and-household,laundry,fabric-conditioner,cleaning-and-household/laundry/fabric-conditioner,Fabric conditioner,false
-cleaning-and-household,laundry,stain-removers-and-treatments,cleaning-and-household/laundry/stain-removers-and-treatments,Stain removers and treatments,false
-cleaning-and-household,laundry,clothes-drying,cleaning-and-household/laundry/clothes-drying,Clothes drying,false
-cleaning-and-household,cloths-and-mops,,cleaning-and-household/cloths-and-mops,Cloths and mops,false
-cleaning-and-household,bin-bags-and-foils,,cleaning-and-household/bin-bags-and-foils,Bin bags and foils,false
-cleaning-and-household,tissues-and-towels,,cleaning-and-household/tissues-and-towels,Tissues and towels,false
-cleaning-and-household,diy,,cleaning-and-household/diy,Diy,false
-cleaning-and-household,plastic-free,,cleaning-and-household/plastic-free.htm,Cleaning and Household - Plastic free,false
-fashion,womens,blouses--tunics---camis,fashion/womens/blouses--tunics---camis,Blouses tunics camis,false
-fashion,womens,knitwear,fashion/womens/knitwear,Knitwear,false
-fashion,womens,coats---jackets,fashion/womens/coats---jackets,Coats jackets,false
-fashion,womens,dresses,fashion/womens/dresses,Dresses,false
-fashion,womens,accessories,fashion/womens/accessories,Accessories,false
-fashion,womens,lingerie-and-nightwear,fashion/womens/lingerie-and-nightwear,Lingerie and nightwear,false
-fashion,womens,lounge-and-leisurewear,fashion/womens/lounge-and-leisurewear,Lounge and leisurewear,false
-fashion,womens,socks,fashion/womens/socks,Socks,false
-fashion,womens,nightwear,fashion/womens/nightwear,Nightwear,false
-fashion,womens,trousers,fashion/womens/trousers,Trousers,false
-fashion,womens,graphic-t_shirt-and-jumpers,fashion/womens/graphic-t_shirt-and-jumpers,Graphic t_shirt and jumpers,false
-fashion,womens,bags,fashion/womens/bags,Bags,false
-fashion,mens,t_shirts,fashion/mens/t_shirts,T_shirts,false
-fashion,mens,shirts,fashion/mens/shirts,Shirts,false
-fashion,mens,graphic-tees,fashion/mens/graphic-tees,Graphic tees,false
-fashion,mens,trousers-and-shorts,fashion/mens/trousers-and-shorts,Trousers and shorts,false
-fashion,mens,jackets-and-jumpers,fashion/mens/jackets-and-jumpers,Jackets and jumpers,false
-fashion,mens,underwear,fashion/mens/underwear,Underwear,false
-fashion,mens,socks,fashion/mens/socks,Socks,false
-fashion,mens,accessories,fashion/mens/accessories,Accessories,false
-fashion,jewellery,necklaces,fashion/jewellery/necklaces,Necklaces,false
-fashion,jewellery,earrings,fashion/jewellery/earrings,Earrings,false
-fashion,jewellery,bracelets,fashion/jewellery/bracelets,Bracelets,false
-fashion,jewellery,rings,fashion/jewellery/rings,Rings,false
-fashion,footwear,mens,fashion/footwear/mens,Mens,false
-fashion,footwear,womens,fashion/footwear/womens,Womens,false
-fashion,footwear,slippers,fashion/footwear/slippers,Slippers,false
-home-and-garden,living,decorative-accessories,home-and-garden/living/decorative-accessories,Decorative accessories,false
-home-and-garden,living,home-furnishings,home-and-garden/living/home-furnishings,Home furnishings,false
-home-and-garden,living,storage-baskets,home-and-garden/living/storage-baskets,Storage baskets,false
-home-and-garden,living,lighting,home-and-garden/living/lighting,Lighting,false
-home-and-garden,living,home-fragrance,home-and-garden/living/home-fragrance,Home fragrance,false
-home-and-garden,living,books,home-and-garden/living/books,Books,false
-home-and-garden,living,gifts,home-and-garden/living/gifts,Gifts,false
-home-and-garden,living,cards-and-wrap,home-and-garden/living/cards-and-wrap,Cards and wrap,false
-home-and-garden,garden-and-outdoor,garden-accessories,home-and-garden/garden-and-outdoor/garden-accessories,Garden accessories,false
-home-and-garden,garden-and-outdoor,trees-plants-and-seeds,home-and-garden/garden-and-outdoor/trees-plants-and-seeds,Trees plants and seeds,false
-home-and-garden,garden-and-outdoor,solar-garden-products,home-and-garden/garden-and-outdoor/solar-garden-products,Solar garden products,false
-home-and-garden,garden-and-outdoor,wildlife,home-and-garden/garden-and-outdoor/wildlife,Wildlife,false
-home-and-garden,garden-and-outdoor,outdoor-furniture,home-and-garden/garden-and-outdoor/outdoor-furniture,Outdoor furniture,false
-home-and-garden,kitchen-and-dining,dining-and-entertaining,home-and-garden/kitchen-and-dining/dining-and-entertaining,Dining and entertaining,false
-home-and-garden,kitchen-and-dining,cups-mugs-and-glasses,home-and-garden/kitchen-and-dining/cups-mugs-and-glasses,Cups mugs and glasses,false
-home-and-garden,kitchen-and-dining,cookware-and-food-prep,home-and-garden/kitchen-and-dining/cookware-and-food-prep,Cookware and food prep,false
-home-and-garden,kitchen-and-dining,eco-kettles,home-and-garden/kitchen-and-dining/eco-kettles,Eco kettles,false
-home-and-garden,kitchen-and-dining,kitchen-accessories,home-and-garden/kitchen-and-dining/kitchen-accessories,Kitchen accessories,false
-home-and-garden,kitchen-and-dining,picnicware-and-lunchboxes,home-and-garden/kitchen-and-dining/picnicware-and-lunchboxes,Picnicware and lunchboxes,false
-home-and-garden,kitchen-and-dining,reusable-cups-and-bottles,home-and-garden/kitchen-and-dining/reusable-cups-and-bottles,Reusable cups and bottles,false
-home-and-garden,kitchen-and-dining,home-composting,home-and-garden/kitchen-and-dining/home-composting,Home composting,false
-home-and-garden,bed-and-bath,bedding-sets,home-and-garden/bed-and-bath/bedding-sets,Bedding sets,false
-home-and-garden,bed-and-bath,duvet-covers-and-pillowcases,home-and-garden/bed-and-bath/duvet-covers-and-pillowcases,Duvet covers and pillowcases,false
-home-and-garden,bed-and-bath,duvets-pillows-and-protectors,home-and-garden/bed-and-bath/duvets-pillows-and-protectors,Duvets pillows and protectors,false
-home-and-garden,bed-and-bath,flat-sheets,home-and-garden/bed-and-bath/flat-sheets,Flat sheets,false
-home-and-garden,bed-and-bath,throws-and-blankets,home-and-garden/bed-and-bath/throws-and-blankets,Throws and blankets,false
-home-and-garden,bed-and-bath,bath-linen,home-and-garden/bed-and-bath/bath-linen,Bath linen,false
-beauty-health-and-wellbeing,bath-and-body,bath-and-shower,beauty-health-and-wellbeing/bath-and-body/bath-and-shower,Bath and shower,false
-beauty-health-and-wellbeing,bath-and-body,body-lotion,beauty-health-and-wellbeing/bath-and-body/body-lotion,Body lotion,false
-beauty-health-and-wellbeing,bath-and-body,soap,beauty-health-and-wellbeing/bath-and-body/soap,Soap,false
-beauty-health-and-wellbeing,bath-and-body,hand-soap,beauty-health-and-wellbeing/bath-and-body/hand-soap,Hand soap,false
-beauty-health-and-wellbeing,bath-and-body,hands-nails-and-feet,beauty-health-and-wellbeing/bath-and-body/hands-nails-and-feet,Hands nails and feet,false
-beauty-health-and-wellbeing,bath-and-body,sun-care-and-tanning,beauty-health-and-wellbeing/bath-and-body/sun-care-and-tanning,Sun care and tanning,false
-beauty-health-and-wellbeing,bath-and-body,bath-accessories,beauty-health-and-wellbeing/bath-and-body/bath-accessories,Bath accessories,false
-beauty-health-and-wellbeing,bath-and-body,deodorant,beauty-health-and-wellbeing/bath-and-body/deodorant,Deodorant,false
-beauty-health-and-wellbeing,skin-care,moisturiser,beauty-health-and-wellbeing/skin-care/moisturiser,Moisturiser,false
-beauty-health-and-wellbeing,skin-care,cleanser-toner-and-facewash,beauty-health-and-wellbeing/skin-care/cleanser-toner-and-facewash,Cleanser toner and facewash,false
-beauty-health-and-wellbeing,skin-care,lip-care,beauty-health-and-wellbeing/skin-care/lip-care,Lip care,false
-beauty-health-and-wellbeing,skin-care,treatments,beauty-health-and-wellbeing/skin-care/treatments,Treatments,false
-beauty-health-and-wellbeing,hair-care,shampoo,beauty-health-and-wellbeing/hair-care/shampoo,Shampoo,false
-beauty-health-and-wellbeing,hair-care,shampoo-bars,beauty-health-and-wellbeing/hair-care/shampoo-bars,Shampoo bars,false
-beauty-health-and-wellbeing,hair-care,conditioner,beauty-health-and-wellbeing/hair-care/conditioner,Conditioner,false
-beauty-health-and-wellbeing,hair-care,conditioner-bars,beauty-health-and-wellbeing/hair-care/conditioner-bars,Conditioner bars,false
-beauty-health-and-wellbeing,hair-care,styling,beauty-health-and-wellbeing/hair-care/styling,Styling,false
-beauty-health-and-wellbeing,make-up,face,beauty-health-and-wellbeing/make-up/face,Face,false
-beauty-health-and-wellbeing,make-up,eyes,beauty-health-and-wellbeing/make-up/eyes,Eyes,false
-beauty-health-and-wellbeing,make-up,tools,beauty-health-and-wellbeing/make-up/tools,Tools,false
-beauty-health-and-wellbeing,make-up,nail-polish,beauty-health-and-wellbeing/make-up/nail-polish,Nail polish,false
-beauty-health-and-wellbeing,for-men,shaving,beauty-health-and-wellbeing/for-men/shaving,Shaving,false
-beauty-health-and-wellbeing,for-men,skin-care,beauty-health-and-wellbeing/for-men/skin-care,Skin care,false
-beauty-health-and-wellbeing,for-men,bath-and-shower,beauty-health-and-wellbeing/for-men/bath-and-shower,Bath and shower,false
-beauty-health-and-wellbeing,dental-care,toothbrushes,beauty-health-and-wellbeing/dental-care/toothbrushes,Toothbrushes,false
-beauty-health-and-wellbeing,dental-care,toothpaste,beauty-health-and-wellbeing/dental-care/toothpaste,Toothpaste,false
-beauty-health-and-wellbeing,dental-care,mouthwash-and-dental-floss,beauty-health-and-wellbeing/dental-care/mouthwash-and-dental-floss,Mouthwash and dental floss,false
-beauty-health-and-wellbeing,essentials,,beauty-health-and-wellbeing/essentials,Essentials,false
-beauty-health-and-wellbeing,menstrual-care,tampons,beauty-health-and-wellbeing/menstrual-care/tampons,Tampons,false
-beauty-health-and-wellbeing,menstrual-care,menstrual-cups,beauty-health-and-wellbeing/menstrual-care/menstrual-cups,Menstrual cups,false
-beauty-health-and-wellbeing,menstrual-care,pads-and-panty-liners,beauty-health-and-wellbeing/menstrual-care/pads-and-panty-liners,Pads and panty liners,false
-beauty-health-and-wellbeing,menstrual-care,reusable-sanitary-pads,beauty-health-and-wellbeing/menstrual-care/reusable-sanitary-pads,Reusable sanitary pads,false
-beauty-health-and-wellbeing,menstrual-care,period-underwear,beauty-health-and-wellbeing/menstrual-care/period-underwear,Period underwear,false
-beauty-health-and-wellbeing,menstrual-care,intimate-wipes-washes,beauty-health-and-wellbeing/menstrual-care/intimate-wipes-washes,Intimate wipes washes,false
-beauty-health-and-wellbeing,remedies-and-wellbeing,face-masks,beauty-health-and-wellbeing/remedies-and-wellbeing/face-masks,Face masks,false
-beauty-health-and-wellbeing,remedies-and-wellbeing,remedies,beauty-health-and-wellbeing/remedies-and-wellbeing/remedies,Remedies,false
-beauty-health-and-wellbeing,remedies-and-wellbeing,light-therapy,beauty-health-and-wellbeing/remedies-and-wellbeing/light-therapy,Light therapy,false
-beauty-health-and-wellbeing,remedies-and-wellbeing,sports-nutrition,beauty-health-and-wellbeing/remedies-and-wellbeing/sports-nutrition,Sports nutrition,false
-beauty-health-and-wellbeing,beauty-gift-sets,,beauty-health-and-wellbeing/beauty-gift-sets,Beauty gift sets,false
-beauty-health-and-wellbeing,plastic-free,,beauty-health-and-wellbeing/plastic-free.htm,"Beauty, Health & Wellbeing - Plastic free",false
-beauty-health-and-wellbeing,organic,,beauty-health-and-wellbeing/organic.htm,"Beauty, Health & Wellbeing - Organic",false
-baby-child-and-toys,clothing,baby,baby-child-and-toys/clothing/baby,Baby,false
-baby-child-and-toys,clothing,tops-and-t_shirts,baby-child-and-toys/clothing/tops-and-t_shirts,Tops and t_shirts,false
-baby-child-and-toys,clothing,knitwear-and-jumpers,baby-child-and-toys/clothing/knitwear-and-jumpers,Knitwear and jumpers,false
-baby-child-and-toys,clothing,coats-and-jackets,baby-child-and-toys/clothing/coats-and-jackets,Coats and jackets,false
-baby-child-and-toys,clothing,trousers,baby-child-and-toys/clothing/trousers,Trousers,false
-baby-child-and-toys,clothing,dresses-and-skirts,baby-child-and-toys/clothing/dresses-and-skirts,Dresses and skirts,false
-baby-child-and-toys,clothing,pyjamas-and-underwear,baby-child-and-toys/clothing/pyjamas-and-underwear,Pyjamas and underwear,false
-baby-child-and-toys,clothing,accessories,baby-child-and-toys/clothing/accessories,Accessories,false
-baby-child-and-toys,clothing,school-uniform,baby-child-and-toys/clothing/school-uniform,School uniform,false
-baby-child-and-toys,feeding-and-nursing,,baby-child-and-toys/feeding-and-nursing,Feeding and nursing,false
-baby-child-and-toys,nappies,eco-nappies,baby-child-and-toys/nappies/eco-nappies,Eco nappies,false
-baby-child-and-toys,nappies,reusable-nappies,baby-child-and-toys/nappies/reusable-nappies,Reusable nappies,false
-baby-child-and-toys,nappies,wipes-and-creams,baby-child-and-toys/nappies/wipes-and-creams,Wipes and creams,false
-baby-child-and-toys,bodycare,bathtime,baby-child-and-toys/bodycare/bathtime,Bathtime,false
-baby-child-and-toys,bodycare,baby-oil-and-lotion,baby-child-and-toys/bodycare/baby-oil-and-lotion,Baby oil and lotion,false
-baby-child-and-toys,bodycare,dental-care,baby-child-and-toys/bodycare/dental-care,Dental care,false
-baby-child-and-toys,baby-food,,baby-child-and-toys/baby-food,Baby food,false
-baby-child-and-toys,toys,baby,baby-child-and-toys/toys/baby,Baby,false
-baby-child-and-toys,toys,kids,baby-child-and-toys/toys/kids,Kids,false
-pet-care,dog-food,,pet-care/dog-food,Dog food,false
-pet-care,cat-food,,pet-care/cat-food,Cat food,false
-pet-care,vegan-pet-food,,pet-care/vegan-pet-food,Vegan pet food,false
-pet-care,accessories,,pet-care/accessories,Accessories,false
-pet-care,toys,,pet-care/toys,Toys,false
+category,identifier,description,active,sourceLink
+groceries-and-everyday,groceries-and-everyday/store-cupboard/breakfast-cereals,Breakfast cereals,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/breakfast-cereals
+groceries-and-everyday,groceries-and-everyday/store-cupboard/herbs-and-spices,Herbs and spices,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/herbs-and-spices
+groceries-and-everyday,groceries-and-everyday/store-cupboard/tinned-veg-and-pulses,Tinned veg and pulses,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/tinned-veg-and-pulses
+groceries-and-everyday,groceries-and-everyday/store-cupboard/soup,Soup,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/soup
+groceries-and-everyday,groceries-and-everyday/store-cupboard/coconut,Coconut,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/coconut
+groceries-and-everyday,groceries-and-everyday/store-cupboard/fish-and-seafood,Fish and seafood,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/store-cupboard/fish-and-seafood
+groceries-and-everyday,groceries-and-everyday/pasta-and-noodles/pasta,Pasta,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-and-noodles/pasta
+groceries-and-everyday,groceries-and-everyday/pasta-and-noodles/noodles,Noodles,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-and-noodles/noodles
+groceries-and-everyday,groceries-and-everyday/pasta-rice-and-pulses/rice,Rice,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-rice-and-pulses/rice
+groceries-and-everyday,groceries-and-everyday/pasta-rice-and-pulses/pulses,Pulses,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-rice-and-pulses/pulses
+groceries-and-everyday,groceries-and-everyday/pasta-rice-and-pulses/beans-and-pulses-dried,Beans and pulses dried,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-rice-and-pulses/beans-and-pulses-dried
+groceries-and-everyday,groceries-and-everyday/pasta-rice-and-pulses/grains,Grains,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/pasta-rice-and-pulses/grains
+groceries-and-everyday,groceries-and-everyday/sauces-and-stock/curry-sauces,Curry sauces,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/sauces-and-stock/curry-sauces
+groceries-and-everyday,groceries-and-everyday/sauces-and-stock/pasta-sauce-and-pesto,Pasta sauce and pesto,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/sauces-and-stock/pasta-sauce-and-pesto
+groceries-and-everyday,groceries-and-everyday/sauces-and-stock/gravy-and-stock,Gravy and stock,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/sauces-and-stock/gravy-and-stock
+groceries-and-everyday,groceries-and-everyday/sauces-and-stock/cooking-sauces,Cooking sauces,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/sauces-and-stock/cooking-sauces
+groceries-and-everyday,groceries-and-everyday/jams-and-preserves/preserves,Preserves,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/jams-and-preserves/preserves
+groceries-and-everyday,groceries-and-everyday/jams-and-preserves/savoury-spreads,Savoury spreads,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/jams-and-preserves/savoury-spreads
+groceries-and-everyday,groceries-and-everyday/jams-and-preserves/chocolate-spread,Chocolate spread,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/jams-and-preserves/chocolate-spread
+groceries-and-everyday,groceries-and-everyday/condiments/table-sauces,Table sauces,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/condiments/table-sauces
+groceries-and-everyday,groceries-and-everyday/condiments/mayonnaise,Mayonnaise,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/condiments/mayonnaise
+groceries-and-everyday,groceries-and-everyday/condiments/chutney-and-relish,Chutney and relish,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/condiments/chutney-and-relish
+groceries-and-everyday,groceries-and-everyday/condiments/salt-and-pepper,Salt and pepper,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/condiments/salt-and-pepper
+groceries-and-everyday,groceries-and-everyday/deli-and-antipasti/olives,Olives,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/deli-and-antipasti/olives
+groceries-and-everyday,groceries-and-everyday/deli-and-antipasti/oils-and-vinegars,Oils and vinegars,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/deli-and-antipasti/oils-and-vinegars
+groceries-and-everyday,groceries-and-everyday/deli-and-antipasti/pate-and-dips,Pate and dips,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/deli-and-antipasti/pate-and-dips
+groceries-and-everyday,groceries-and-everyday/deli-and-antipasti/antipasti,Antipasti,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/deli-and-antipasti/antipasti
+groceries-and-everyday,groceries-and-everyday/deli-and-antipasti/salad-dressings,Salad dressings,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/deli-and-antipasti/salad-dressings
+groceries-and-everyday,groceries-and-everyday/fruit-nuts-and-seeds/fruit,Fruit,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/fruit-nuts-and-seeds/fruit
+groceries-and-everyday,groceries-and-everyday/fruit-nuts-and-seeds/nuts,Nuts,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/fruit-nuts-and-seeds/nuts
+groceries-and-everyday,groceries-and-everyday/fruit-nuts-and-seeds/seeds,Seeds,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/fruit-nuts-and-seeds/seeds
+groceries-and-everyday,groceries-and-everyday/baking-ingredients/flour,Flour,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/baking-ingredients/flour
+groceries-and-everyday,groceries-and-everyday/baking-ingredients/sugars-and-syrups,Sugars and syrups,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/baking-ingredients/sugars-and-syrups
+groceries-and-everyday,groceries-and-everyday/baking-ingredients/baking-mixes,Baking mixes,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/baking-ingredients/baking-mixes
+groceries-and-everyday,groceries-and-everyday/baking-ingredients/egg-replacers,Egg replacers,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/baking-ingredients/egg-replacers
+groceries-and-everyday,groceries-and-everyday/drinks/coffee-beans,Coffee beans,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/coffee-beans
+groceries-and-everyday,groceries-and-everyday/drinks/ground-coffee,Ground coffee,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/ground-coffee
+groceries-and-everyday,groceries-and-everyday/drinks/instant-coffee,Instant coffee,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/instant-coffee
+groceries-and-everyday,groceries-and-everyday/drinks/tea,Tea,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/tea
+groceries-and-everyday,groceries-and-everyday/drinks/green-tea,Green tea,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/green-tea
+groceries-and-everyday,groceries-and-everyday/drinks/herbal-tea,Herbal tea,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/herbal-tea
+groceries-and-everyday,groceries-and-everyday/drinks/chocolate,Chocolate,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/chocolate
+groceries-and-everyday,groceries-and-everyday/drinks/soft-drinks,Soft drinks,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/soft-drinks
+groceries-and-everyday,groceries-and-everyday/drinks/juice,Juice,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/juice
+groceries-and-everyday,groceries-and-everyday/drinks/milk-alternatives,Milk alternatives,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/drinks/milk-alternatives
+groceries-and-everyday,groceries-and-everyday/cakes-biscuits-and-snacks/biscuits,Biscuits,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/cakes-biscuits-and-snacks/biscuits
+groceries-and-everyday,groceries-and-everyday/cakes-biscuits-and-snacks/snack-bars,Snack bars,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/cakes-biscuits-and-snacks/snack-bars
+groceries-and-everyday,groceries-and-everyday/cakes-biscuits-and-snacks/snacks,Snacks,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/cakes-biscuits-and-snacks/snacks
+groceries-and-everyday,groceries-and-everyday/yoghurt/yoghurt,Yoghurt,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/yoghurt/yoghurt
+groceries-and-everyday,groceries-and-everyday/yoghurt/custard-and-jelly,Custard and jelly,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/yoghurt/custard-and-jelly
+groceries-and-everyday,groceries-and-everyday/yoghurt/cream,Cream,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/yoghurt/cream
+groceries-and-everyday,groceries-and-everyday/chocolate/chocolate-bars,Chocolate bars,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/chocolate/chocolate-bars
+groceries-and-everyday,groceries-and-everyday/chocolate/raw-chocolate,Raw chocolate,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/chocolate/raw-chocolate
+groceries-and-everyday,groceries-and-everyday/chocolate/chocolate-gifts,Chocolate gifts,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/chocolate/chocolate-gifts
+groceries-and-everyday,groceries-and-everyday/chocolate/sweets,Sweets,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/chocolate/sweets
+groceries-and-everyday,groceries-and-everyday/free-from/vegan,Vegan,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/free-from/vegan
+groceries-and-everyday,groceries-and-everyday/free-from/gluten-free,Gluten free,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/free-from/gluten-free
+groceries-and-everyday,groceries-and-everyday/free-from/no-added-sugar,No added sugar,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/free-from/no-added-sugar
+groceries-and-everyday,groceries-and-everyday/meat-alternatives,Meat alternatives,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/meat-alternatives
+groceries-and-everyday,groceries-and-everyday/ready-meals,Ready meals,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/ready-meals
+groceries-and-everyday,groceries-and-everyday/cheese,Cheese,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/cheese
+groceries-and-everyday,groceries-and-everyday/world-food/african,African,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/african
+groceries-and-everyday,groceries-and-everyday/world-food/mexican,Mexican,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/mexican
+groceries-and-everyday,groceries-and-everyday/world-food/mediterannean,Mediterannean,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/mediterannean
+groceries-and-everyday,groceries-and-everyday/world-food/chinese-and-japanese,Chinese and japanese,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/chinese-and-japanese
+groceries-and-everyday,groceries-and-everyday/world-food/indian,Indian,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/indian
+groceries-and-everyday,groceries-and-everyday/world-food/thai-and-indonesian,Thai and indonesian,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/world-food/thai-and-indonesian
+groceries-and-everyday,groceries-and-everyday/wine-beer-spirits,Wine beer spirits,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/wine-beer-spirits
+groceries-and-everyday,groceries-and-everyday/baby-food,Baby food,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/baby-food
+groceries-and-everyday,groceries-and-everyday/plastic-free.htm,Groceries and Everyday - Plastic free,FALSE,https://www.ethicalsuperstore.com/category/groceries-and-everyday/plastic-free.htm
+cleaning-and-household,cleaning-and-household/dish-washing/washing-up-liquid,Washing up liquid,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/dish-washing/washing-up-liquid
+cleaning-and-household,cleaning-and-household/dish-washing/dish-washer,Dish washer,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/dish-washing/dish-washer
+cleaning-and-household,cleaning-and-household/cleaning/kitchen-cleaners,Kitchen cleaners,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cleaning/kitchen-cleaners
+cleaning-and-household,cleaning-and-household/cleaning/bathroom-cleaners,Bathroom cleaners,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cleaning/bathroom-cleaners
+cleaning-and-household,cleaning-and-household/cleaning/all-purpose-cleaners,All purpose cleaners,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cleaning/all-purpose-cleaners
+cleaning-and-household,cleaning-and-household/cleaning/glass-cleaners-and-polish,Glass cleaners and polish,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cleaning/glass-cleaners-and-polish
+cleaning-and-household,cleaning-and-household/cleaning/floor-cleaners,Floor cleaners,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cleaning/floor-cleaners
+cleaning-and-household,cleaning-and-household/laundry/laundry-liquid,Laundry liquid,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/laundry/laundry-liquid
+cleaning-and-household,cleaning-and-household/laundry/washing-powder-and-tablets,Washing powder and tablets,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/laundry/washing-powder-and-tablets
+cleaning-and-household,cleaning-and-household/laundry/fabric-conditioner,Fabric conditioner,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/laundry/fabric-conditioner
+cleaning-and-household,cleaning-and-household/laundry/stain-removers-and-treatments,Stain removers and treatments,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/laundry/stain-removers-and-treatments
+cleaning-and-household,cleaning-and-household/laundry/clothes-drying,Clothes drying,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/laundry/clothes-drying
+cleaning-and-household,cleaning-and-household/cloths-and-mops,Cloths and mops,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/cloths-and-mops
+cleaning-and-household,cleaning-and-household/bin-bags-and-foils,Bin bags and foils,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/bin-bags-and-foils
+cleaning-and-household,cleaning-and-household/tissues-and-towels,Tissues and towels,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/tissues-and-towels
+cleaning-and-household,cleaning-and-household/diy,Diy,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/diy
+cleaning-and-household,cleaning-and-household/plastic-free.htm,Cleaning and Household - Plastic free,FALSE,https://www.ethicalsuperstore.com/category/cleaning-and-household/plastic-free.htm
+fashion,fashion/womens/blouses--tunics---camis,Blouses tunics camis,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/blouses--tunics---camis
+fashion,fashion/womens/knitwear,Knitwear,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/knitwear
+fashion,fashion/womens/coats---jackets,Coats jackets,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/coats---jackets
+fashion,fashion/womens/dresses,Dresses,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/dresses
+fashion,fashion/womens/accessories,Accessories,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/accessories
+fashion,fashion/womens/lingerie-and-nightwear,Lingerie and nightwear,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/lingerie-and-nightwear
+fashion,fashion/womens/lounge-and-leisurewear,Lounge and leisurewear,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/lounge-and-leisurewear
+fashion,fashion/womens/socks,Socks,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/socks
+fashion,fashion/womens/nightwear,Nightwear,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/nightwear
+fashion,fashion/womens/trousers,Trousers,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/trousers
+fashion,fashion/womens/graphic-t_shirt-and-jumpers,Graphic t_shirt and jumpers,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/graphic-t_shirt-and-jumpers
+fashion,fashion/womens/bags,Bags,FALSE,https://www.ethicalsuperstore.com/category/fashion/womens/bags
+fashion,fashion/mens/t_shirts,T_shirts,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/t_shirts
+fashion,fashion/mens/shirts,Shirts,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/shirts
+fashion,fashion/mens/graphic-tees,Graphic tees,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/graphic-tees
+fashion,fashion/mens/trousers-and-shorts,Trousers and shorts,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/trousers-and-shorts
+fashion,fashion/mens/jackets-and-jumpers,Jackets and jumpers,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/jackets-and-jumpers
+fashion,fashion/mens/underwear,Underwear,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/underwear
+fashion,fashion/mens/socks,Socks,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/socks
+fashion,fashion/mens/accessories,Accessories,FALSE,https://www.ethicalsuperstore.com/category/fashion/mens/accessories
+fashion,fashion/jewellery/necklaces,Necklaces,FALSE,https://www.ethicalsuperstore.com/category/fashion/jewellery/necklaces
+fashion,fashion/jewellery/earrings,Earrings,FALSE,https://www.ethicalsuperstore.com/category/fashion/jewellery/earrings
+fashion,fashion/jewellery/bracelets,Bracelets,FALSE,https://www.ethicalsuperstore.com/category/fashion/jewellery/bracelets
+fashion,fashion/jewellery/rings,Rings,FALSE,https://www.ethicalsuperstore.com/category/fashion/jewellery/rings
+fashion,fashion/footwear/mens,Mens,FALSE,https://www.ethicalsuperstore.com/category/fashion/footwear/mens
+fashion,fashion/footwear/womens,Womens,FALSE,https://www.ethicalsuperstore.com/category/fashion/footwear/womens
+fashion,fashion/footwear/slippers,Slippers,FALSE,https://www.ethicalsuperstore.com/category/fashion/footwear/slippers
+home-and-garden,home-and-garden/living/decorative-accessories,Decorative accessories,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/decorative-accessories
+home-and-garden,home-and-garden/living/home-furnishings,Home furnishings,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/home-furnishings
+home-and-garden,home-and-garden/living/storage-baskets,Storage baskets,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/storage-baskets
+home-and-garden,home-and-garden/living/lighting,Lighting,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/lighting
+home-and-garden,home-and-garden/living/home-fragrance,Home fragrance,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/home-fragrance
+home-and-garden,home-and-garden/living/books,Books,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/books
+home-and-garden,home-and-garden/living/gifts,Gifts,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/gifts
+home-and-garden,home-and-garden/living/cards-and-wrap,Cards and wrap,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/living/cards-and-wrap
+home-and-garden,home-and-garden/garden-and-outdoor/garden-accessories,Garden accessories,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/garden-and-outdoor/garden-accessories
+home-and-garden,home-and-garden/garden-and-outdoor/trees-plants-and-seeds,Trees plants and seeds,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/garden-and-outdoor/trees-plants-and-seeds
+home-and-garden,home-and-garden/garden-and-outdoor/solar-garden-products,Solar garden products,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/garden-and-outdoor/solar-garden-products
+home-and-garden,home-and-garden/garden-and-outdoor/wildlife,Wildlife,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/garden-and-outdoor/wildlife
+home-and-garden,home-and-garden/garden-and-outdoor/outdoor-furniture,Outdoor furniture,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/garden-and-outdoor/outdoor-furniture
+home-and-garden,home-and-garden/kitchen-and-dining/dining-and-entertaining,Dining and entertaining,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/dining-and-entertaining
+home-and-garden,home-and-garden/kitchen-and-dining/cups-mugs-and-glasses,Cups mugs and glasses,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/cups-mugs-and-glasses
+home-and-garden,home-and-garden/kitchen-and-dining/cookware-and-food-prep,Cookware and food prep,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/cookware-and-food-prep
+home-and-garden,home-and-garden/kitchen-and-dining/eco-kettles,Eco kettles,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/eco-kettles
+home-and-garden,home-and-garden/kitchen-and-dining/kitchen-accessories,Kitchen accessories,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/kitchen-accessories
+home-and-garden,home-and-garden/kitchen-and-dining/picnicware-and-lunchboxes,Picnicware and lunchboxes,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/picnicware-and-lunchboxes
+home-and-garden,home-and-garden/kitchen-and-dining/reusable-cups-and-bottles,Reusable cups and bottles,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/reusable-cups-and-bottles
+home-and-garden,home-and-garden/kitchen-and-dining/home-composting,Home composting,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/kitchen-and-dining/home-composting
+home-and-garden,home-and-garden/bed-and-bath/bedding-sets,Bedding sets,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/bedding-sets
+home-and-garden,home-and-garden/bed-and-bath/duvet-covers-and-pillowcases,Duvet covers and pillowcases,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/duvet-covers-and-pillowcases
+home-and-garden,home-and-garden/bed-and-bath/duvets-pillows-and-protectors,Duvets pillows and protectors,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/duvets-pillows-and-protectors
+home-and-garden,home-and-garden/bed-and-bath/flat-sheets,Flat sheets,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/flat-sheets
+home-and-garden,home-and-garden/bed-and-bath/throws-and-blankets,Throws and blankets,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/throws-and-blankets
+home-and-garden,home-and-garden/bed-and-bath/bath-linen,Bath linen,FALSE,https://www.ethicalsuperstore.com/category/home-and-garden/bed-and-bath/bath-linen
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/bath-and-shower,Bath and shower,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/bath-and-shower
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/body-lotion,Body lotion,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/body-lotion
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/soap,Soap,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/soap
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/hand-soap,Hand soap,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/hand-soap
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/hands-nails-and-feet,Hands nails and feet,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/hands-nails-and-feet
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/sun-care-and-tanning,Sun care and tanning,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/sun-care-and-tanning
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/bath-accessories,Bath accessories,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/bath-accessories
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/bath-and-body/deodorant,Deodorant,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/bath-and-body/deodorant
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/skin-care/moisturiser,Moisturiser,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/skin-care/moisturiser
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/skin-care/cleanser-toner-and-facewash,Cleanser toner and facewash,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/skin-care/cleanser-toner-and-facewash
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/skin-care/lip-care,Lip care,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/skin-care/lip-care
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/skin-care/treatments,Treatments,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/skin-care/treatments
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/hair-care/shampoo,Shampoo,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/hair-care/shampoo
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/hair-care/shampoo-bars,Shampoo bars,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/hair-care/shampoo-bars
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/hair-care/conditioner,Conditioner,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/hair-care/conditioner
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/hair-care/conditioner-bars,Conditioner bars,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/hair-care/conditioner-bars
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/hair-care/styling,Styling,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/hair-care/styling
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/make-up/face,Face,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/make-up/face
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/make-up/eyes,Eyes,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/make-up/eyes
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/make-up/tools,Tools,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/make-up/tools
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/make-up/nail-polish,Nail polish,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/make-up/nail-polish
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/for-men/shaving,Shaving,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/for-men/shaving
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/for-men/skin-care,Skin care,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/for-men/skin-care
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/for-men/bath-and-shower,Bath and shower,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/for-men/bath-and-shower
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/dental-care/toothbrushes,Toothbrushes,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/dental-care/toothbrushes
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/dental-care/toothpaste,Toothpaste,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/dental-care/toothpaste
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/dental-care/mouthwash-and-dental-floss,Mouthwash and dental floss,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/dental-care/mouthwash-and-dental-floss
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/essentials,Essentials,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/essentials
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/tampons,Tampons,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/tampons
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/menstrual-cups,Menstrual cups,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/menstrual-cups
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/pads-and-panty-liners,Pads and panty liners,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/pads-and-panty-liners
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/reusable-sanitary-pads,Reusable sanitary pads,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/reusable-sanitary-pads
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/period-underwear,Period underwear,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/period-underwear
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/menstrual-care/intimate-wipes-washes,Intimate wipes washes,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/menstrual-care/intimate-wipes-washes
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/remedies-and-wellbeing/face-masks,Face masks,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/remedies-and-wellbeing/face-masks
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/remedies-and-wellbeing/remedies,Remedies,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/remedies-and-wellbeing/remedies
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/remedies-and-wellbeing/light-therapy,Light therapy,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/remedies-and-wellbeing/light-therapy
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/remedies-and-wellbeing/sports-nutrition,Sports nutrition,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/remedies-and-wellbeing/sports-nutrition
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/beauty-gift-sets,Beauty gift sets,FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/beauty-gift-sets
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/plastic-free.htm,"Beauty, Health & Wellbeing - Plastic free",FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/plastic-free.htm
+beauty-health-and-wellbeing,beauty-health-and-wellbeing/organic.htm,"Beauty, Health & Wellbeing - Organic",FALSE,https://www.ethicalsuperstore.com/category/beauty-health-and-wellbeing/organic.htm
+baby-child-and-toys,baby-child-and-toys/clothing/baby,Baby,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/baby
+baby-child-and-toys,baby-child-and-toys/clothing/tops-and-t_shirts,Tops and t_shirts,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/tops-and-t_shirts
+baby-child-and-toys,baby-child-and-toys/clothing/knitwear-and-jumpers,Knitwear and jumpers,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/knitwear-and-jumpers
+baby-child-and-toys,baby-child-and-toys/clothing/coats-and-jackets,Coats and jackets,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/coats-and-jackets
+baby-child-and-toys,baby-child-and-toys/clothing/trousers,Trousers,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/trousers
+baby-child-and-toys,baby-child-and-toys/clothing/dresses-and-skirts,Dresses and skirts,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/dresses-and-skirts
+baby-child-and-toys,baby-child-and-toys/clothing/pyjamas-and-underwear,Pyjamas and underwear,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/pyjamas-and-underwear
+baby-child-and-toys,baby-child-and-toys/clothing/accessories,Accessories,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/accessories
+baby-child-and-toys,baby-child-and-toys/clothing/school-uniform,School uniform,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/clothing/school-uniform
+baby-child-and-toys,baby-child-and-toys/feeding-and-nursing,Feeding and nursing,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/feeding-and-nursing
+baby-child-and-toys,baby-child-and-toys/nappies/eco-nappies,Eco nappies,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/nappies/eco-nappies
+baby-child-and-toys,baby-child-and-toys/nappies/reusable-nappies,Reusable nappies,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/nappies/reusable-nappies
+baby-child-and-toys,baby-child-and-toys/nappies/wipes-and-creams,Wipes and creams,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/nappies/wipes-and-creams
+baby-child-and-toys,baby-child-and-toys/bodycare/bathtime,Bathtime,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/bodycare/bathtime
+baby-child-and-toys,baby-child-and-toys/bodycare/baby-oil-and-lotion,Baby oil and lotion,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/bodycare/baby-oil-and-lotion
+baby-child-and-toys,baby-child-and-toys/bodycare/dental-care,Dental care,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/bodycare/dental-care
+baby-child-and-toys,baby-child-and-toys/baby-food,Baby food,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/baby-food
+baby-child-and-toys,baby-child-and-toys/toys/baby,Baby,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/toys/baby
+baby-child-and-toys,baby-child-and-toys/toys/kids,Kids,FALSE,https://www.ethicalsuperstore.com/category/baby-child-and-toys/toys/kids
+pet-care,pet-care/dog-food,Dog food,FALSE,https://www.ethicalsuperstore.com/category/pet-care/dog-food
+pet-care,pet-care/cat-food,Cat food,FALSE,https://www.ethicalsuperstore.com/category/pet-care/cat-food
+pet-care,pet-care/vegan-pet-food,Vegan pet food,FALSE,https://www.ethicalsuperstore.com/category/pet-care/vegan-pet-food
+pet-care,pet-care/accessories,Accessories,FALSE,https://www.ethicalsuperstore.com/category/pet-care/accessories
+pet-care,pet-care/toys,Toys,FALSE,https://www.ethicalsuperstore.com/category/pet-care/toys

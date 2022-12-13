@@ -1,4 +1,5 @@
 import { MessagingModule } from '@lib/messaging';
+import { SearchModule } from '@lib/search';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -18,6 +19,8 @@ import { ProductsController } from './api/controllers/products.controller';
 import { ProvidersController } from './api/controllers/providers.controller';
 import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
 import { RefreshProductConsumer } from './consumers/refresh-product.consumer';
+import { IndexProductBatchConsumer } from './consumers/index-product-batch.consumer';
+import { IndexProductConsumer } from './consumers/index-product.consumer';
 import { EtlModule } from './etl/etl.module';
 import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
@@ -66,7 +69,7 @@ import { TasksService } from './services/tasks.service';
     ]),
     DatabaseModule,
     MessagingModule,
-    // SearchModule,
+    SearchModule,
     forwardRef(() => EtlModule),
   ],
   controllers: [
@@ -86,6 +89,8 @@ import { TasksService } from './services/tasks.service';
     // messaging
     RefreshProductConsumer,
     IntegrateSourceConsumer,
+    IndexProductConsumer,
+    IndexProductBatchConsumer,
     // core services
     IntegrationService,
     ProvidersService,

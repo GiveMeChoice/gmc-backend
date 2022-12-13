@@ -1,5 +1,5 @@
 import { MessageBase } from '@lib/messaging/interface/message-base.class';
-import { IntegrateSourceCommandDataDto } from './dto/integrate-source-command-data.dto';
+import { IntegrateSourceCommandDataDto } from './dto/integrate-source-command.dto';
 
 export class IntegrateSourceCommand extends MessageBase<IntegrateSourceCommandDataDto> {
   static readonly ROUTING_KEY = 'pi.source.integrate';
@@ -10,5 +10,4 @@ export class IntegrateSourceCommand extends MessageBase<IntegrateSourceCommandDa
   getQueue(): string {
     return IntegrateSourceCommand.QUEUE;
   }
-  data: IntegrateSourceCommandDataDto;
 }

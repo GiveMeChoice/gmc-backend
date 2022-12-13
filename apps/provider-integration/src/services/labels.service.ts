@@ -49,7 +49,7 @@ export class LabelsService {
 
   findOneByProvider(providerId: string, title: string) {
     return this.labelsRepo.findOne({
-      where: { providerId, title },
+      where: { providerId, code: title },
     });
   }
 

@@ -13,11 +13,11 @@ import { Product } from './product.entity';
 import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_category' })
-@Index(['providerId', 'title'], { unique: true })
+@Index(['providerId', 'code'], { unique: true })
 export class Category {
   constructor(providerId: string, title: string) {
     this.providerId = providerId;
-    this.title = title;
+    this.code = title;
   }
 
   public static factory(
@@ -37,13 +37,13 @@ export class Category {
   readonly providerId: string;
 
   @Column()
-  readonly title: string;
-
-  @Column({ name: 'info_link', nullable: true })
-  infoLink?: string;
+  readonly code: string;
 
   @Column({ nullable: true })
   description?: string;
+
+  @Column({ name: 'info_link', nullable: true })
+  infoLink?: string;
 
   @CreateDateColumn({
     name: 'created_at',

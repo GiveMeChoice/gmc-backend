@@ -1,15 +1,20 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
+import { MessagingService } from '@lib/messaging';
+import { SearchService } from '@lib/search';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
+import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
+import { IndexProductCommand } from '../messages/index-product.command';
 import { Brand } from '../model/brand.entity';
 import { Category } from '../model/category.entity';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
 import { Label } from '../model/label.entity';
 import { Product } from '../model/product.entity';
+import { normalizeIdCode } from '../utils/normalize-id-code';
 import { BrandsService } from './brands.service';
 import { CategoriesService } from './categories.service';
 import { LabelsService } from './labels.service';
@@ -24,7 +29,91 @@ export class ProductsService {
     private readonly labelsService: LabelsService,
     private readonly categoriesService: CategoriesService,
     private readonly brandsService: BrandsService,
+    private readonly messagingService: MessagingService,
+    private readonly searchService: SearchService,
   ) {}
+
+  async indexProductAsync(productId: string) {
+    await this.messagingService.sendToQueue(
+      new IndexProductCommand({
+        productId,
+      }),
+    );
+  }
+
+  async indexProduct(productId: string) {
+    const data = await this.findOneData(productId);
+    return this.searchService.indexDocument(data.shortId, data);
+  }
+
+  async indexProductBatchAsync(findDto: Partial<Product>) {
+    findDto.integrationStatus = ProductIntegrationStatus.LIVE;
+    const BATCH_SIZE = 15;
+    const pageRequest: PageRequest = { skip: 0, take: BATCH_SIZE };
+    let page = await this.findIds(findDto, pageRequest);
+    if (page.meta.count > 0) {
+      await this.messagingService.sendToQueue(
+        new IndexProductBatchCommand({
+          productIds: page.data.map((p) => p.id),
+        }),
+      );
+    }
+    while (pageRequest.skip + pageRequest.take < page.meta.totalCount) {
+      pageRequest.skip += BATCH_SIZE;
+      page = await this.findIds(findDto, pageRequest);
+      if (page.meta.count > 0) {
+        await this.messagingService.sendToQueue(
+          new IndexProductBatchCommand({
+            productIds: page.data.map((p) => p.id),
+          }),
+        );
+      }
+    }
+  }
+
+  async indexProductBatch(productIds: string[]) {
+    const batchData = await this.productsRepo.find({
+      where: { id: In(productIds) },
+      relations: {
+        labels: true,
+        provider: true,
+        category: true,
+        brand: true,
+      },
+      select: {
+        shortId: true,
+        sku: true,
+        title: true,
+        description: true,
+        price: true,
+        currency: true,
+        listImage: true,
+        rating: true,
+        ratingsTotal: true,
+        provider: {
+          key: true,
+        },
+        labels: {
+          code: true,
+          description: true,
+        },
+        category: {
+          code: true,
+          description: true,
+        },
+        brand: {
+          code: true,
+          description: true,
+        },
+      },
+    });
+    await this.searchService.bulk(
+      batchData.map((p) => ({
+        id: p.shortId,
+        ...p,
+      })),
+    );
+  }
 
   async find(
     findDto: Partial<Product>,
@@ -43,6 +132,22 @@ export class ProductsService {
           identifier: true,
           description: true,
         },
+      },
+    });
+    return buildPage<Product>(data, count, pageRequest);
+  }
+
+  async findIds(
+    findDto: Partial<Product>,
+    pageRequest?: PageRequest,
+  ): Promise<Page<Product>> {
+    const [data, count] = await this.productsRepo.findAndCount({
+      ...pageRequest,
+      where: {
+        ...findDto,
+      },
+      select: {
+        id: true,
       },
     });
     return buildPage<Product>(data, count, pageRequest);
@@ -137,6 +242,91 @@ export class ProductsService {
     });
   }
 
+  async findData(
+    findDto: Partial<Product>,
+    pageRequest?: PageRequest,
+  ): Promise<Page<Product>> {
+    const [data, count] = await this.productsRepo.findAndCount({
+      ...pageRequest,
+      where: {
+        ...findDto,
+      },
+      relations: {
+        labels: true,
+        provider: true,
+        category: true,
+        brand: true,
+      },
+      select: {
+        id: true,
+        shortId: true,
+        sku: true,
+        title: true,
+        description: true,
+        price: true,
+        currency: true,
+        listImage: true,
+        rating: true,
+        ratingsTotal: true,
+        provider: {
+          key: true,
+        },
+        labels: {
+          code: true,
+          description: true,
+        },
+        category: {
+          code: true,
+          description: true,
+        },
+        brand: {
+          code: true,
+          description: true,
+        },
+      },
+    });
+    return buildPage<Product>(data, count, pageRequest);
+  }
+
+  findOneData(id: string): Promise<Product> {
+    return this.productsRepo.findOne({
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+      relations: {
+        labels: true,
+        provider: true,
+        category: true,
+        brand: true,
+      },
+      select: {
+        id: true,
+        shortId: true,
+        sku: true,
+        title: true,
+        description: true,
+        price: true,
+        currency: true,
+        listImage: true,
+        rating: true,
+        ratingsTotal: true,
+        provider: {
+          key: true,
+        },
+        labels: {
+          code: true,
+          description: true,
+        },
+        category: {
+          code: true,
+          description: true,
+        },
+        brand: {
+          code: true,
+          description: true,
+        },
+      },
+    });
+  }
+
   async getStatus(id: string): Promise<ProductIntegrationStatus> {
     const { integrationStatus: status } = await this.productsRepo.findOne({
       select: {
@@ -168,28 +358,8 @@ export class ProductsService {
     if (data.labels) {
       data.labels = await this.normalizeLabels(providerId, data.labels);
     }
-
     const product = Product.factory(providerId, providerProductId, data);
-
-    const queryRunner = this.dataSource.createQueryRunner();
-    await queryRunner.connect();
-    await queryRunner.startTransaction();
-    try {
-      const created = await queryRunner.manager.save(product);
-      // await this.messagingService.sendToQueue({
-      //   routingKey: 'pi.product.created',
-      //   data: {
-      //     productId: created.id,
-      //   },
-      // });
-      await queryRunner.commitTransaction();
-      return created;
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      throw err;
-    } finally {
-      await queryRunner.release();
-    }
+    return await this.productsRepo.save(product);
   }
 
   async update(
@@ -209,12 +379,10 @@ export class ProductsService {
     if (updates.labels) {
       updates.labels = await this.normalizeLabels(providerId, updates.labels);
     }
-    Logger.debug('About to update :o!');
     await this.productsRepo.save({
       id,
       ...updates,
     });
-    Logger.debug('Updated.. about to find one!');
     return await this.findOne(id);
   }
 
@@ -235,11 +403,11 @@ export class ProductsService {
     } else {
       const existing = await this.categoriesService.findOneByProvider(
         providerId,
-        category.title,
+        category.code,
       );
       return existing
         ? existing
-        : Category.factory(providerId, category.title, category);
+        : Category.factory(providerId, category.code, category);
     }
   }
 
@@ -252,11 +420,9 @@ export class ProductsService {
     } else {
       const existing = await this.brandsService.findOneByProvider(
         providerId,
-        brand.title,
+        brand.code,
       );
-      return existing
-        ? existing
-        : Brand.factory(providerId, brand.title, brand);
+      return existing ? existing : Brand.factory(providerId, brand.code, brand);
     }
   }
 
@@ -272,14 +438,14 @@ export class ProductsService {
       } else {
         const existing = await this.labelsService.findOneByProvider(
           providerId,
-          label.title,
+          label.code,
         );
         if (existing) {
           // assign existing label
           labels.push(existing);
         } else {
           // create new label
-          labels.push(Label.factory(providerId, label.title, label));
+          labels.push(Label.factory(providerId, label.code, label));
         }
       }
     }

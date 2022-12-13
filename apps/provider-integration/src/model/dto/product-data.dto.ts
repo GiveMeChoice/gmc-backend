@@ -8,6 +8,7 @@ export class ProductDataDto extends PickType(PartialProduct, [
   'title',
   'description',
   'price',
+  'shippingPrice',
   'currency',
   'mainImage',
   'secondaryImage',

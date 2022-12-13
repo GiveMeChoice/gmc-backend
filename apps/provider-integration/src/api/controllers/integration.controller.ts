@@ -1,4 +1,5 @@
 import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
+import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { IntegrationService } from '@app/provider-integration/services/integration.service';
@@ -28,6 +29,7 @@ export class IntegrationController {
     await this.integrationService.refreshProduct(
       productId,
       'REST_API',
+      ProductRefreshReason.MANUAL,
       skipCache,
     );
     return this.productsService.findOneExternal(productId);

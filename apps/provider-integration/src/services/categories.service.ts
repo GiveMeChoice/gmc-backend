@@ -50,7 +50,7 @@ export class CategoriesService {
 
   findOneByProvider(providerId: string, title: string) {
     return this.categoriesRepo.findOne({
-      where: { providerId, title },
+      where: { providerId, code: title },
     });
   }
 

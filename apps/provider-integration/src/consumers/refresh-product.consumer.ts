@@ -1,6 +1,9 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
 import { Consumer } from '@lib/messaging/interface/consumer.interface';
-import { DEFAULT_EXCHANGE } from '@lib/messaging/messaging.constants';
+import {
+  CHANNEL_HIGH,
+  DEFAULT_EXCHANGE,
+} from '@lib/messaging/messaging.constants';
 import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
@@ -19,20 +22,22 @@ export class RefreshProductConsumer implements Consumer<RefreshProductCommand> {
     exchange: DEFAULT_EXCHANGE,
     routingKey: RefreshProductCommand.ROUTING_KEY,
     queue: RefreshProductCommand.QUEUE,
+    queueOptions: { channel: CHANNEL_HIGH },
   })
   async receive(msg: RefreshProductCommand, amqpMsg: ConsumeMessage) {
-    const { data } = msg;
-    Logger.debug(
-      `Command ${RefreshProductCommand.ROUTING_KEY} Received: ${JSON.stringify(
-        data,
-      )}`,
-    );
     try {
+      Logger.debug(
+        `Command ${
+          RefreshProductCommand.ROUTING_KEY
+        } Received: ${JSON.stringify(msg.data.productId)}`,
+      );
+      const { data } = msg;
       const status = await this.productsService.getStatus(data.productId);
       if (status === ProductIntegrationStatus.PENDING) {
         await this.integrationService.refreshProduct(
           data.productId,
           data.runId,
+          data.reason,
           data.skipCache,
         );
       } else {
@@ -43,12 +48,12 @@ export class RefreshProductConsumer implements Consumer<RefreshProductCommand> {
       Logger.debug(
         `Command ${
           RefreshProductCommand.ROUTING_KEY
-        } Completed: ${JSON.stringify(data)}`,
+        } Completed: ${JSON.stringify(data.productId)}`,
       );
     } catch (err) {
       Logger.error(
         `Command ${RefreshProductCommand.ROUTING_KEY} Error` +
-          data.productId +
+          `${msg.data ? msg.data.productId : ''}` +
           ' : ' +
           err,
       );

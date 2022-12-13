@@ -1,4 +1,5 @@
 import { RefreshProductCommand } from '@app/provider-integration/messages/refresh-product.command';
+import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
@@ -92,7 +93,11 @@ export abstract class PipelineBase implements Pipeline {
               break;
             case ProductIntegrationStatus.PENDING:
               run.pendingCount++;
-              await this.sendRefreshSignal(existingProduct.id, run.id);
+              await this.sendRefreshSignal(
+                existingProduct.id,
+                run.id,
+                ProductRefreshReason.PENDING,
+              );
               run.refreshSignalCount++;
               break;
             case ProductIntegrationStatus.LIVE:
@@ -150,7 +155,11 @@ export abstract class PipelineBase implements Pipeline {
       sourceProduct.providerProductId,
       sourceProduct,
     );
-    await this.sendRefreshSignal(productId, run.id);
+    await this.sendRefreshSignal(
+      productId,
+      run.id,
+      ProductRefreshReason.CREATED,
+    );
   }
 
   /* 
@@ -169,7 +178,12 @@ export abstract class PipelineBase implements Pipeline {
   private async refreshStaleProduct(product: Product, run: ProductRun) {
     product.integrationStatus = ProductIntegrationStatus.PENDING;
     await this.productsService.save(product);
-    await this.sendRefreshSignal(product.id, run.id, true);
+    await this.sendRefreshSignal(
+      product.id,
+      run.id,
+      ProductRefreshReason.STALE,
+      true,
+    );
   }
 
   /* 
@@ -181,18 +195,24 @@ export abstract class PipelineBase implements Pipeline {
     product.source = run.source;
     product.expiresAt = renewExpirationDate(run.source);
     await this.productsService.save(product);
-    await this.sendRefreshSignal(product.id, run.id);
+    await this.sendRefreshSignal(
+      product.id,
+      run.id,
+      ProductRefreshReason.ADOPTED,
+    );
   }
 
   private async sendRefreshSignal(
     productId: string,
     runId: string,
+    reason: ProductRefreshReason,
     skipCache = false,
   ) {
     await this.messagingService.sendToQueue(
       new RefreshProductCommand({
         productId,
         runId,
+        reason,
         skipCache,
       }),
     );

@@ -40,7 +40,7 @@ export class BrandsService {
 
   findOneByProvider(providerId: string, title: string) {
     return this.brandsRepo.findOne({
-      where: { providerId, title },
+      where: { providerId, code: title },
     });
   }
 

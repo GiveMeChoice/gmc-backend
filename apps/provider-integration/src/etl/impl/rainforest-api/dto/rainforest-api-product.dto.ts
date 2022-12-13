@@ -22,23 +22,11 @@ export interface RainforestApiProductDto {
     feature_bullets_flat: [string];
     specifications: any;
     specifications_flat: any;
-    // keep
-    title: string;
-    asin: string;
-    link: string;
-    brand: string;
-    categories: [
-      {
-        name: string;
-        link: string;
-        category_id: string;
-      },
-    ];
-    categories_flat: string;
-    delivery_message: string;
-    description: string;
+    keywords: any;
+    keywords_list: any;
+    a_plus_content: any;
+    sub_title: any;
     promotions_feature: string;
-    rating: number;
     rating_breakdown: {
       five_star: {
         count: number;
@@ -56,6 +44,27 @@ export interface RainforestApiProductDto {
         count: number;
       };
     };
+    has_coupon: boolean;
+    coupon_text: string;
+    images_count: number;
+    images_flat: string;
+    is_bundle: boolean;
+    // keep
+    title: string;
+    asin: string;
+    link: string;
+    brand: string;
+    delivery_message: string;
+    categories: [
+      {
+        name: string;
+        link: string;
+        category_id: string;
+      },
+    ];
+    categories_flat: string;
+    description: string;
+    rating: number;
     ratings_total: number;
     main_image: {
       link: string;
@@ -84,33 +93,23 @@ export interface RainforestApiProductDto {
       is_prime: boolean;
       is_amazon_fresh: boolean;
       availability: {
-        tye: string;
+        type: string;
         raw: string;
         dispatch_days: number;
       };
-      price: {
-        symbol: string;
-        value: number;
-        currency: string;
-        raw: string;
-      };
-      rrp: {
-        symbol: string;
-        value: number;
-        currency: string;
-        raw: string;
-      };
-      save: {
-        symbol: string;
-        value: number;
-        currency: string;
-        raw: string;
-      };
-      shipping: {
-        raw: string;
-      };
+      price: RainforestApiPriceDto;
+      rrp: RainforestApiPriceDto;
+      save: RainforestApiPriceDto;
+      shipping: RainforestApiPriceDto;
     };
   };
+}
+
+export interface RainforestApiPriceDto {
+  raw: string;
+  value: number;
+  currency: string;
+  symbol: string;
 }
 
 export interface RainforestApiImageDto {

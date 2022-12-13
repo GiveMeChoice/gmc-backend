@@ -71,6 +71,7 @@ export class EthicalSuperstoreTransformer
       product.rating = data.rating;
       product.ratingsTotal = data.reviewCount;
       product.price = data.productInfo.price.price;
+      product.shippingPrice = product.price > 50 ? 0 : 4.95;
       product.currency = data.productInfo.price.currency;
 
       product.categoryDetail = source.identifier
@@ -110,7 +111,7 @@ export class EthicalSuperstoreTransformer
 
   private mapBrand(data: EthicalSuperstoreProductDto): Partial<Brand> {
     return {
-      title: data.productInfo.brand,
+      code: data.productInfo.brand,
       logo: data.manufacturer ? data.manufacturer.logo : null,
       description: data.manufacturer ? data.manufacturer.description : null,
     };
@@ -118,7 +119,7 @@ export class EthicalSuperstoreTransformer
 
   private mapCategory(source: ProductSource): Partial<Category> {
     return {
-      title: source.category,
+      code: source.category,
       description: source.category.split('-').map(capitalizeWord).join(' '),
     };
   }

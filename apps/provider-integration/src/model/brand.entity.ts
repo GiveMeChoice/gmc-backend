@@ -9,11 +9,11 @@ import {
 import { Product } from './product.entity';
 
 @Entity({ name: 'gmc_brand' })
-@Index(['providerId', 'title'], { unique: true })
+@Index(['providerId', 'code'], { unique: true })
 export class Brand {
   constructor(providerId: string, title: string) {
     this.providerId = providerId;
-    this.title = title;
+    this.code = title;
   }
 
   public static factory(
@@ -33,16 +33,16 @@ export class Brand {
   readonly providerId: string;
 
   @Column()
-  readonly title: string;
+  readonly code: string;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({ nullable: true })
   logo?: string;
 
   @Column({ name: 'info_link', nullable: true })
   infoLink?: string;
-
-  @Column({ nullable: true })
-  description?: string;
 
   @CreateDateColumn({
     name: 'created_at',

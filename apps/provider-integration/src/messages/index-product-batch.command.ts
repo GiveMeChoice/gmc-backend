@@ -1,0 +1,14 @@
+import { MessageBase } from '@lib/messaging/interface/message-base.class';
+import { IndexProductBatchCommandDto as IndexProductBatchCommandDto } from './dto/index-product-batch-command.dto';
+
+export class IndexProductBatchCommand extends MessageBase<IndexProductBatchCommandDto> {
+  static readonly ROUTING_KEY = 'pi.product.sync-batch';
+  static readonly QUEUE = 'pi.product.sync-batch';
+
+  getRoutingKey() {
+    return IndexProductBatchCommand.ROUTING_KEY;
+  }
+  getQueue() {
+    return IndexProductBatchCommand.QUEUE;
+  }
+}

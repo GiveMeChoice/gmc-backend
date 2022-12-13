@@ -26,13 +26,13 @@ export class IntegrateSourceConsumer
     msg: IntegrateSourceCommand,
     amqpMsg: ConsumeMessage,
   ): Promise<void> {
-    const { data } = msg;
-    Logger.debug(
-      `Command ${IntegrateSourceCommand.ROUTING_KEY} Received: ${JSON.stringify(
-        data,
-      )}`,
-    );
     try {
+      const { data } = msg;
+      Logger.debug(
+        `Command ${
+          IntegrateSourceCommand.ROUTING_KEY
+        } Received: ${JSON.stringify(data)}`,
+      );
       const source = await this.sourcesService.findOne(data.productSourceId);
       if (
         // must be due and cant be DOWN or BUSY
@@ -53,7 +53,7 @@ export class IntegrateSourceConsumer
     } catch (err) {
       Logger.error(
         `Command ${IntegrateSourceCommand.ROUTING_KEY} Error` +
-          data.productSourceId +
+          `${msg.data ? msg.data.productSourceId : ''}` +
           ' : ' +
           err,
       );

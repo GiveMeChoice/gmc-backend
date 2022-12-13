@@ -1,3 +1,4 @@
 export const DEFAULT_EXCHANGE = 'gmc-exchange';
-export const PRODUCT_REFRESH_QUEUE = 'pi-product-refresh';
-export const SOURCE_PIPELINE_QUEUE = 'pi-source-pipeline';
+export const CHANNEL_LOW = 'channel-low';
+export const CHANNEL_MID = 'channel-mid';
+export const CHANNEL_HIGH = 'channel-high';

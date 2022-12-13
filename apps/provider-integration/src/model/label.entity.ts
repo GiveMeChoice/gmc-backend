@@ -14,11 +14,11 @@ import { Product } from './product.entity';
 import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_label' })
-@Index(['providerId', 'title'], { unique: true })
+@Index(['providerId', 'code'], { unique: true })
 export class Label {
   constructor(providerId: string, title: string) {
     this.providerId = providerId;
-    this.title = title;
+    this.code = title;
   }
 
   public static factory(
@@ -38,7 +38,10 @@ export class Label {
   readonly providerId: string;
 
   @Column()
-  readonly title: string;
+  readonly code: string;
+
+  @Column({ nullable: true })
+  description?: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -47,21 +50,11 @@ export class Label {
   })
   createdAt: Date;
 
-  @UpdateDateColumn({
-    name: 'updated_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
-
   @Column({ name: 'info_link', nullable: true })
   infoLink?: string;
 
   @Column({ nullable: true })
   icon?: string;
-
-  @Column({ nullable: true })
-  description?: string;
 
   @Column({ name: 'group_id', nullable: true })
   groupId?: string;

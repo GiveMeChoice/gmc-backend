@@ -139,6 +139,16 @@ export class RainforestApiExtractor
     delete dto.product.variants;
     delete dto.product.videos;
     delete dto.product.videos_flat;
+    delete dto.product.keywords;
+    delete dto.product.keywords_list;
+    delete dto.product.a_plus_content;
+    delete dto.product.sub_title;
+    delete dto.product.rating_breakdown;
+    delete dto.product.promotions_feature;
+    delete dto.product.has_coupon;
+    delete dto.product.coupon_text;
+    delete dto.product.images_count;
+    delete dto.product.images_flat;
     delete dto.product.feature_bullets_flat;
     delete dto.product.specifications;
     delete dto.product.specifications_flat;

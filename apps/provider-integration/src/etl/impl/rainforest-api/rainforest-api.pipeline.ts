@@ -66,7 +66,14 @@ export class RainforestApiPipeline extends PipelineBase {
     sourceProduct: Partial<Product>,
     existingProduct: Product,
   ): boolean {
-    return sourceProduct.price && sourceProduct.price != existingProduct.price;
+    if (sourceProduct.price && sourceProduct.price != existingProduct.price) {
+      Logger.debug(
+        `Product ${existingProduct.shortId} is stale b/c price ${existingProduct.price} vs. source price ${sourceProduct.price}`,
+      );
+      return true;
+    } else {
+      return false;
+    }
   }
 
   protected applySourceRefresh(existing: Product, source: Partial<Product>) {

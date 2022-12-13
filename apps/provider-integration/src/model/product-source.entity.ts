@@ -32,8 +32,8 @@ export class ProductSource {
   })
   status: ProductSourceStatus;
 
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @Column({ default: false })
   active: boolean;
@@ -42,7 +42,7 @@ export class ProductSource {
   runIntervalHours: number;
 
   @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
-  lastRunAt: Date;
+  lastRunAt?: Date;
 
   @Column({ name: 'owned_count', default: 0 })
   ownedCount: number;
@@ -54,13 +54,10 @@ export class ProductSource {
   retryLimit: number;
 
   @Column({ nullable: true })
-  category: string;
+  category?: string;
 
-  @Column({ name: 'subcategory_1', nullable: true })
-  subcategory1: string;
-
-  @Column({ name: 'subcategory_2', nullable: true })
-  subcategory2: string;
+  @Column({ name: 'source_link', nullable: true })
+  sourceLink?: string;
 
   @OneToMany(() => ProductRun, (run: ProductRun) => run.source)
   runs: ProductRun[];

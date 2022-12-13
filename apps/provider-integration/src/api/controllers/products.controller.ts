@@ -30,6 +30,21 @@ export class ProductsController {
     return await this.productsService.findOneExternal(id);
   }
 
+  @Get(':id/data')
+  async getOneData(@Param('id') id): Promise<Product> {
+    return await this.productsService.findOneData(id);
+  }
+
+  @Post(':id/index')
+  async syncData(@Param('id') id): Promise<any> {
+    return await this.productsService.indexProduct(id);
+  }
+
+  @Post('index')
+  async syncTest(@Body() findDto: FindProductsDto) {
+    await this.productsService.indexProductBatchAsync(findDto);
+  }
+
   @Post('search')
   async search(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,

@@ -15,6 +15,7 @@ import {
 import { shortId } from '../utils/short-id';
 import { Brand } from './brand.entity';
 import { Category } from './category.entity';
+import { ProductRefreshReason } from './enum/product-refresh-reason.enum';
 import { ProductIntegrationStatus } from './enum/product-status.enum';
 import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
@@ -99,6 +100,15 @@ export class Product {
   @Column({ name: 'refreshed_at', type: 'timestamptz', nullable: true })
   refreshedAt: Date;
 
+  @Column({
+    name: 'refresh_reason',
+    type: 'enum',
+    enum: ProductRefreshReason,
+    enumName: 'gmc_product_refresh_reason_enum',
+    nullable: true,
+  })
+  refreshReason: ProductRefreshReason;
+
   @Column({ name: 'source_date', type: 'timestamptz', nullable: true })
   sourceDate: Date;
 
@@ -145,6 +155,15 @@ export class Product {
 
   @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
   price?: number;
+
+  @Column({
+    name: 'shipping_price',
+    type: 'decimal',
+    precision: 10,
+    scale: 2,
+    nullable: true,
+  })
+  shippingPrice?: number;
 
   @Column({ nullable: true })
   currency?: string;

@@ -18,6 +18,7 @@ import {
   TRANSFORMER_CONTAINER,
 } from '../etl/shared/transformer/transformer.container';
 import { ProductRefreshDto } from '../model/dto/product-data.dto';
+import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
 import { ProductRun } from '../model/product-run.entity';
 import { ProductSource } from '../model/product-source.entity';
@@ -64,6 +65,7 @@ export class IntegrationService {
   async refreshProduct(
     productId: string,
     runId: string,
+    reason: ProductRefreshReason,
     skipCache: boolean,
   ): Promise<Product> {
     let product = await this.productsService.findOne(productId);
@@ -78,10 +80,12 @@ export class IntegrationService {
       product.hasIntegrationError = false;
       product.errorMessage = null;
       product.refreshedAt = new Date();
+      product.refreshReason = reason;
       product.expiresAt = renewExpirationDate(product.source);
       product.keepAliveCount = 0;
       product.refreshedByRunId = runId;
       product.integrationStatus = ProductIntegrationStatus.LIVE;
+      await this.productsService.indexProductAsync(product.id);
     } catch (err) {
       product.hasIntegrationError = true;
       product.errorMessage = formatErrorMessage(err);

@@ -24,4 +24,5 @@ rainforest:
 elastic:
   username: elastic
   password: changeme
-  node: 'http://localhost:9200'
+  node: http://localhost:9200
+  index: gmc_search

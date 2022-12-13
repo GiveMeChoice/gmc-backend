@@ -18,10 +18,24 @@ import { MessagingService } from './messaging.service';
             },
           ],
           channels: {
-            'channel-1': {
+            'channel-low': {
               prefetchCount:
-                configService.get<number>('rabbitmq.prefetch-count') || 5,
+                configService.get<number>(
+                  'rabbitmq.prefetch-count.channel-low',
+                ) || 1,
+            },
+            'channel-mid': {
+              prefetchCount:
+                configService.get<number>(
+                  'rabbitmq.prefetch-count.channel-mid',
+                ) || 2,
               default: true,
+            },
+            'channel-high': {
+              prefetchCount:
+                configService.get<number>(
+                  'rabbitmq.prefetch-count.channel-high',
+                ) || 5,
             },
           },
           uri: configService.get('rabbitmq.uri'),
