@@ -15,7 +15,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
         database: configService.get('datasource.database'),
         autoLoadEntities: true,
         synchronize: false,
-        // logging: true, //configService.get('NODE_ENV') === 'dev',
+        logging: true, //configService.get('NODE_ENV') === 'dev',
       }),
       inject: [ConfigService],
     }),

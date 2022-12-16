@@ -20,8 +20,8 @@ import { UpdateProviderDto } from '../dto/update-provider.dto';
 export class ProvidersController {
   constructor(private readonly providersService: ProvidersService) {}
 
-  @Post('search')
-  async search(
+  @Post('find')
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindProvidersDto,
   ): Promise<Page<Provider>> {

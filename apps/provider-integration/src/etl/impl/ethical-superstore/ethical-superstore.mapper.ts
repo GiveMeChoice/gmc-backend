@@ -9,9 +9,10 @@ import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Review } from '@app/provider-integration/model/review.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
+import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
-import { SourceTransformer } from '../../shared/transformer/transformer.interface';
+import { SourceMapper } from '../../shared/mapper/source-mapper.interface';
 import {
   EthicalSuperstoreEthicsAndTagsDto,
   EthicalSuperstoreProductDto,
@@ -21,12 +22,9 @@ import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-
 import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
 
 @Injectable()
-export class EthicalSuperstoreTransformer
+export class EthicalSuperstoreMapper
   implements
-    SourceTransformer<
-      EthicalSuperstoreSourceItemDto,
-      EthicalSuperstoreProductDto
-    >
+    SourceMapper<EthicalSuperstoreSourceItemDto, EthicalSuperstoreProductDto>
 {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
@@ -40,7 +38,7 @@ export class EthicalSuperstoreTransformer
       product.offerLink = `${ETHICAL_SUPERSTORE_BASE_URL}${item.href}`;
       return product;
     } catch (err) {
-      throw new PipelineError('TRANSFORM_ERROR', err);
+      throw new PipelineError('MAP_ERROR', err);
     }
   }
 
@@ -89,7 +87,7 @@ export class EthicalSuperstoreTransformer
       product.labels = this.mapLabels(data.ethicsAndTags) as Label[];
       return product;
     } catch (err) {
-      throw new PipelineError('TRANSFORM_ERROR', err);
+      throw new PipelineError('MAP_ERROR', err);
     }
   }
 
@@ -110,16 +108,20 @@ export class EthicalSuperstoreTransformer
   }
 
   private mapBrand(data: EthicalSuperstoreProductDto): Partial<Brand> {
+    const brand = data.productInfo.brand
+      ? data.productInfo.brand
+      : data.manufacturer.name;
     return {
-      code: data.productInfo.brand,
+      code: normalizeIdCode(brand),
+      description: brand,
+      info: data.manufacturer ? data.manufacturer.description : null,
       logo: data.manufacturer ? data.manufacturer.logo : null,
-      description: data.manufacturer ? data.manufacturer.description : null,
     };
   }
 
   private mapCategory(source: ProductSource): Partial<Category> {
     return {
-      code: source.category,
+      code: normalizeIdCode(source.category),
       description: source.category.split('-').map(capitalizeWord).join(' '),
     };
   }
@@ -132,7 +134,8 @@ export class EthicalSuperstoreTransformer
     ethicsAndTags: EthicalSuperstoreEthicsAndTagsDto[],
   ): Partial<Label>[] {
     return ethicsAndTags.map((tag) => ({
-      title: tag.title,
+      code: normalizeIdCode(tag.title),
+      description: tag.title,
       infoLink: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.href}`,
       icon: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.icon}`,
     }));

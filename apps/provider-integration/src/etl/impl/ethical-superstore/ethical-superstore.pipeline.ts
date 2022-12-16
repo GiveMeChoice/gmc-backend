@@ -11,29 +11,29 @@ import {
 } from '../../shared/extractor/extractor.container';
 import { PipelineBase } from '../../shared/pipeline/pipeline.base';
 import {
-  TransformerContainer,
-  TRANSFORMER_CONTAINER,
-} from '../../shared/transformer/transformer.container';
+  MapperContainer,
+  MAPPER_CONTAINER,
+} from '../../shared/mapper/source-mapper.container';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
-import { EthicalSuperstoreTransformer } from './ethical-superstore.transformer';
+import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';
 
 @Injectable()
 export class EthicalSuperstorePipeline extends PipelineBase {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
   private readonly _extractor: EthicalSuperstoreExtractor;
-  private readonly _transformer: EthicalSuperstoreTransformer;
+  private readonly _mapper: EthicalSuperstoreMapper;
 
   constructor(
     @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
-    @Inject(TRANSFORMER_CONTAINER) transformerFactory: TransformerContainer,
+    @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer,
   ) {
     super();
     this._extractor = extractorFactory.getExtractor(
       this.providerKey,
     ) as EthicalSuperstoreExtractor;
-    this._transformer = transformerFactory.getTransformer(
+    this._mapper = mapperContainer.getMapper(
       this.providerKey,
-    ) as EthicalSuperstoreTransformer;
+    ) as EthicalSuperstoreMapper;
   }
 
   async execute(run: ProductRun): Promise<ProductRun> {
@@ -43,7 +43,7 @@ export class EthicalSuperstorePipeline extends PipelineBase {
         this._extractor.extractSource(run.source).pipe(
           concatMap(async (sourceItem) => {
             if (sourceItem.inStock) {
-              const sourceProduct = this._transformer.mapSourceItem(sourceItem);
+              const sourceProduct = this._mapper.mapSourceItem(sourceItem);
               await this.loadSourceProduct(sourceProduct, run);
             }
           }),
@@ -69,7 +69,14 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     sourceProduct: Partial<Product>,
     source: ProductSource,
   ): boolean {
-    return sourceProduct.price && sourceProduct.price != existingProduct.price;
+    if (sourceProduct.price && sourceProduct.price != existingProduct.price) {
+      Logger.debug(
+        `Product ${existingProduct.shortId} is stale b/c price ${existingProduct.price} vs. source price ${sourceProduct.price}`,
+      );
+      return true;
+    } else {
+      return false;
+    }
   }
 
   async refreshProduct(
@@ -79,10 +86,7 @@ export class EthicalSuperstorePipeline extends PipelineBase {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return {
       sourceDate: extracted.sourceDate,
-      ...(await this._transformer.mapProductData(
-        extracted.data,
-        product.source,
-      )),
+      ...(await this._mapper.mapProductData(extracted.data, product.source)),
     };
   }
 }

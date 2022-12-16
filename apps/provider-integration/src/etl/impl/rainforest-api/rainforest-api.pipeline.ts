@@ -1,7 +1,4 @@
-import {
-  ProductDataDto,
-  ProductRefreshDto,
-} from '@app/provider-integration/model/dto/product-data.dto';
+import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
@@ -11,32 +8,32 @@ import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
 } from '../../shared/extractor/extractor.container';
-import { PipelineBase } from '../../shared/pipeline/pipeline.base';
 import {
-  TransformerContainer,
-  TRANSFORMER_CONTAINER,
-} from '../../shared/transformer/transformer.container';
+  MapperContainer,
+  MAPPER_CONTAINER,
+} from '../../shared/mapper/source-mapper.container';
+import { PipelineBase } from '../../shared/pipeline/pipeline.base';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiExtractor } from './rainforest-api.extractor';
-import { RainforestApiTransformer } from './rainforest-api.transformer';
+import { RainforestApiMapper } from './rainforest-api.mapper';
 
 @Injectable()
 export class RainforestApiPipeline extends PipelineBase {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   private readonly _extractor: RainforestApiExtractor;
-  private readonly _transformer: RainforestApiTransformer;
+  private readonly _mapper: RainforestApiMapper;
 
   constructor(
     @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
-    @Inject(TRANSFORMER_CONTAINER) transformerFactory: TransformerContainer,
+    @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer,
   ) {
     super();
     this._extractor = extractorFactory.getExtractor(
       this.providerKey,
     ) as RainforestApiExtractor;
-    this._transformer = transformerFactory.getTransformer(
+    this._mapper = mapperContainer.getMapper(
       this.providerKey,
-    ) as RainforestApiTransformer;
+    ) as RainforestApiMapper;
   }
 
   async execute(run: ProductRun): Promise<ProductRun> {
@@ -51,7 +48,7 @@ export class RainforestApiPipeline extends PipelineBase {
             !item.result.category_results.sponsored &&
             item.result.category_results.price.value
           ) {
-            const sourceProduct = this._transformer.mapSourceItem(item);
+            const sourceProduct = this._mapper.mapSourceItem(item);
             await super.loadSourceProduct(sourceProduct, run);
           }
         });
@@ -88,10 +85,7 @@ export class RainforestApiPipeline extends PipelineBase {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return {
       sourceDate: extracted.sourceDate,
-      ...(await this._transformer.mapProductData(
-        extracted.data,
-        product.source,
-      )),
+      ...(await this._mapper.mapProductData(extracted.data, product.source)),
     };
   }
 }

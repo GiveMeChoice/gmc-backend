@@ -38,7 +38,7 @@ export class ProductSource {
   @Column({ default: false })
   active: boolean;
 
-  @Column({ name: 'run_interval_hours', type: 'integer', default: 0 })
+  @Column({ name: 'run_interval_hours', type: 'integer', default: 24 })
   runIntervalHours: number;
 
   @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
@@ -50,7 +50,7 @@ export class ProductSource {
   @Column({ name: 'retry_count', type: 'integer', default: 0 })
   retryCount: number;
 
-  @Column({ name: 'retry_limit', type: 'integer', default: 3 })
+  @Column({ name: 'retry_limit', type: 'integer', default: 4 })
   retryLimit: number;
 
   @Column({ nullable: true })

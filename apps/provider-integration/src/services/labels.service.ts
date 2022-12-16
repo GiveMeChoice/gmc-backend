@@ -3,7 +3,7 @@ import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Label } from '../model/label.entity';
 
 @Injectable()
@@ -30,20 +30,24 @@ export class LabelsService {
     findDto: Partial<Label>,
     pageRequest?: PageRequest,
   ): Promise<Page<Label>> {
-    const [data, count] = await this.labelsRepo.findAndCount({
-      ...pageRequest,
-      where: {
+    const [data, count] = await this.labelsRepo
+      .createQueryBuilder('label')
+      .where({
         ...findDto,
-      },
-      relations: {
-        group: true,
-      },
-      select: {
-        group: {
-          name: true,
+      })
+      .setFindOptions({
+        ...pageRequest,
+        relations: {
+          group: true,
         },
-      },
-    });
+        select: {
+          group: {
+            name: true,
+          },
+        },
+      })
+      .loadRelationCountAndMap('label.productCount', 'label.products')
+      .getManyAndCount();
     return buildPage<Label>(data, count, pageRequest);
   }
 

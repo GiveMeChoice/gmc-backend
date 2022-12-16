@@ -5,10 +5,10 @@ import { forwardRef, Module } from '@nestjs/common';
 import { AppModule } from '../app.module';
 import { EthicalSuperstoreExtractor } from './impl/ethical-superstore/ethical-superstore.extractor';
 import { EthicalSuperstorePipeline } from './impl/ethical-superstore/ethical-superstore.pipeline';
-import { EthicalSuperstoreTransformer } from './impl/ethical-superstore/ethical-superstore.transformer';
+import { EthicalSuperstoreMapper } from './impl/ethical-superstore/ethical-superstore.mapper';
 import { RainforestApiExtractor } from './impl/rainforest-api/rainforest-api.extractor';
 import { RainforestApiPipeline } from './impl/rainforest-api/rainforest-api.pipeline';
-import { RainforestApiTransformer } from './impl/rainforest-api/rainforest-api.transformer';
+import { RainforestApiMapper } from './impl/rainforest-api/rainforest-api.mapper';
 import { ProductCacheManager } from './shared/cache/product-cache.manager';
 import { SourceCacheManager } from './shared/cache/source-cache.manager';
 import {
@@ -20,9 +20,9 @@ import {
   PIPELINE_CONTAINER,
 } from './shared/pipeline/pipeline.container';
 import {
-  TransformerContainer,
-  TRANSFORMER_CONTAINER,
-} from './shared/transformer/transformer.container';
+  MapperContainer,
+  MAPPER_CONTAINER,
+} from './shared/mapper/source-mapper.container';
 
 @Module({
   imports: [
@@ -36,10 +36,10 @@ import {
     SourceCacheManager,
     RainforestApiPipeline,
     RainforestApiExtractor,
-    RainforestApiTransformer,
+    RainforestApiMapper,
     EthicalSuperstorePipeline,
     EthicalSuperstoreExtractor,
-    EthicalSuperstoreTransformer,
+    EthicalSuperstoreMapper,
     {
       provide: PIPELINE_CONTAINER,
       useFactory: (
@@ -57,14 +57,14 @@ import {
       inject: [RainforestApiExtractor, EthicalSuperstoreExtractor],
     },
     {
-      provide: TRANSFORMER_CONTAINER,
+      provide: MAPPER_CONTAINER,
       useFactory: (
-        rainforestTranformer: RainforestApiTransformer,
-        ethicalTransformer: EthicalSuperstoreTransformer,
-      ) => new TransformerContainer([rainforestTranformer, ethicalTransformer]),
-      inject: [RainforestApiTransformer, EthicalSuperstoreTransformer],
+        rainforestTranformer: RainforestApiMapper,
+        ethicalTransformer: EthicalSuperstoreMapper,
+      ) => new MapperContainer([rainforestTranformer, ethicalTransformer]),
+      inject: [RainforestApiMapper, EthicalSuperstoreMapper],
     },
   ],
-  exports: [PIPELINE_CONTAINER, EXTRACTOR_CONTAINER, TRANSFORMER_CONTAINER],
+  exports: [PIPELINE_CONTAINER, EXTRACTOR_CONTAINER, MAPPER_CONTAINER],
 })
 export class EtlModule {}

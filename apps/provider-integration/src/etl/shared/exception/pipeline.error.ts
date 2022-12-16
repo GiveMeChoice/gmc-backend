@@ -1,4 +1,4 @@
-type PipelineErrors = 'EXTRACT_ERROR' | 'TRANSFORM_ERROR' | 'LOAD_ERROR';
+type PipelineErrors = 'EXTRACT_ERROR' | 'MAP_ERROR' | 'LOAD_ERROR';
 
 export class PipelineError extends Error {
   constructor(name: PipelineErrors, message?: string) {

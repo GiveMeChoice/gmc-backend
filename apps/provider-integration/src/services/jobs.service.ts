@@ -97,8 +97,6 @@ export class JobsService {
     try {
       next = cronJob.nextDates(5);
     } catch (ignored) {}
-    console.log(cronJob.lastDate);
-    console.log(cronJob.lastDate());
     return {
       name,
       schedule: job.schedule,

@@ -20,8 +20,8 @@ import { UpdateSourceDto } from '../dto/update-source.dto';
 export class ProductSourcesController {
   constructor(private readonly productSourcesService: ProductSourcesService) {}
 
-  @Post('search')
-  async search(
+  @Post('find')
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindSourcesDto,
   ): Promise<Page<ProductSource>> {

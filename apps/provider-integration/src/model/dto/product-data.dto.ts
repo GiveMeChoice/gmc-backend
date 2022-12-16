@@ -10,6 +10,7 @@ export class ProductDataDto extends PickType(PartialProduct, [
   'price',
   'shippingPrice',
   'currency',
+  'listImage',
   'mainImage',
   'secondaryImage',
   'offerLink',
@@ -20,6 +21,7 @@ export class ProductDataDto extends PickType(PartialProduct, [
   'categoryDetail',
   'reviews',
   'labels',
+  'provider',
 ]) {}
 
 export class ProductRefreshDto extends IntersectionType(

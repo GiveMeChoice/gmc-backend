@@ -1,5 +1,5 @@
-export function formatErrorMessage(e: any, defaultMsg?: string): string {
-  let message = defaultMsg ? defaultMsg : 'Unknown Error';
+export function formatErrorMessage(e: any, title?: string): string {
+  let message = 'Unknown Error';
   if (
     e.response &&
     e.response.data &&
@@ -10,5 +10,5 @@ export function formatErrorMessage(e: any, defaultMsg?: string): string {
   } else if (e.message && typeof message === 'string') {
     message = e.message;
   }
-  return message;
+  return title ? `${title}: ${message}` : message;
 }

@@ -11,7 +11,7 @@ import { Review } from '@app/provider-integration/model/review.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
-import { SourceTransformer } from '../../shared/transformer/transformer.interface';
+import { SourceMapper } from '../../shared/mapper/source-mapper.interface';
 import {
   RainforestApiClimatePledgeFriendlyDto,
   RainforestApiImageDto,
@@ -22,9 +22,8 @@ import {
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 
 @Injectable()
-export class RainforestApiTransformer
-  implements
-    SourceTransformer<RainforestApiSourceItemDto, RainforestApiProductDto>
+export class RainforestApiMapper
+  implements SourceMapper<RainforestApiSourceItemDto, RainforestApiProductDto>
 {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
@@ -38,7 +37,7 @@ export class RainforestApiTransformer
       product.offerLink = item.result.category_results.link;
       return product;
     } catch (err) {
-      throw new PipelineError('TRANSFORM_ERROR', err);
+      throw new PipelineError('MAP_ERROR', err);
     }
   }
 
@@ -68,7 +67,7 @@ export class RainforestApiTransformer
       product.labels = this.mapLabels(data.climate_pledge_friendly) as Label[];
       return product;
     } catch (err) {
-      throw new PipelineError('TRANSFORM_ERROR', err);
+      throw new PipelineError('MAP_ERROR', err);
     }
   }
 

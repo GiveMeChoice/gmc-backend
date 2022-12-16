@@ -1,5 +1,6 @@
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
 import { Client } from '@elastic/elasticsearch';
+import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
@@ -60,8 +61,8 @@ export class SearchService implements OnModuleInit {
     await this._client.delete({ index: this._index, id });
   }
 
-  async search(q: string) {
-    await this._client.search({ index: this._index, q });
+  async search<T>(q: string): Promise<SearchResponse<T>> {
+    return await this._client.search<T>({ index: this._index, q });
   }
 
   async bulk(documents: any[]) {

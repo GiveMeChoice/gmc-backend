@@ -13,10 +13,6 @@ import {
   PipelineContainer,
   PIPELINE_CONTAINER,
 } from '../etl/shared/pipeline/pipeline.container';
-import {
-  TransformerContainer,
-  TRANSFORMER_CONTAINER,
-} from '../etl/shared/transformer/transformer.container';
 import { ProductRefreshDto } from '../model/dto/product-data.dto';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
@@ -35,8 +31,6 @@ export class IntegrationService {
     private readonly pipelineContainer: PipelineContainer,
     @Inject(EXTRACTOR_CONTAINER)
     private readonly extractorContainer: ExtractorContainer,
-    @Inject(TRANSFORMER_CONTAINER)
-    private readonly transformerContainer: TransformerContainer,
     private productSourcesService: ProductSourcesService,
     private readonly productsService: ProductsService,
   ) {}

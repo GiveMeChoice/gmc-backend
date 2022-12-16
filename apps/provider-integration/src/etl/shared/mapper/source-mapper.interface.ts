@@ -5,7 +5,7 @@ import {
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 
-export interface SourceTransformer<I, P> {
+export interface SourceMapper<I, P> {
   providerKey: ProviderKey;
 
   mapSourceItem(item: I): SourceItemDataDto;

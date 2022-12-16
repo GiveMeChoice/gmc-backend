@@ -22,13 +22,16 @@ export class ProductSourcesService {
     findDto: Partial<ProductSource>,
     pageRequest?: PageRequest,
   ): Promise<Page<ProductSource>> {
-    const [data, count] = await this.sourcesRepo.findAndCount({
-      ...pageRequest,
-      where: {
+    const [data, count] = await this.sourcesRepo
+      .createQueryBuilder('source')
+      .where({
         ...findDto,
         identifier: Like(`%${findDto.identifier ? findDto.identifier : ''}%`),
-      },
-    });
+      })
+      .setFindOptions({ ...pageRequest })
+      .loadRelationCountAndMap('source.runCount', 'source.runs')
+      .loadRelationCountAndMap('source.productCount', 'source.products')
+      .getManyAndCount();
     return buildPage<ProductSource>(data, count, pageRequest);
   }
 

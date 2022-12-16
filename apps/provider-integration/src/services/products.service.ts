@@ -6,7 +6,8 @@ import { SearchService } from '@lib/search';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
-import { DataSource, In, Repository } from 'typeorm';
+import { ArrayContains, DataSource, In, Like, Repository } from 'typeorm';
+import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
 import { Brand } from '../model/brand.entity';
@@ -116,10 +117,28 @@ export class ProductsService {
   }
 
   async find(
-    findDto: Partial<Product>,
+    findDto: FindProductsDto,
     pageRequest?: PageRequest,
   ): Promise<Page<Product>> {
-    const [data, count] = await this.productsRepo.findAndCount({
+    const query = this.productsRepo.createQueryBuilder('product');
+    if (findDto.label) {
+      let addJoin = false;
+      if (findDto.label.code) {
+        query.andWhere('label.code=:code', { code: findDto.label.code });
+        addJoin = true;
+      }
+      if (findDto.label.groupId) {
+        query.andWhere('label.group=:groupId', {
+          groupId: findDto.label.groupId,
+        });
+        addJoin = true;
+      }
+      if (addJoin) {
+        query.innerJoin('product.labels', 'label');
+      }
+      delete findDto.label;
+    }
+    query.setFindOptions({
       ...pageRequest,
       where: {
         ...findDto,
@@ -134,6 +153,7 @@ export class ProductsService {
         },
       },
     });
+    const [data, count] = await query.getManyAndCount();
     return buildPage<Product>(data, count, pageRequest);
   }
 
@@ -386,6 +406,11 @@ export class ProductsService {
     return await this.findOne(id);
   }
 
+  async search(q: string): Promise<Product[]> {
+    const response = await this.searchService.search<Product>(q);
+    return response.hits.hits.map((hit) => hit._source);
+  }
+
   async save(product: Product): Promise<Product> {
     return await this.productsRepo.save(product);
   }
@@ -430,9 +455,12 @@ export class ProductsService {
     providerId: string,
     rawLabels: Label[],
   ): Promise<Label[]> {
-    const labels = [];
+    const labels: Label[] = [];
     for (const label of rawLabels) {
-      if (label.id) {
+      if (labels.find((l) => l.code === label.code)) {
+        // remove duplicates
+        continue;
+      } else if (label.id) {
         // label was already on product, dont mess with it
         labels.push(label);
       } else {

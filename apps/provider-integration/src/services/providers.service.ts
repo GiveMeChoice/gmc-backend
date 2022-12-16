@@ -16,12 +16,17 @@ export class ProvidersService {
 
   async find(
     findDto: FindProvidersDto,
-    pageRequest?: PageRequest,
+    pageRequest: PageRequest,
   ): Promise<Page<Provider>> {
-    const [data, count] = await this.providersRepo.findAndCount({
-      ...pageRequest,
-      where: { ...findDto },
-    });
+    const [data, count] = await this.providersRepo
+      .createQueryBuilder('provider')
+      .where({ ...findDto })
+      .setFindOptions({ ...pageRequest })
+      .loadRelationCountAndMap('provider.labelCount', 'provider.labels')
+      .loadRelationCountAndMap('provider.productCount', 'provider.products')
+      .loadRelationCountAndMap('provider.categoryCount', 'provider.categories')
+      .loadRelationCountAndMap('provider.sourcesCount', 'provider.sources')
+      .getManyAndCount();
     return buildPage<Provider>(data, count, pageRequest);
   }
 

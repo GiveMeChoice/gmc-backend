@@ -3,6 +3,7 @@ import { ProductsService } from '@app/provider-integration/services/products.ser
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
+import { SearchService } from '@lib/search';
 import {
   Body,
   Controller,
@@ -45,12 +46,17 @@ export class ProductsController {
     await this.productsService.indexProductBatchAsync(findDto);
   }
 
-  @Post('search')
-  async search(
+  @Post('find')
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindProductsDto,
   ) {
     Logger.debug(JSON.stringify(findDto));
     return await this.productsService.find(findDto, pageRequest);
+  }
+
+  @Post('search')
+  search(@Query('q') q: string) {
+    return this.productsService.search(q);
   }
 }

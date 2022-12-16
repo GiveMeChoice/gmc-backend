@@ -18,8 +18,8 @@ import { FindRunsDto } from '../dto/find-runs.dto';
 export class ProductRunsController {
   constructor(private readonly runsService: ProductRunsService) {}
 
-  @Post('search')
-  async search(
+  @Post('find')
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindRunsDto,
   ): Promise<Page<ProductRun>> {

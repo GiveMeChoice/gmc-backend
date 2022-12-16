@@ -31,20 +31,24 @@ export class CategoriesService {
     findDto: Partial<Category>,
     pageRequest?: PageRequest,
   ): Promise<Page<Category>> {
-    const [data, count] = await this.categoriesRepo.findAndCount({
-      ...pageRequest,
-      where: {
+    const [data, count] = await this.categoriesRepo
+      .createQueryBuilder('category')
+      .where({
         ...findDto,
-      },
-      relations: {
-        group: true,
-      },
-      select: {
-        group: {
-          name: true,
+      })
+      .setFindOptions({
+        ...pageRequest,
+        relations: {
+          group: true,
         },
-      },
-    });
+        select: {
+          group: {
+            name: true,
+          },
+        },
+      })
+      .loadRelationCountAndMap('category.productCount', 'category.products')
+      .getManyAndCount();
     return buildPage<Category>(data, count, pageRequest);
   }
 

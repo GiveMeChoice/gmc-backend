@@ -41,6 +41,9 @@ export class Brand {
   @Column({ nullable: true })
   logo?: string;
 
+  @Column({ nullable: true })
+  info?: string;
+
   @Column({ name: 'info_link', nullable: true })
   infoLink?: string;
 

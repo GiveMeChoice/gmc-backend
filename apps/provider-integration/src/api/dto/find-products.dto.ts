@@ -1,4 +1,6 @@
+import { Category } from '@app/provider-integration/model/category.entity';
 import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
+import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Provider } from '@app/provider-integration/model/provider.entity';
@@ -20,4 +22,13 @@ export class FindProductsDto extends PartialType(Product) {
 
   @IsOptional()
   shortId?: string;
+
+  @IsOptional()
+  hasIntegrationError?: boolean;
+
+  @IsOptional()
+  label?: Label;
+
+  @IsOptional()
+  category?: Category;
 }

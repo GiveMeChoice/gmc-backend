@@ -1,3 +1,4 @@
+import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
 import { S3Service } from '@lib/aws/services/s3.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { CachedResponse } from './interface/cached-response.interface';
@@ -12,7 +13,7 @@ export abstract class AbstractCacheManager {
       Logger.debug('cache hit: ' + key);
       return JSON.parse(cachedRaw) as CachedResponse<T>;
     } catch (err) {
-      Logger.debug('cache miss: ' + key);
+      Logger.log('cache miss: ' + key);
       return null;
     }
   }
@@ -22,7 +23,11 @@ export abstract class AbstractCacheManager {
       retrievedAt: new Date(),
       data,
     };
-    await this.s3Service.putObject(key, JSON.stringify(toCache));
-    Logger.debug('cache save: ' + key);
+    try {
+      await this.s3Service.putObject(key, JSON.stringify(toCache));
+      Logger.debug('cache save: ' + key);
+    } catch (e) {
+      formatErrorMessage(e, 'Cache Save Failure');
+    }
   }
 }

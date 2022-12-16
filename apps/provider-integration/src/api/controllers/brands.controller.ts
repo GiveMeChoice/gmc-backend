@@ -40,8 +40,8 @@ export class BrandsController {
     return this.brandsService.update(id, updateDto);
   }
 
-  @Post('search')
-  async search(
+  @Post('find')
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindBrandsDto,
   ) {

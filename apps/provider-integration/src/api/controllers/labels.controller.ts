@@ -40,7 +40,7 @@ export class LabelsController {
     return this.labelsService.update(id, updateDto);
   }
 
-  @Post('search')
+  @Post('find')
   async search(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindLabelsDto,
