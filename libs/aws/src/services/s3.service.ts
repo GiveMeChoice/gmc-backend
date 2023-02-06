@@ -17,6 +17,12 @@ export class S3Service {
   private readonly _defaultBucket: string = 'give-me-choice';
 
   constructor(configService: ConfigService) {
+    const id = configService.get('aws.id');
+    const secret = configService.get('aws.secret');
+    const region = configService.get('aws.region');
+    if (!id || !secret || !region) {
+      throw new Error('AWS configuration missing');
+    }
     this._client = new S3Client({
       region: configService.get('aws.region'),
       credentials: {

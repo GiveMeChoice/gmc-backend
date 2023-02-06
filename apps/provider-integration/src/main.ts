@@ -34,7 +34,7 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   Logger.log('starting api');
-  await app.listen(configService.get('app.port', 3000));
+  await app.listen(configService.get('PORT', 5001));
   Logger.log('api started');
 }
 bootstrap();

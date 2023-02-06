@@ -1,6 +1,25 @@
 version: '3.7'
 
 services:
+  provider-integration:
+    build:
+      context: .
+      dockerfile: ./apps/provider-integration/Dockerfile
+      target: development
+    command: npm run start:dev provider-integration
+    container_name: gmc_provider_integration
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres
+      - elasticsearch
+      - rabbitmq
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '5001:5001'
+
   postgres:
     image: postgres
     container_name: gmc_postgres
@@ -14,7 +33,7 @@ services:
       - '5432:5432'
 
   pgadmin:
-    build: ./pgadmin
+    build: ./libs/database/pgadmin
     # image: dpage/pgadmin4
     container_name: gmc_pgadmin
     restart: unless-stopped

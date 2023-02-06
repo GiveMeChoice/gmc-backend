@@ -17,6 +17,9 @@ import { MessagingService } from './messaging.service';
               type: 'topic',
             },
           ],
+          connectionInitOptions: {
+            timeout: 30000,
+          },
           channels: {
             'channel-low': {
               prefetchCount:

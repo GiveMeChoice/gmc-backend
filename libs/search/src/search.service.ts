@@ -18,6 +18,7 @@ export class SearchService implements OnModuleInit {
 
   async onModuleInit() {
     Logger.log('Connecting to Elasticsearch');
+    Logger.debug(this._configService.get('elastic.node'));
     this._client = new Client({
       node: this._configService.get('elastic.node'),
       auth: {

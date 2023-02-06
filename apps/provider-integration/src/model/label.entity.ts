@@ -7,7 +7,6 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { LabelGroup } from './label-group.entity';
 import { Product } from './product.entity';

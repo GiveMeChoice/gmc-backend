@@ -47,6 +47,7 @@ import { ProductSourcesService } from './services/product-sources.service';
 import { ProductsService } from './services/products.service';
 import { ProvidersService } from './services/providers.service';
 import { TasksService } from './services/tasks.service';
+import { PingController } from './api/controllers/ping.controller';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { TasksService } from './services/tasks.service';
   ],
   controllers: [
     IntegrationController,
+    PingController,
     ProvidersController,
     ProductSourcesController,
     ProductRunsController,

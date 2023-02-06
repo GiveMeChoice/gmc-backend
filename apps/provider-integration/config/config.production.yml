@@ -1,15 +1,14 @@
 port: 5001
 
 datasource:
-  host: 172.17.0.1
+  host:
   port: 5432
   username: postgres
   password: password
   database: gmc_db
-  migrate:
 
 rabbitmq:
-  uri: amqp://guest:guest@gmc_rabbitmq:5672
+  uri:
   prefetch-count:
 
 aws:
@@ -22,7 +21,7 @@ rainforest:
   api_key:
 
 elastic:
-  username: elastic
-  password: changeme
-  node: http://gmc_elasticsearch:9200
+  username:
+  password:
+  node:
   index: gmc_search
