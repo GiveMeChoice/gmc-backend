@@ -1,8 +1,8 @@
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 
-export class RefreshProductCommandDataDto {
+export class IntegrateProductCommandDataDto {
   productId: string;
   runId: string;
   reason: ProductRefreshReason;
-  skipCache: boolean;
+  skipCache?: boolean;
 }

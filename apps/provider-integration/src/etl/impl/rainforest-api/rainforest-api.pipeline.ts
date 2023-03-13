@@ -1,6 +1,5 @@
-import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
-import { ProductRun } from '@app/provider-integration/model/product-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
+import { SourceRun } from '@app/provider-integration/model/source-run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
@@ -9,34 +8,45 @@ import {
   EXTRACTOR_CONTAINER,
 } from '../../shared/extractor/extractor.container';
 import {
+  LoaderContainer,
+  LOADER_CONTAINER,
+} from '../../shared/loader/loader.container';
+import {
   MapperContainer,
   MAPPER_CONTAINER,
-} from '../../shared/mapper/source-mapper.container';
-import { PipelineBase } from '../../shared/pipeline/pipeline.base';
+} from '../../shared/mapper/mapper.container';
+import { Pipeline } from '../../shared/pipeline/pipeline.interface';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiExtractor } from './rainforest-api.extractor';
+import { RainforestApiLoader } from './rainforest-api.loader';
 import { RainforestApiMapper } from './rainforest-api.mapper';
 
 @Injectable()
-export class RainforestApiPipeline extends PipelineBase {
+export class RainforestApiPipeline implements Pipeline {
+  private readonly logger = new Logger(RainforestApiPipeline.name);
+
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   private readonly _extractor: RainforestApiExtractor;
   private readonly _mapper: RainforestApiMapper;
+  private readonly _loader: RainforestApiLoader;
 
   constructor(
     @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
     @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer,
+    @Inject(LOADER_CONTAINER) loaderContainer: LoaderContainer,
   ) {
-    super();
     this._extractor = extractorFactory.getExtractor(
       this.providerKey,
     ) as RainforestApiExtractor;
     this._mapper = mapperContainer.getMapper(
       this.providerKey,
     ) as RainforestApiMapper;
+    this._loader = loaderContainer.getLoader(
+      this.providerKey,
+    ) as RainforestApiLoader;
   }
 
-  async execute(run: ProductRun): Promise<ProductRun> {
+  async executeSource(run: SourceRun) {
     try {
       const sourceStream = await this._extractor.extractSource(run.source);
       run.sourceDate = sourceStream.runDate;
@@ -49,43 +59,24 @@ export class RainforestApiPipeline extends PipelineBase {
             item.result.category_results.price.value
           ) {
             const sourceProduct = this._mapper.mapSourceItem(item);
-            await super.loadSourceProduct(sourceProduct, run);
+            await this._loader.loadSourceItem(sourceProduct, run);
           }
         });
     } catch (err) {
-      Logger.error(err);
+      this.logger.error(err);
       run.errorMessage = err.toString();
     }
     return run;
   }
 
-  protected isProductStale(
-    sourceProduct: Partial<Product>,
-    existingProduct: Product,
-  ): boolean {
-    if (sourceProduct.price && sourceProduct.price != existingProduct.price) {
-      Logger.debug(
-        `Product ${existingProduct.shortId} is stale b/c price ${existingProduct.price} vs. source price ${sourceProduct.price}`,
-      );
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  protected applySourceRefresh(existing: Product, source: Partial<Product>) {
-    existing.price = source.price;
-    return existing;
-  }
-
-  async refreshProduct(
-    product: Product,
-    skipCache: boolean,
-  ): Promise<ProductRefreshDto> {
+  async executeProduct(product: Product, runId, reason, skipCache: boolean) {
     const extracted = await this._extractor.extractProduct(product, skipCache);
-    return {
-      sourceDate: extracted.sourceDate,
-      ...(await this._mapper.mapProductData(extracted.data, product.source)),
-    };
+    return await this._loader.loadProductDetail(
+      product.id,
+      this._mapper.mapProductDetail(extracted.data, product.source),
+      product.source,
+      runId,
+      reason,
+    );
   }
 }

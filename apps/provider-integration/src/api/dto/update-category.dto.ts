@@ -1,8 +1,8 @@
-import { Category } from '@app/provider-integration/model/category.entity';
+import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class UpdateCategoryDto extends PartialType(Category) {
+export class UpdateCategoryDto extends PartialType(ProviderCategory) {
   @IsOptional()
   groupId?: string;
 

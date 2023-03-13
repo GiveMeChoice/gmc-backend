@@ -6,29 +6,36 @@ import { SearchService } from '@lib/search';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
-import { ArrayContains, DataSource, In, Like, Repository } from 'typeorm';
+import * as moment from 'moment';
+import { In, Repository } from 'typeorm';
 import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
 import { Brand } from '../model/brand.entity';
-import { Category } from '../model/category.entity';
-import { ProductIntegrationStatus } from '../model/enum/product-status.enum';
+import { ProductIntegrationStatus } from '../model/enum/product-integration-status.enum';
+import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
+import { ProviderKey } from '../model/enum/provider-key.enum';
 import { Label } from '../model/label.entity';
+import { ProductSource } from '../model/product-source.entity';
 import { Product } from '../model/product.entity';
-import { normalizeIdCode } from '../utils/normalize-id-code';
+import { ProviderCategory } from '../model/provider-category.entity';
+import { Provider } from '../model/provider.entity';
+import { SourceRun } from '../model/source-run.entity';
+import { formatErrorMessage } from '../utils/format-error-message';
 import { BrandsService } from './brands.service';
-import { CategoriesService } from './categories.service';
 import { LabelsService } from './labels.service';
+import { ProviderCategoriesService } from './provider-categories.service';
 
 @Injectable()
 export class ProductsService {
+  private readonly logger = new Logger(ProductsService.name);
+
   constructor(
-    private readonly dataSource: DataSource,
     // private readonly messagingService: MessagingService,
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: LabelsService,
-    private readonly categoriesService: CategoriesService,
+    private readonly categoriesService: ProviderCategoriesService,
     private readonly brandsService: BrandsService,
     private readonly messagingService: MessagingService,
     private readonly searchService: SearchService,
@@ -43,8 +50,8 @@ export class ProductsService {
   }
 
   async indexProduct(productId: string) {
-    const data = await this.findOneData(productId);
-    return this.searchService.indexDocument(data.shortId, data);
+    const toCreate = await this.findOnetoCreate(productId);
+    return this.searchService.indexDocument(toCreate.shortId, toCreate);
   }
 
   async indexProductBatchAsync(findDto: Partial<Product>) {
@@ -73,12 +80,12 @@ export class ProductsService {
   }
 
   async indexProductBatch(productIds: string[]) {
-    const batchData = await this.productsRepo.find({
+    const batchtoCreate = await this.productsRepo.find({
       where: { id: In(productIds) },
       relations: {
         labels: true,
         provider: true,
-        category: true,
+        providerCategory: true,
         brand: true,
       },
       select: {
@@ -98,7 +105,7 @@ export class ProductsService {
           code: true,
           description: true,
         },
-        category: {
+        providerCategory: {
           code: true,
           description: true,
         },
@@ -109,7 +116,7 @@ export class ProductsService {
       },
     });
     await this.searchService.bulk(
-      batchData.map((p) => ({
+      batchtoCreate.map((p) => ({
         id: p.shortId,
         ...p,
       })),
@@ -153,15 +160,15 @@ export class ProductsService {
         },
       },
     });
-    const [data, count] = await query.getManyAndCount();
-    return buildPage<Product>(data, count, pageRequest);
+    const [toCreate, count] = await query.getManyAndCount();
+    return buildPage<Product>(toCreate, count, pageRequest);
   }
 
   async findIds(
     findDto: Partial<Product>,
     pageRequest?: PageRequest,
   ): Promise<Page<Product>> {
-    const [data, count] = await this.productsRepo.findAndCount({
+    const [toCreate, count] = await this.productsRepo.findAndCount({
       ...pageRequest,
       where: {
         ...findDto,
@@ -170,7 +177,7 @@ export class ProductsService {
         id: true,
       },
     });
-    return buildPage<Product>(data, count, pageRequest);
+    return buildPage<Product>(toCreate, count, pageRequest);
   }
 
   async existsById(id: string): Promise<boolean> {
@@ -203,10 +210,10 @@ export class ProductsService {
   }
 
   async findAll(pageRequest?: PageRequest): Promise<Page<Product>> {
-    const [data, count] = await this.productsRepo.findAndCount({
+    const [toCreate, count] = await this.productsRepo.findAndCount({
       ...pageRequest,
     });
-    return buildPage<Product>(data, count, pageRequest);
+    return buildPage<Product>(toCreate, count, pageRequest);
   }
 
   async updateAllExpired(): Promise<number> {
@@ -218,6 +225,21 @@ export class ProductsService {
         expiresAt: null,
       })
       .where('expiresAt < :now', { now: new Date() })
+      .execute();
+    return raw.affected;
+  }
+
+  async setToRemapByProvider(id: string): Promise<number> {
+    const raw = await this.productsRepo
+      .createQueryBuilder()
+      .update(Product)
+      .set({
+        integrationStatus: ProductIntegrationStatus.REMAP,
+      })
+      .where('providerId = :id', { id })
+      .andWhere('integrationStatus != :expired', {
+        expired: ProductIntegrationStatus.EXPIRED,
+      })
       .execute();
     return raw.affected;
   }
@@ -247,7 +269,7 @@ export class ProductsService {
         labels: true,
         source: true,
         provider: true,
-        category: true,
+        providerCategory: true,
         brand: true,
       },
       select: {
@@ -262,11 +284,11 @@ export class ProductsService {
     });
   }
 
-  async findData(
+  async findtoCreate(
     findDto: Partial<Product>,
     pageRequest?: PageRequest,
   ): Promise<Page<Product>> {
-    const [data, count] = await this.productsRepo.findAndCount({
+    const [toCreate, count] = await this.productsRepo.findAndCount({
       ...pageRequest,
       where: {
         ...findDto,
@@ -274,7 +296,7 @@ export class ProductsService {
       relations: {
         labels: true,
         provider: true,
-        category: true,
+        providerCategory: true,
         brand: true,
       },
       select: {
@@ -295,7 +317,7 @@ export class ProductsService {
           code: true,
           description: true,
         },
-        category: {
+        providerCategory: {
           code: true,
           description: true,
         },
@@ -305,16 +327,16 @@ export class ProductsService {
         },
       },
     });
-    return buildPage<Product>(data, count, pageRequest);
+    return buildPage<Product>(toCreate, count, pageRequest);
   }
 
-  findOneData(id: string): Promise<Product> {
+  findOnetoCreate(id: string): Promise<Product> {
     return this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {
         labels: true,
         provider: true,
-        category: true,
+        providerCategory: true,
         brand: true,
       },
       select: {
@@ -335,7 +357,7 @@ export class ProductsService {
           code: true,
           description: true,
         },
-        category: {
+        providerCategory: {
           code: true,
           description: true,
         },
@@ -359,49 +381,88 @@ export class ProductsService {
     return status;
   }
 
-  async create(
-    providerId: string,
-    providerProductId: string,
-    data: Partial<Product>,
-  ): Promise<Partial<Product>> {
-    if (!this.existsByProvider(providerId, providerProductId)) {
+  async create(toCreate: Partial<Product>, run: SourceRun): Promise<Product> {
+    if (
+      !this.existsByProvider(run.source.providerId, toCreate.providerProductId)
+    ) {
       throw new Error(
-        `Provider ${providerProductId} product ${providerProductId} already exists!`,
+        `Provider ${run.source.providerId} product ${toCreate.providerProductId} already exists!`,
       );
     }
-    if (data.category) {
-      data.category = await this.normalizeCategory(providerId, data.category);
+    toCreate.provider = run.source.provider;
+    toCreate.source = run.source;
+    toCreate.createdByRunId = run.id;
+    toCreate.keepAliveCount = 0;
+    toCreate.expiresAt = await this.renewExpirationDate(
+      run.source.provider,
+      run.source,
+    );
+    if (toCreate.providerCategory) {
+      toCreate.providerCategory = await this.normalizeCategory(
+        run.source.providerId,
+        toCreate.providerCategory,
+      );
     }
-    if (data.brand) {
-      data.brand = await this.normalizeBrand(providerId, data.brand);
+    if (toCreate.brand) {
+      toCreate.brand = await this.normalizeBrand(
+        run.source.providerId,
+        toCreate.brand,
+      );
     }
-    if (data.labels) {
-      data.labels = await this.normalizeLabels(providerId, data.labels);
+    if (toCreate.labels) {
+      toCreate.labels = await this.normalizeLabels(
+        run.source.providerId,
+        toCreate.labels,
+      );
     }
-    const product = Product.factory(providerId, providerProductId, data);
-    return await this.productsRepo.save(product);
+    return await this.productsRepo.save(Product.factory(toCreate));
   }
 
   async update(
     id: string,
-    providerId: string,
     updates: Partial<Product>,
+    renewExpiration?: boolean,
   ): Promise<Product> {
-    if (updates.category) {
-      updates.category = await this.normalizeCategory(
-        providerId,
-        updates.category,
-      );
+    let expirationDate;
+    if (renewExpiration) {
+      const { provider, source } = await this.productsRepo.findOne({
+        where: {
+          id,
+        },
+        select: {
+          provider: {
+            expirationHours: true,
+          },
+          source: {
+            expirationHours: true,
+          },
+        },
+      });
+      expirationDate = this.renewExpirationDate(provider, source);
     }
-    if (updates.brand) {
-      updates.brand = await this.normalizeBrand(providerId, updates.brand);
-    }
-    if (updates.labels) {
-      updates.labels = await this.normalizeLabels(providerId, updates.labels);
+
+    if (updates.providerCategory || updates.brand || updates.labels) {
+      const { providerId } = await this.productsRepo.findOne({
+        where: { id },
+        select: { providerId: true },
+      });
+      if (updates.providerCategory) {
+        updates.providerCategory = await this.normalizeCategory(
+          providerId,
+          updates.providerCategory,
+        );
+      }
+      if (updates.brand) {
+        updates.brand = await this.normalizeBrand(providerId, updates.brand);
+      }
+      if (updates.labels) {
+        updates.labels = await this.normalizeLabels(providerId, updates.labels);
+      }
     }
     await this.productsRepo.save({
       id,
       ...updates,
+      ...(renewExpiration && { expirationDate }),
     });
     return await this.findOne(id);
   }
@@ -411,18 +472,60 @@ export class ProductsService {
     return response.hits.hits.map((hit) => hit._source);
   }
 
-  async save(product: Product): Promise<Product> {
-    return await this.productsRepo.save(product);
-  }
-
   async remove(id: string): Promise<void> {
     await this.productsRepo.delete(id);
   }
 
+  async refresh(
+    id: string,
+    updates: Partial<Product>,
+    source: ProductSource,
+    runId: string,
+    reason: ProductRefreshReason,
+  ) {
+    if (!this.existsById(id)) throw new Error(`Product not found: ${id}`);
+    try {
+      updates.hasIntegrationError = false;
+      updates.errorMessage = null;
+      updates.refreshedAt = new Date();
+      updates.refreshReason = reason;
+      updates.expiresAt = this.renewExpirationDate(source.provider, source);
+      updates.keepAliveCount = 0;
+      updates.refreshedByRunId = runId;
+      updates.integrationStatus = ProductIntegrationStatus.LIVE;
+      const product = await this.update(id, updates);
+      await this.indexProductAsync(product.id);
+      return product;
+    } catch (err) {
+      const errorMessage = formatErrorMessage(err);
+      this.logger.error(`Product ${id} Refresh Failed: ${errorMessage}`);
+      return await this.update(id, { hasIntegrationError: true, errorMessage });
+    }
+  }
+
+  async keepAlive(product: Product, run: SourceRun) {
+    product.keepAliveCount++;
+    product.expiresAt = this.renewExpirationDate(
+      run.source.provider,
+      run.source,
+    );
+    await this.productsRepo.save(product);
+  }
+
+  private renewExpirationDate(provider: Provider, source: ProductSource): Date {
+    if (source && source.expirationHours) {
+      return moment().add(source.runIntervalHours, 'hours').toDate();
+    } else if (provider && provider.expirationHours) {
+      return moment().add(provider.expirationHours, 'hours').toDate();
+    } else {
+      return moment().add(24, 'hours').toDate();
+    }
+  }
+
   private async normalizeCategory(
     providerId: string,
-    category: Category,
-  ): Promise<Category> {
+    category: ProviderCategory,
+  ): Promise<ProviderCategory> {
     if (category.id) {
       return category;
     } else {
@@ -432,7 +535,7 @@ export class ProductsService {
       );
       return existing
         ? existing
-        : Category.factory(providerId, category.code, category);
+        : ProviderCategory.factory(providerId, category.code, category);
     }
   }
 

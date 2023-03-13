@@ -6,6 +6,8 @@ export const PIPELINE_CONTAINER = 'PIPELINE_CONTAINER';
 
 @Injectable()
 export class PipelineContainer {
+  private readonly logger = new Logger(PipelineContainer.name);
+
   constructor(private readonly pipelines: Pipeline[]) {}
 
   public getPipeline(providerKey: ProviderKey): Pipeline {
@@ -15,7 +17,7 @@ export class PipelineContainer {
       );
       if (pipeline) return pipeline;
     } catch (e) {
-      Logger.error(e);
+      this.logger.error(e);
     }
     throw new Error(
       `Unable to find pipeline runner for Provider Key ${providerKey}`,

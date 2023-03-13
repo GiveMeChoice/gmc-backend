@@ -18,6 +18,8 @@ import { UpdateLabelDto } from '../dto/update-label.dto';
 
 @Controller('labels')
 export class LabelsController {
+  private readonly logger = new Logger(LabelsController.name);
+
   constructor(private readonly labelsService: LabelsService) {}
 
   @Get()
@@ -45,7 +47,7 @@ export class LabelsController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindLabelsDto,
   ) {
-    Logger.debug(JSON.stringify(findDto));
+    this.logger.debug(JSON.stringify(findDto));
     return await this.labelsService.find(findDto, pageRequest);
   }
 }

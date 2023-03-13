@@ -3,7 +3,7 @@ import { ProductSource } from '@app/provider-integration/model/product-source.en
 import { Product } from '@app/provider-integration/model/product.entity';
 import { S3Service } from '@lib/aws/services/s3.service';
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom, map, Observable, tap } from 'rxjs';
 import { Readable } from 'stream';
@@ -26,12 +26,10 @@ export type SourceStream = {
 
 @Injectable()
 export class RainforestApiExtractor
-  implements
-    Extractor<
-      Promise<SourceStream>,
-      Promise<ExtractResult<RainforestApiProductDto>>
-    >
+  implements Extractor<Promise<SourceStream>, RainforestApiProductDto>
 {
+  private readonly logger = new Logger(RainforestApiExtractor.name);
+
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   public static readonly BASE_URL = 'https://api.rainforestapi.com';
   private readonly _apiKey: string;
@@ -52,10 +50,11 @@ export class RainforestApiExtractor
       const sourceKey = await lastValueFrom(
         this.fetchLatestCollectionResultKey(source.identifier),
       );
+      this.logger.debug('Fetching latest collection result key', sourceKey);
       return {
         stream: await this.s3Service.getObjectStream(
           sourceKey.key,
-          this.providerKey,
+          'gmc-rainforest-api',
         ),
         runDate: sourceKey.runDate,
       };
@@ -67,21 +66,19 @@ export class RainforestApiExtractor
   private fetchLatestCollectionResultKey(
     collectionId: string,
   ): Observable<SourceKey> {
+    const url = `${RainforestApiExtractor.BASE_URL}/collections/${collectionId}/`;
     return this.httpService
-      .get<RainforestApiCollectionDto>(
-        `${RainforestApiExtractor.BASE_URL}/collections/${collectionId}/`,
-        {
-          params: {
-            api_key: this._apiKey,
-          },
+      .get<RainforestApiCollectionDto>(url, {
+        params: {
+          api_key: this._apiKey,
         },
-      )
+      })
       .pipe(
         map((res) => res.data.collection),
         map((collection) => ({
           key: `${collectionId}/Collection_Results_${collectionId}_${
             collection.next_result_set_id - 1
-          }_Page_1_bb6d6dbffba33cbcecd3f56639ac8792d2ddd200.csv`,
+          }_Page_1_5fa4c58bb77800b802dcec939eb1cf31abf80fb4.csv`,
           runDate: collection.last_run,
         })),
       );
@@ -136,13 +133,13 @@ export class RainforestApiExtractor
     delete dto.compare_with_similar;
     delete dto.also_viewed;
     delete dto.also_bought;
-    delete dto.product.variants;
+    // delete dto.product.variants;
     delete dto.product.videos;
     delete dto.product.videos_flat;
     delete dto.product.keywords;
     delete dto.product.keywords_list;
-    delete dto.product.a_plus_content;
-    delete dto.product.sub_title;
+    // delete dto.product.a_plus_content;
+    // delete dto.product.sub_title;
     delete dto.product.rating_breakdown;
     delete dto.product.promotions_feature;
     delete dto.product.has_coupon;
@@ -150,7 +147,7 @@ export class RainforestApiExtractor
     delete dto.product.images_count;
     delete dto.product.images_flat;
     delete dto.product.feature_bullets_flat;
-    delete dto.product.specifications;
+    // delete dto.product.specifications;
     delete dto.product.specifications_flat;
     if (dto.product.top_reviews) {
       dto.product.top_reviews.forEach((r) => delete r.body_html);

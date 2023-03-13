@@ -18,6 +18,8 @@ import { UpdateSourceDto } from '../dto/update-source.dto';
 
 @Controller('product-sources')
 export class ProductSourcesController {
+  private readonly logger = new Logger(ProductSourcesController.name);
+
   constructor(private readonly productSourcesService: ProductSourcesService) {}
 
   @Post('find')
@@ -25,7 +27,7 @@ export class ProductSourcesController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindSourcesDto,
   ): Promise<Page<ProductSource>> {
-    Logger.debug(JSON.stringify(findDto));
+    this.logger.debug(JSON.stringify(findDto));
     return await this.productSourcesService.find(findDto, pageRequest);
   }
 

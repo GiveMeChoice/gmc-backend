@@ -5,16 +5,18 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
 import { ProductSourceStatus } from '../model/enum/product-source-status';
-import { IntegrationService } from '../services/integration.service';
+import { EtlService } from '../services/etl.service';
 import { ProductSourcesService } from '../services/product-sources.service';
 
 @Injectable()
 export class IntegrateSourceConsumer
   implements Consumer<IntegrateSourceCommand>
 {
+  private readonly logger = new Logger(IntegrateSourceConsumer.name);
+
   constructor(
     private readonly sourcesService: ProductSourcesService,
-    private readonly integrationService: IntegrationService,
+    private readonly etlService: EtlService,
   ) {}
 
   @RabbitSubscribe({
@@ -28,7 +30,7 @@ export class IntegrateSourceConsumer
   ): Promise<void> {
     try {
       const { data } = msg;
-      Logger.debug(
+      this.logger.debug(
         `Command ${
           IntegrateSourceCommand.ROUTING_KEY
         } Received: ${JSON.stringify(data)}`,
@@ -39,19 +41,19 @@ export class IntegrateSourceConsumer
         source.status === ProductSourceStatus.READY &&
         this.sourcesService.isDue(source)
       ) {
-        await this.integrationService.inegrateSource(data.productSourceId);
+        await this.etlService.inegrateSource(data.productSourceId);
       } else {
-        Logger.debug(
+        this.logger.debug(
           `Source is NOT due and/or READY... Will not be integrated: ${data.productSourceId}`,
         );
       }
-      Logger.debug(
+      this.logger.debug(
         `Command ${
           IntegrateSourceCommand.ROUTING_KEY
         } Completed: ${JSON.stringify(data)}`,
       );
     } catch (err) {
-      Logger.error(
+      this.logger.error(
         `Command ${IntegrateSourceCommand.ROUTING_KEY} Error` +
           `${msg.data ? msg.data.productSourceId : ''}` +
           ' : ' +

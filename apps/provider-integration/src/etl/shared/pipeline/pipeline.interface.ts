@@ -1,14 +1,16 @@
-import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
-import { ProductRun } from '@app/provider-integration/model/product-run.entity';
+import { SourceRun } from '@app/provider-integration/model/source-run.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
+import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 
 export interface Pipeline {
   providerKey: ProviderKey;
 
-  execute(run: ProductRun): Promise<ProductRun>;
-  refreshProduct(
+  executeSource(run: SourceRun): Promise<SourceRun>;
+  executeProduct(
     product: Product,
-    skipCache: boolean,
-  ): Promise<ProductRefreshDto>;
+    runId: string,
+    reason: ProductRefreshReason,
+    skipCache?: boolean,
+  ): Promise<Product>;
 }

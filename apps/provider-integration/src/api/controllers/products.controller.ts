@@ -17,6 +17,8 @@ import { FindProductsDto } from '../dto/find-products.dto';
 
 @Controller('products')
 export class ProductsController {
+  private readonly logger = new Logger(ProductsController.name);
+
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
@@ -31,10 +33,10 @@ export class ProductsController {
     return await this.productsService.findOneExternal(id);
   }
 
-  @Get(':id/data')
-  async getOneData(@Param('id') id): Promise<Product> {
-    return await this.productsService.findOneData(id);
-  }
+  // @Get(':id/data')
+  // async getOneData(@Param('id') id): Promise<Product> {
+  //   return await this.productsService.findOneData(id);
+  // }
 
   @Post(':id/index')
   async syncData(@Param('id') id): Promise<any> {
@@ -51,7 +53,7 @@ export class ProductsController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindProductsDto,
   ) {
-    Logger.debug(JSON.stringify(findDto));
+    this.logger.debug(JSON.stringify(findDto));
     return await this.productsService.find(findDto, pageRequest);
   }
 

@@ -1,68 +1,33 @@
 import {
-  Column,
-  CreateDateColumn,
   Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
+  Tree,
   PrimaryGeneratedColumn,
+  Column,
+  TreeChildren,
+  TreeParent,
+  OneToMany,
 } from 'typeorm';
-import { CategoryGroup } from './category-group.entity';
-import { Product } from './product.entity';
-import { Provider } from './provider.entity';
+import { ProviderCategory } from './provider-category.entity';
 
 @Entity({ name: 'gmc_category' })
-@Index(['providerId', 'code'], { unique: true })
+@Tree('nested-set')
 export class Category {
-  constructor(providerId: string, title: string) {
-    this.providerId = providerId;
-    this.code = title;
-  }
-
-  public static factory(
-    providerId: string,
-    title: string,
-    data: Partial<Category>,
-  ) {
-    const category = new Category(providerId, title);
-    Object.assign(category, data);
-    return category;
+  constructor(name: string) {
+    this.name = name;
   }
 
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({ name: 'provider_id' })
-  readonly providerId: string;
-
   @Column()
-  readonly code: string;
+  name: string;
 
-  @Column({ nullable: true })
-  description?: string;
+  @TreeChildren()
+  children: Category[];
 
-  @Column({ name: 'info_link', nullable: true })
-  infoLink?: string;
+  @TreeParent()
+  parent: Category;
 
-  @CreateDateColumn({
-    name: 'created_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @Column({ name: 'group_id', nullable: true })
-  groupId?: string;
-
-  @ManyToOne(() => Provider, (provider) => provider.categories)
-  @JoinColumn({ name: 'provider_id' })
-  provider: Provider;
-
-  @ManyToOne(() => CategoryGroup, (group) => group.categories)
-  @JoinColumn({ name: 'group_id' })
-  group?: CategoryGroup;
-
-  @OneToMany(() => Product, (product) => product.category)
-  products: Product[];
+  @OneToMany(() => ProviderCategory, (category) => category.category)
+  providerCategories: ProviderCategory[];
 }

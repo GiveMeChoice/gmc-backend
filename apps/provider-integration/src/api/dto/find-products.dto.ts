@@ -1,5 +1,5 @@
-import { Category } from '@app/provider-integration/model/category.entity';
-import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-status.enum';
+import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
+import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-integration-status.enum';
 import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
@@ -30,5 +30,5 @@ export class FindProductsDto extends PartialType(Product) {
   label?: Label;
 
   @IsOptional()
-  category?: Category;
+  providerCategory?: ProviderCategory;
 }

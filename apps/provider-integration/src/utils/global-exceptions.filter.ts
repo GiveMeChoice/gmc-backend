@@ -11,10 +11,12 @@ import { formatErrorMessage } from './format-error-message';
 
 @Catch()
 export class GlobalExceptionsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(GlobalExceptionsFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost): void {
-    Logger.error(exception);
+    this.logger.error(exception);
     const message = formatErrorMessage(exception);
-    Logger.error(message);
+    this.logger.error(message);
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

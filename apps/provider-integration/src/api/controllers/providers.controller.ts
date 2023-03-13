@@ -18,6 +18,8 @@ import { UpdateProviderDto } from '../dto/update-provider.dto';
 
 @Controller('providers')
 export class ProvidersController {
+  private readonly logger = new Logger(ProvidersController.name);
+
   constructor(private readonly providersService: ProvidersService) {}
 
   @Post('find')
@@ -25,7 +27,7 @@ export class ProvidersController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindProvidersDto,
   ): Promise<Page<Provider>> {
-    Logger.debug(JSON.stringify(findDto));
+    this.logger.debug(JSON.stringify(findDto));
     return await this.providersService.find(findDto, pageRequest);
   }
 

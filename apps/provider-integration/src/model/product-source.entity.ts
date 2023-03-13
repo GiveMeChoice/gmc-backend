@@ -10,7 +10,7 @@ import {
 } from 'typeorm';
 import { ProductSourceStatus } from './enum/product-source-status';
 import { Product } from './product.entity';
-import { ProductRun } from './product-run.entity';
+import { SourceRun } from './source-run.entity';
 
 @Entity({ name: 'pi_product_source' })
 @Unique(['providerId', 'identifier'])
@@ -38,8 +38,11 @@ export class ProductSource {
   @Column({ default: false })
   active: boolean;
 
-  @Column({ name: 'run_interval_hours', type: 'integer', default: 24 })
+  @Column({ name: 'run_interval_hours', type: 'integer', nullable: true })
   runIntervalHours: number;
+
+  @Column({ name: 'expiration_hours', type: 'integer', nullable: true })
+  expirationHours: number;
 
   @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
   lastRunAt?: Date;
@@ -59,8 +62,8 @@ export class ProductSource {
   @Column({ name: 'source_link', nullable: true })
   sourceLink?: string;
 
-  @OneToMany(() => ProductRun, (run: ProductRun) => run.source)
-  runs: ProductRun[];
+  @OneToMany(() => SourceRun, (run: SourceRun) => run.source)
+  runs: SourceRun[];
 
   @OneToMany(() => Product, (product: Product) => product.source)
   products: Product[];

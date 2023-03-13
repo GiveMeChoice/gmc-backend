@@ -14,9 +14,9 @@ import {
 } from 'typeorm';
 import { shortId } from '../utils/short-id';
 import { Brand } from './brand.entity';
-import { Category } from './category.entity';
+import { ProviderCategory } from './provider-category.entity';
 import { ProductRefreshReason } from './enum/product-refresh-reason.enum';
-import { ProductIntegrationStatus } from './enum/product-status.enum';
+import { ProductIntegrationStatus } from './enum/product-integration-status.enum';
 import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
 import { Provider } from './provider.entity';
@@ -30,12 +30,8 @@ export class Product {
     this.providerId = providerId;
     this.providerProductId = providerProductId;
   }
-  public static factory(
-    providerId: string,
-    providerProductId: string,
-    data: Partial<Product>,
-  ) {
-    const product = new Product(providerId, providerProductId);
+  public static factory(data: Partial<Product>) {
+    const product = new Product(data.provider.id, data.providerProductId);
     product.shortId = shortId();
     Object.assign(product, data);
     return product;
@@ -186,14 +182,11 @@ export class Product {
   })
   brand?: Brand;
 
-  @ManyToOne(() => Category, (category) => category.products, {
+  @ManyToOne(() => ProviderCategory, (category) => category.products, {
     cascade: true,
     onUpdate: 'CASCADE',
   })
-  category?: Category;
-
-  @Column({ name: 'category_detail', nullable: true })
-  categoryDetail?: string;
+  providerCategory?: ProviderCategory;
 
   @OneToMany(() => Review, (reviews) => reviews.product, {
     cascade: true,

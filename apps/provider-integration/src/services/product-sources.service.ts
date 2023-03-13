@@ -1,21 +1,21 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Like, Repository } from 'typeorm';
 import { ProductSourceStatus } from '../model/enum/product-source-status';
-import { ProductRun } from '../model/product-run.entity';
+import { SourceRun } from '../model/source-run.entity';
 import { ProductSource } from '../model/product-source.entity';
-import { ProductRunsService } from './product-runs.service';
+import { SourceRunsService } from './source-runs.service';
 
 @Injectable()
 export class ProductSourcesService {
   constructor(
     @InjectRepository(ProductSource)
     private sourcesRepo: Repository<ProductSource>,
-    private readonly runsService: ProductRunsService,
+    private readonly runsService: SourceRunsService,
   ) {}
 
   async find(
@@ -59,14 +59,27 @@ export class ProductSourcesService {
     return this.sourcesRepo.findOne({ where: { id } });
   }
 
-  async startRun(source: ProductSource): Promise<ProductRun> {
+  async startRun(source: ProductSource): Promise<SourceRun> {
+    // validate source before starting
+    if (!source) {
+      throw new HttpException('Invalid Product Source', HttpStatus.BAD_REQUEST);
+    } else if (!source.active || !source.provider.active) {
+      throw new Error(
+        'Provider and/or Source is not active! Skipping integration...',
+      );
+    }
+    // else if (source.status === ProductSourceStatus.BUSY) {
+    // throw new Error('Source is BUSY. Can not integrate again until ready.');
+    // }
+
+    // set source to BUSY and create new source run
     source.status = ProductSourceStatus.BUSY;
-    const run = ProductRun.factory(source);
+    const run = SourceRun.factory(source);
     run.runAt = new Date();
     return await this.runsService.create(run);
   }
 
-  async completeRun(run: ProductRun): Promise<ProductRun> {
+  async completeRun(run: SourceRun): Promise<SourceRun> {
     run.runTime = moment().diff(run.runAt, 'seconds', true);
     run.source.lastRunAt = new Date();
     if (run.errorMessage) {

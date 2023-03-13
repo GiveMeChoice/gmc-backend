@@ -8,6 +8,10 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
+    "docker:build:dev": "docker-compose up -d --build provider-integration",
+    "docker:build": "docker build --platform linux/amd64 -t us-central1-docker.pkg.dev/gmc-torino/gmc-torino-repo/provider-integration:latest -f apps/provider-integration/Dockerfile .",
+    "docker:push": "docker push us-central1-docker.pkg.dev/gmc-torino/gmc-torino-repo/provider-integration:latest",
+    "gcp:deploy": "gcloud run deploy provider-integration --image us-central1-docker.pkg.dev/gmc-torino/gmc-torino-repo/provider-integration:latest --allow-unauthenticated --region us-central1",
     "format": "prettier --write \"apps/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

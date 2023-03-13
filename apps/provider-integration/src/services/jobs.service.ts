@@ -11,6 +11,8 @@ import { formatErrorMessage } from '../utils/format-error-message';
 
 @Injectable()
 export class JobsService {
+  private readonly logger = new Logger(JobsService.name);
+
   constructor(
     @Inject(JOB_CONTAINER)
     private readonly jobContainer: JobContainer,
@@ -19,7 +21,7 @@ export class JobsService {
 
   async execute(jobName: JobName): Promise<JobExecutionResult> {
     const job: JobBase = this.jobContainer.getJob(jobName);
-    Logger.debug(`Running job: ${jobName}`);
+    this.logger.debug(`Running job: ${jobName}`);
     const start = moment();
     const result: JobExecutionResult = {
       status: 'SUCCESS',
@@ -29,11 +31,11 @@ export class JobsService {
     };
     try {
       const message = await job.execute();
-      Logger.debug(`Finished job ${jobName}: ${message}`);
+      this.logger.debug(`Finished job ${jobName}: ${message}`);
       result.message = message;
     } catch (err) {
       const errorMessage = formatErrorMessage(err);
-      Logger.error(`Error running job ${jobName}: ${errorMessage}`);
+      this.logger.error(`Error running job ${jobName}: ${errorMessage}`);
       result.message = errorMessage;
       result.status = 'ERROR';
     }
@@ -52,21 +54,21 @@ export class JobsService {
 
   startCron(jobName: JobName): JobStatus {
     const job = this.findCronJob(jobName);
-    Logger.log(`(Re)starting Cron Job ${jobName}`);
+    this.logger.log(`(Re)starting Cron Job ${jobName}`);
     job.start();
     return this.buildStatus(job, jobName);
   }
 
   stopCron(jobName: JobName): JobStatus {
     const job = this.findCronJob(jobName);
-    Logger.log(`Stopping Cron Job ${jobName}`);
+    this.logger.log(`Stopping Cron Job ${jobName}`);
     job.stop();
     return this.buildStatus(job, jobName);
   }
 
   rescheduleCron(jobName: JobName, time: CronExpression): JobStatus {
     const cronJob = this.findCronJob(jobName);
-    Logger.log(
+    this.logger.log(
       `Updating Cron Job ${jobName} to Schedule ${time} (${CronExpression[time]})`,
     );
     if (!CronExpression[time]) {

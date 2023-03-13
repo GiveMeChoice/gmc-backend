@@ -4,19 +4,19 @@ import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductRun } from '../model/product-run.entity';
+import { SourceRun } from '../model/source-run.entity';
 
 @Injectable()
-export class ProductRunsService {
+export class SourceRunsService {
   constructor(
-    @InjectRepository(ProductRun)
-    private readonly runRepository: Repository<ProductRun>,
+    @InjectRepository(SourceRun)
+    private readonly runRepository: Repository<SourceRun>,
   ) {}
 
   async find(
-    findDto: Partial<ProductRun>,
+    findDto: Partial<SourceRun>,
     pageRequest?: PageRequest,
-  ): Promise<Page<ProductRun>> {
+  ): Promise<Page<SourceRun>> {
     const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
       where: { ...findDto },
@@ -31,20 +31,20 @@ export class ProductRunsService {
         },
       },
     });
-    return buildPage<ProductRun>(data, count, pageRequest);
+    return buildPage<SourceRun>(data, count, pageRequest);
   }
 
-  async findAll(pageRequest?: PageRequest): Promise<Page<ProductRun>> {
+  async findAll(pageRequest?: PageRequest): Promise<Page<SourceRun>> {
     const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
     });
-    return buildPage<ProductRun>(data, count, pageRequest);
+    return buildPage<SourceRun>(data, count, pageRequest);
   }
 
   async findBySource(
     sourceId: string,
     pageRequest?: PageRequest,
-  ): Promise<ProductRun[]> {
+  ): Promise<SourceRun[]> {
     return await this.runRepository.find({
       where: {
         source: {
@@ -55,15 +55,15 @@ export class ProductRunsService {
     });
   }
 
-  async findOne(id: string): Promise<ProductRun> {
+  async findOne(id: string): Promise<SourceRun> {
     return await this.runRepository.findOneBy({ id });
   }
 
-  async create(run: Partial<ProductRun>): Promise<ProductRun> {
+  async create(run: Partial<SourceRun>): Promise<SourceRun> {
     return await this.runRepository.save(run);
   }
 
-  async save(run: ProductRun): Promise<ProductRun> {
+  async save(run: SourceRun): Promise<SourceRun> {
     return await this.runRepository.save(run);
   }
 }

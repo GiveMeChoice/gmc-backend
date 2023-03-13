@@ -11,6 +11,8 @@ import { formatErrorMessage } from './format-error-message';
 export class TransformPageRequestPipe
   implements PipeTransform<string, PageRequest>
 {
+  private readonly logger = new Logger(TransformPageRequestPipe.name);
+
   private static readonly DEFAULT_PAGE_SIZE = 20;
 
   transform(query: any, metadata: ArgumentMetadata): PageRequest {
@@ -31,10 +33,10 @@ export class TransformPageRequestPipe
       } else {
         pageRequest.order['id'] = 'ASC';
       }
-      Logger.debug(JSON.stringify(pageRequest));
+      this.logger.debug(JSON.stringify(pageRequest));
       return pageRequest;
     } catch (err) {
-      Logger.error(formatErrorMessage(err));
+      this.logger.error(formatErrorMessage(err));
     }
 
     return {

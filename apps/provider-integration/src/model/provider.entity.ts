@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { Category } from './category.entity';
+import { ProviderCategory } from './provider-category.entity';
 import { ProviderKey } from './enum/provider-key.enum';
 import { Label } from './label.entity';
 import { ProductSource } from './product-source.entity';
@@ -30,6 +30,12 @@ export class Provider {
   @Column({ default: false })
   active: boolean;
 
+  @Column({ name: 'run_interval_hours', type: 'integer', default: 24 })
+  runIntervalHours: number;
+
+  @Column({ name: 'expiration_hours', type: 'integer', default: 36 })
+  expirationHours: number;
+
   @OneToMany(
     () => ProductSource,
     (productSource: ProductSource) => productSource.provider,
@@ -42,6 +48,6 @@ export class Provider {
   @OneToMany(() => Label, (label) => label.provider)
   labels: Label[];
 
-  @OneToMany(() => Category, (category) => category.provider)
-  categories: Category[];
+  @OneToMany(() => ProviderCategory, (category) => category.provider)
+  categories: ProviderCategory[];
 }

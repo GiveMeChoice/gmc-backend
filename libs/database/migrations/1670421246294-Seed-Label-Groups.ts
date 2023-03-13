@@ -5,9 +5,12 @@ import * as csv from 'csvtojson';
 import { LabelGroup } from '@app/provider-integration/model/label-group.entity';
 
 export class SeedLabelGroups1670421246294 implements MigrationInterface {
+  private readonly logger = new Logger(SeedLabelGroups1670421246294.name);
+
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const csvFile = path.join(__dirname, '../seeds/label-groups.seed.csv');
-    Logger.log('Loading CSV Data: ' + csvFile);
+    this.logger.log('Executing Migration');
+    const csvFile = path.join(__dirname, '../seeds/gmc-label-groups.seed.csv');
+    this.logger.debug('Loading CSV Data: ' + csvFile);
     const labelGroupsSeed = await csv().fromFile(csvFile);
     await queryRunner.connection
       .getRepository(LabelGroup)
@@ -16,7 +19,7 @@ export class SeedLabelGroups1670421246294 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const repo = queryRunner.connection.getRepository(LabelGroup);
-    Logger.log('Reverting Migration');
+    this.logger.log('Reverting Migration');
     await repo.query('DELETE FROM gmc_label_group');
   }
 }

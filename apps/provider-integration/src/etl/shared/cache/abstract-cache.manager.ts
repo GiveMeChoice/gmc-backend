@@ -5,15 +5,19 @@ import { CachedResponse } from './interface/cached-response.interface';
 
 @Injectable()
 export abstract class AbstractCacheManager {
+  private readonly logger = new Logger(AbstractCacheManager.name);
+
+  private readonly _cacheBucket: string = 'gmc-cache';
+
   constructor(private readonly s3Service: S3Service) {}
 
   protected async getInternal<T>(key: string): Promise<CachedResponse<T>> {
     try {
-      const cachedRaw = await this.s3Service.getObject(key);
-      Logger.debug('cache hit: ' + key);
+      const cachedRaw = await this.s3Service.getObject(key, this._cacheBucket);
+      this.logger.debug('cache hit: ' + key);
       return JSON.parse(cachedRaw) as CachedResponse<T>;
     } catch (err) {
-      Logger.log('cache miss: ' + key);
+      this.logger.log('cache miss: ' + key);
       return null;
     }
   }
@@ -24,8 +28,12 @@ export abstract class AbstractCacheManager {
       data,
     };
     try {
-      await this.s3Service.putObject(key, JSON.stringify(toCache));
-      Logger.debug('cache save: ' + key);
+      await this.s3Service.putObject(
+        key,
+        JSON.stringify(toCache),
+        this._cacheBucket,
+      );
+      this.logger.debug('cache save: ' + key);
     } catch (e) {
       formatErrorMessage(e, 'Cache Save Failure');
     }

@@ -7,8 +7,8 @@ import {
 } from 'typeorm';
 import { ProductSource } from './product-source.entity';
 
-@Entity({ name: 'pi_product_run' })
-export class ProductRun {
+@Entity({ name: 'pi_source_run' })
+export class SourceRun {
   constructor(source: ProductSource) {
     this.source = source;
   }
@@ -74,6 +74,6 @@ export class ProductRun {
   errorMessage?: string;
 
   public static factory(source: ProductSource) {
-    return new ProductRun(source);
+    return new SourceRun(source);
   }
 }

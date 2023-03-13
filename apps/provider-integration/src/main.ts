@@ -9,8 +9,10 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { GlobalExceptionsFilter } from './utils/global-exceptions.filter';
 
+const logger = new Logger('Main=>bootstrap()');
+
 async function bootstrap() {
-  Logger.log('Starting Give Me Choice - Provider Integration Service (BETA)');
+  logger.log('Starting Give Me Choice - Provider Integration Service (BETA)');
   const app = await NestFactory.create(AppModule);
   app.enableCors({
     origin: '*',
@@ -21,7 +23,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       exceptionFactory: (validationErrors: ValidationError[] = []) => {
-        Logger.error(JSON.stringify(validationErrors));
+        logger.error(JSON.stringify(validationErrors));
         let errMsg = '';
         validationErrors.forEach((valErr) => {
           errMsg += `Invalid ${valErr.property}; `;
@@ -33,8 +35,9 @@ async function bootstrap() {
     }),
   );
   const configService = app.get(ConfigService);
-  Logger.log('starting api');
-  await app.listen(configService.get('PORT', 5001));
-  Logger.log('api started');
+  logger.log('starting api');
+  const port = configService.get('PORT', 5002);
+  await app.listen(port);
+  logger.log(`api started, listening on port: ${port}`);
 }
 bootstrap();

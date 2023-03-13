@@ -1,18 +1,15 @@
 import { Brand } from '@app/provider-integration/model/brand.entity';
-import { Category } from '@app/provider-integration/model/category.entity';
-import {
-  ProductDataDto,
-  SourceItemDataDto,
-} from '@app/provider-integration/model/dto/product-data.dto';
+import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
 import { Review } from '@app/provider-integration/model/review.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
-import { SourceMapper } from '../../shared/mapper/source-mapper.interface';
+import { Mapper } from '../../shared/mapper/mapper.interface';
 import {
   EthicalSuperstoreEthicsAndTagsDto,
   EthicalSuperstoreProductDto,
@@ -24,13 +21,13 @@ import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
 @Injectable()
 export class EthicalSuperstoreMapper
   implements
-    SourceMapper<EthicalSuperstoreSourceItemDto, EthicalSuperstoreProductDto>
+    Mapper<EthicalSuperstoreSourceItemDto, EthicalSuperstoreProductDto>
 {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
-  mapSourceItem(item: EthicalSuperstoreSourceItemDto): SourceItemDataDto {
+  mapSourceItem(item: EthicalSuperstoreSourceItemDto): ProductDataDto {
     try {
-      const product: SourceItemDataDto = {
+      const product: ProductDataDto = {
         providerProductId: item.id,
       };
       product.price = item.price ? Number(item.price) : null;
@@ -42,7 +39,7 @@ export class EthicalSuperstoreMapper
     }
   }
 
-  mapProductData(
+  mapProductDetail(
     data: EthicalSuperstoreProductDto,
     source: ProductSource,
   ): ProductDataDto {
@@ -71,18 +68,8 @@ export class EthicalSuperstoreMapper
       product.price = data.productInfo.price.price;
       product.shippingPrice = product.price > 50 ? 0 : 4.95;
       product.currency = data.productInfo.price.currency;
-
-      product.categoryDetail = source.identifier
-        .split('/')
-        .map((s) =>
-          (s.endsWith('.htm') ? s.slice(0, -3) : s)
-            .split('-')
-            .map(capitalizeWord)
-            .join(' '),
-        )
-        .join(' > ');
       product.brand = this.mapBrand(data) as Brand;
-      product.category = this.mapCategory(source) as Category;
+      product.providerCategory = this.mapCategory(source) as ProviderCategory;
       product.reviews = this.mapReviews(data.reviews) as Review[];
       product.labels = this.mapLabels(data.ethicsAndTags) as Label[];
       return product;
@@ -119,10 +106,31 @@ export class EthicalSuperstoreMapper
     };
   }
 
-  private mapCategory(source: ProductSource): Partial<Category> {
+  private mapCategory(source: ProductSource): Partial<ProviderCategory> {
     return {
-      code: normalizeIdCode(source.category),
-      description: source.category.split('-').map(capitalizeWord).join(' '),
+      code: source.identifier
+        .split('/')
+        .map((s) =>
+          (s.endsWith('.htm') ? s.slice(0, -3) : s)
+            .split('-')
+            .map(capitalizeWord)
+            .join(' '),
+        )
+        .join('_')
+        .toLowerCase() // lowercase only
+        .replace(/\&/g, 'and') // spaces -> dashes
+        .replace(/\s+/g, '-') // spaces -> dashes
+        .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
+        .trim(), // remove whitespace;,
+      description: source.identifier
+        .split('/')
+        .map((s) =>
+          (s.endsWith('.htm') ? s.slice(0, -3) : s)
+            .split('-')
+            .map(capitalizeWord)
+            .join(' '),
+        )
+        .join(' > '),
     };
   }
 

@@ -12,6 +12,8 @@ import { formatErrorMessage } from '../utils/format-error-message';
 
 @Injectable()
 export class IndexProductConsumer implements Consumer<IndexProductCommand> {
+  private readonly logger = new Logger(IndexProductConsumer.name);
+
   constructor(private readonly productsService: ProductsService) {}
 
   @RabbitSubscribe({
@@ -22,14 +24,14 @@ export class IndexProductConsumer implements Consumer<IndexProductCommand> {
   })
   async receive(msg: IndexProductCommand, amqpMsg: ConsumeMessage) {
     try {
-      Logger.debug(
+      this.logger.debug(
         `Command ${IndexProductCommand.ROUTING_KEY} Received: ${JSON.stringify(
           msg.data.productId,
         )}`,
       );
       await this.productsService.indexProduct(msg.data.productId);
     } catch (e) {
-      Logger.error(formatErrorMessage(e));
+      this.logger.error(e);
     }
   }
 }

@@ -18,6 +18,8 @@ import { UpdateBrandDto } from '../dto/update-brand.dto';
 
 @Controller('brands')
 export class BrandsController {
+  private readonly logger = new Logger(BrandsController.name);
+
   constructor(private readonly brandsService: BrandsService) {}
 
   @Get()
@@ -45,7 +47,7 @@ export class BrandsController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindBrandsDto,
   ) {
-    Logger.debug(JSON.stringify(findDto));
+    this.logger.debug(JSON.stringify(findDto));
     return await this.brandsService.find(findDto, pageRequest);
   }
 }

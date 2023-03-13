@@ -6,6 +6,8 @@ export const JOB_CONTAINER = 'JOB_CONTAINER';
 
 @Injectable()
 export class JobContainer {
+  private readonly logger = new Logger(JobContainer.name);
+
   constructor(private readonly jobs: Job[]) {}
 
   public getJob(jobName: JobName): Job {
@@ -13,7 +15,7 @@ export class JobContainer {
       const job = this.jobs.find((j) => j.getName() === jobName);
       if (job) return job;
     } catch (e) {
-      Logger.error(e);
+      this.logger.error(e);
     }
     throw new Error(`Job not found: ${jobName}`);
   }

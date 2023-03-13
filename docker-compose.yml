@@ -18,7 +18,7 @@ services:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     ports:
-      - '5001:5001'
+      - '5002:5002'
 
   postgres:
     image: postgres

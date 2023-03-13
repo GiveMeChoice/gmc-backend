@@ -23,6 +23,6 @@ export class SourceCacheManager extends AbstractCacheManager {
     provider: ProviderKey,
     sourceIdentifier: string,
   ): string {
-    return `cache/${provider}/sources/${sourceIdentifier}.json`;
+    return `${provider}/sources/${sourceIdentifier}.json`;
   }
 }

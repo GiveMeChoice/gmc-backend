@@ -6,6 +6,8 @@ export const EXTRACTOR_CONTAINER = 'EXTRACTOR_CONTAINER';
 
 @Injectable()
 export class ExtractorContainer {
+  private readonly logger = new Logger(ExtractorContainer.name);
+
   constructor(private readonly extractors: Extractor<any, any>[]) {}
 
   public getExtractor(providerKey: ProviderKey) {
@@ -15,7 +17,7 @@ export class ExtractorContainer {
       );
       if (extractor) return extractor;
     } catch (e) {
-      Logger.error(e);
+      this.logger.error(e);
     }
     throw new Error(`Unable to find extractor for provider Key ${providerKey}`);
   }

@@ -1,0 +1,10 @@
+category,identifier,description,active,sourceLink
+baby,6F28ECBF,Baby,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Ababy
+beauty,F1A3C8C6,Beauty,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Abeauty
+fashion,DBECC84C,Fashion,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Afashion
+garden,476DEF2C,Garden & Outdoors,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Aoutdoor
+grocery,CC81EE8C,Grocery,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Agrocery
+health,76511C0E,Health & Personal Care,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Adrugstore
+home,752B89E3,Home & Kitchen,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Akitchen
+pets,A55C93FA,Pet Supplies,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Apets
+toys,1D0AA44F,Toys & Games,FALSE,https://www.amazon.co.uk/s?node=22409164031&fs=true&rh=i%3Atoys

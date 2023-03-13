@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class SearchService implements OnModuleInit {
+  private readonly logger = new Logger(SearchService.name);
+
   private readonly _index;
   private _client: Client;
 
@@ -17,8 +19,8 @@ export class SearchService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    Logger.log('Connecting to Elasticsearch');
-    Logger.debug(this._configService.get('elastic.node'));
+    this.logger.log('Connecting to Elasticsearch');
+    this.logger.debug(this._configService.get('elastic.node'));
     this._client = new Client({
       node: this._configService.get('elastic.node'),
       auth: {
@@ -28,9 +30,9 @@ export class SearchService implements OnModuleInit {
     });
     const res = await this._client.ping();
     if (res) {
-      Logger.log('Elasticsearch Cluster running....');
+      this.logger.log('Elasticsearch Cluster running....');
       if (!(await this._client.indices.exists({ index: this._index }))) {
-        Logger.debug(`Creating Index ${this._index}`);
+        this.logger.debug(`Creating Index ${this._index}`);
         await this._client.indices.create({ index: this._index });
       }
     } else {
@@ -100,7 +102,7 @@ export class SearchService implements OnModuleInit {
         console.debug('Error documents: ' + JSON.stringify(erroredDocuments));
       }
     } catch (e) {
-      Logger.error(formatErrorMessage(e));
+      this.logger.error(formatErrorMessage(e));
     }
 
     const count = await this._client.count({ index: this._index });

@@ -1,17 +1,14 @@
 import { Brand } from '@app/provider-integration/model/brand.entity';
-import { Category } from '@app/provider-integration/model/category.entity';
-import {
-  ProductDataDto,
-  SourceItemDataDto,
-} from '@app/provider-integration/model/dto/product-data.dto';
+import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Label } from '@app/provider-integration/model/label.entity';
 import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
 import { Review } from '@app/provider-integration/model/review.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PipelineError } from '../../shared/exception/pipeline.error';
-import { SourceMapper } from '../../shared/mapper/source-mapper.interface';
+import { Mapper } from '../../shared/mapper/mapper.interface';
 import {
   RainforestApiClimatePledgeFriendlyDto,
   RainforestApiImageDto,
@@ -23,13 +20,13 @@ import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto
 
 @Injectable()
 export class RainforestApiMapper
-  implements SourceMapper<RainforestApiSourceItemDto, RainforestApiProductDto>
+  implements Mapper<RainforestApiSourceItemDto, RainforestApiProductDto>
 {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
-  mapSourceItem(item: RainforestApiSourceItemDto): SourceItemDataDto {
+  mapSourceItem(item: RainforestApiSourceItemDto): ProductDataDto {
     try {
-      const product: SourceItemDataDto = {
+      const product: ProductDataDto = {
         providerProductId: item.result.category_results.asin,
       };
       product.price = Number(item.result.category_results.price.value);
@@ -41,7 +38,7 @@ export class RainforestApiMapper
     }
   }
 
-  mapProductData(
+  mapProductDetail(
     data: RainforestApiProductDto,
     source: ProductSource,
   ): ProductDataDto {
@@ -59,10 +56,12 @@ export class RainforestApiMapper
       product.currency = data.product.buybox_winner.price.currency;
       product.mainImage = data.product.main_image.link;
       product.secondaryImage = this.mapSecondaryImage(data.product.images);
-      product.categoryDetail = data.product.categories_flat;
       product.description = this.mapDescription(data);
       product.brand = this.mapBrand(data.product.brand) as Brand;
-      product.category = this.mapCategory(source) as Category;
+      product.providerCategory = this.mapProviderCategory(
+        data.product.categories_flat,
+        source,
+      ) as ProviderCategory;
       product.reviews = this.mapReviews(data.product.top_reviews) as Review[];
       product.labels = this.mapLabels(data.climate_pledge_friendly) as Label[];
       return product;
@@ -115,11 +114,27 @@ export class RainforestApiMapper
     };
   }
 
-  private mapCategory(source: ProductSource): Partial<Category> {
-    return {
-      code: normalizeIdCode(source.category),
-      description: source.description,
-    };
+  private mapProviderCategory(
+    categoriesFlat: string,
+    source: ProductSource,
+  ): Partial<ProviderCategory> {
+    return categoriesFlat
+      ? {
+          code: categoriesFlat
+            .split(' > ')
+            .slice(0, 2)
+            .join('_')
+            .toLowerCase() // lowercase only
+            .replace(/\&/g, 'and') // spaces -> dashes
+            .replace(/\s+/g, '-') // spaces -> dashes
+            .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
+            .trim(), // remove whitespace;,
+          description: categoriesFlat.split(' > ').slice(0, 2).join(' > '),
+        }
+      : {
+          code: normalizeIdCode(source.category),
+          description: source.description,
+        };
   }
 
   private mapReviews(

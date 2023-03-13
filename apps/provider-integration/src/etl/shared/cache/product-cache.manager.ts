@@ -21,6 +21,6 @@ export class ProductCacheManager extends AbstractCacheManager {
   }
 
   private buildProductKey(provider: ProviderKey, productId: string): string {
-    return `cache/${provider}/products/${productId}.json`;
+    return `${provider}/products/${productId}.json`;
   }
 }

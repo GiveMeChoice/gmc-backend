@@ -1,42 +1,51 @@
-import { ProductRefreshDto } from '@app/provider-integration/model/dto/product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductRun } from '@app/provider-integration/model/product-run.entity';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
+import { SourceRun } from '@app/provider-integration/model/source-run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { concatMap, lastValueFrom, map } from 'rxjs';
+import { concatMap, lastValueFrom } from 'rxjs';
 import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
 } from '../../shared/extractor/extractor.container';
-import { PipelineBase } from '../../shared/pipeline/pipeline.base';
+import {
+  LoaderContainer,
+  LOADER_CONTAINER,
+} from '../../shared/loader/loader.container';
 import {
   MapperContainer,
   MAPPER_CONTAINER,
-} from '../../shared/mapper/source-mapper.container';
+} from '../../shared/mapper/mapper.container';
+import { Pipeline } from '../../shared/pipeline/pipeline.interface';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
+import { EthicalSuperstoreLoader } from './ethical-superstore.loader';
 import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';
 
 @Injectable()
-export class EthicalSuperstorePipeline extends PipelineBase {
+export class EthicalSuperstorePipeline implements Pipeline {
+  private readonly logger = new Logger(EthicalSuperstorePipeline.name);
+
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
   private readonly _extractor: EthicalSuperstoreExtractor;
   private readonly _mapper: EthicalSuperstoreMapper;
+  private readonly _loader: EthicalSuperstoreLoader;
 
   constructor(
     @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
     @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer,
+    @Inject(LOADER_CONTAINER) LoaderContainer: LoaderContainer,
   ) {
-    super();
     this._extractor = extractorFactory.getExtractor(
       this.providerKey,
     ) as EthicalSuperstoreExtractor;
     this._mapper = mapperContainer.getMapper(
       this.providerKey,
     ) as EthicalSuperstoreMapper;
+    this._loader = LoaderContainer.getLoader(
+      this.providerKey,
+    ) as EthicalSuperstoreLoader;
   }
 
-  async execute(run: ProductRun): Promise<ProductRun> {
+  async executeSource(run: SourceRun) {
     try {
       run.sourceDate = new Date();
       await lastValueFrom(
@@ -44,49 +53,26 @@ export class EthicalSuperstorePipeline extends PipelineBase {
           concatMap(async (sourceItem) => {
             if (sourceItem.inStock) {
               const sourceProduct = this._mapper.mapSourceItem(sourceItem);
-              await this.loadSourceProduct(sourceProduct, run);
+              await this._loader.loadSourceItem(sourceProduct, run);
             }
           }),
         ),
       );
     } catch (err) {
-      Logger.error(err);
+      this.logger.error(err);
       run.errorMessage = err.toString();
     }
     return run;
   }
 
-  protected applySourceRefresh(
-    existing: Product,
-    source: Partial<Product>,
-  ): Product {
-    existing.price = source.price;
-    return existing;
-  }
-
-  protected isProductStale(
-    existingProduct: Product,
-    sourceProduct: Partial<Product>,
-    source: ProductSource,
-  ): boolean {
-    if (sourceProduct.price && sourceProduct.price != existingProduct.price) {
-      Logger.debug(
-        `Product ${existingProduct.shortId} is stale b/c price ${existingProduct.price} vs. source price ${sourceProduct.price}`,
-      );
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  async refreshProduct(
-    product: Product,
-    skipCache: boolean,
-  ): Promise<ProductRefreshDto> {
+  async executeProduct(product: Product, runId, reason, skipCache: boolean) {
     const extracted = await this._extractor.extractProduct(product, skipCache);
-    return {
-      sourceDate: extracted.sourceDate,
-      ...(await this._mapper.mapProductData(extracted.data, product.source)),
-    };
+    return await this._loader.loadProductDetail(
+      product.id,
+      this._mapper.mapProductDetail(extracted.data, product.source),
+      product.source,
+      runId,
+      reason,
+    );
   }
 }
