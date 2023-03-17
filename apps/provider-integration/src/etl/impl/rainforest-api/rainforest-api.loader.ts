@@ -2,7 +2,7 @@ import { ProductDataDto } from '@app/provider-integration/model/dto/product-data
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Injectable } from '@nestjs/common';
-import { SharedLoader } from '../shared/shared.loader';
+import { SharedLoader } from '../../loader/shared.loader';
 
 @Injectable()
 export class RainforestApiLoader extends SharedLoader {

@@ -11,7 +11,7 @@ import { formatErrorMessage } from '@app/provider-integration/utils/format-error
 import { MessagingService } from '@lib/messaging';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as moment from 'moment';
-import { Loader } from '../../shared/loader/loader.interface';
+import { Loader } from './loader.interface';
 
 @Injectable()
 export abstract class SharedLoader implements Loader {

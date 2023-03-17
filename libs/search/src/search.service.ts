@@ -1,19 +1,25 @@
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
 import { Client } from '@elastic/elasticsearch';
-import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
+import {
+  MappingTypeMapping,
+  SearchResponse,
+} from '@elastic/elasticsearch/lib/api/types';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { mappings } from './config/index-mappings';
 
 @Injectable()
 export class SearchService implements OnModuleInit {
   private readonly logger = new Logger(SearchService.name);
 
-  private readonly _index;
+  private readonly _indexName;
   private _client: Client;
 
   constructor(private _configService: ConfigService) {
-    this._index = this._configService.get('elastic.index');
-    if (!this._index) {
+    this._indexName = this._configService.get('elastic.index');
+    if (!this._indexName) {
       throw new Error('Elastic: No index name defined');
     }
   }
@@ -31,9 +37,10 @@ export class SearchService implements OnModuleInit {
     const res = await this._client.ping();
     if (res) {
       this.logger.log('Elasticsearch Cluster running....');
-      if (!(await this._client.indices.exists({ index: this._index }))) {
-        this.logger.debug(`Creating Index ${this._index}`);
-        await this._client.indices.create({ index: this._index });
+      if (!(await this._client.indices.exists({ index: this._indexName }))) {
+        this.logger.debug(`Importing elasticsearch mappings file`);
+        this.logger.log(`Creating Index ${this._indexName}`);
+        await this._client.indices.create({ index: this._indexName, mappings });
       }
     } else {
       throw new Error('Elasticsearch ping unsuccessful');
@@ -41,38 +48,52 @@ export class SearchService implements OnModuleInit {
   }
 
   async existsDocument(id: string): Promise<boolean> {
-    return await this._client.exists({ index: this._index, id });
+    return await this._client.exists({ index: this._indexName, id });
+  }
+
+  async getDocument(id: string): Promise<any> {
+    const res = await this._client.get({ index: this._indexName, id });
+    return res.found ? res._source : null;
   }
 
   async createDocument(id: string, document: any) {
-    return await this._client.create({ index: this._index, id, document });
+    return await this._client.create({ index: this._indexName, id, document });
   }
 
   async indexDocument(id: string, document: any) {
-    return await this._client.index({ index: this._index, id, document });
+    const result = await this._client.index({
+      index: this._indexName,
+      id,
+      document,
+    });
+    return result.result === 'created' || result.result === 'updated'
+      ? await this.getDocument(id)
+      : null;
   }
 
   async updateDocument(id: string, updates: any) {
     return await this._client.update({
-      index: this._index,
+      index: this._indexName,
       id,
       doc: updates,
     });
   }
 
   async deleteDocument(id: string) {
-    await this._client.delete({ index: this._index, id });
+    await this._client.delete({ index: this._indexName, id });
   }
 
   async search<T>(q: string): Promise<SearchResponse<T>> {
-    return await this._client.search<T>({ index: this._index, q });
+    return await this._client.search<T>({ index: this._indexName, q });
   }
 
   async bulk(documents: any[]) {
     const operations = documents.flatMap((doc) => [
-      { index: { _index: this._index, _id: doc.shortId } },
+      { index: { _index: this._indexName, _id: doc.id } },
       doc,
     ]);
+
+    this.logger.debug(`Operations ${JSON.stringify(operations)}`);
 
     try {
       const bulkResponse = await this._client.bulk({
@@ -99,13 +120,15 @@ export class SearchService implements OnModuleInit {
             });
           }
         });
-        console.debug('Error documents: ' + JSON.stringify(erroredDocuments));
+        this.logger.debug(
+          'Error documents: ' + JSON.stringify(erroredDocuments),
+        );
       }
     } catch (e) {
       this.logger.error(formatErrorMessage(e));
     }
 
-    const count = await this._client.count({ index: this._index });
-    console.log(count);
+    const count = await this._client.count({ index: this._indexName });
+    this.logger.debug(`Count: ${JSON.stringify(count)}`);
   }
 }

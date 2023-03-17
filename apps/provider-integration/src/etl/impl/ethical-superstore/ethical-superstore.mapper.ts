@@ -8,8 +8,8 @@ import { Review } from '@app/provider-integration/model/review.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
-import { PipelineError } from '../../shared/exception/pipeline.error';
-import { Mapper } from '../../shared/mapper/mapper.interface';
+import { PipelineError } from '../../exception/pipeline.error';
+import { Mapper } from '../../mapper/mapper.interface';
 import {
   EthicalSuperstoreEthicsAndTagsDto,
   EthicalSuperstoreProductDto,

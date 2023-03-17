@@ -6,16 +6,16 @@ import { concatMap, lastValueFrom } from 'rxjs';
 import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
-} from '../../shared/extractor/extractor.container';
+} from '../../extractor/extractor.container';
 import {
   LoaderContainer,
   LOADER_CONTAINER,
-} from '../../shared/loader/loader.container';
+} from '../../loader/loader.container';
 import {
   MapperContainer,
   MAPPER_CONTAINER,
-} from '../../shared/mapper/mapper.container';
-import { Pipeline } from '../../shared/pipeline/pipeline.interface';
+} from '../../mapper/mapper.container';
+import { Pipeline } from '../../cache/pipeline/pipeline.interface';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
 import { EthicalSuperstoreLoader } from './ethical-superstore.loader';
 import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';

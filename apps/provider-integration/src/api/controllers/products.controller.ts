@@ -19,7 +19,10 @@ import { FindProductsDto } from '../dto/find-products.dto';
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(
+    private readonly productsService: ProductsService,
+    private readonly searchService: SearchService,
+  ) {}
 
   @Get()
   async getAll(
@@ -33,19 +36,22 @@ export class ProductsController {
     return await this.productsService.findOneExternal(id);
   }
 
-  // @Get(':id/data')
-  // async getOneData(@Param('id') id): Promise<Product> {
-  //   return await this.productsService.findOneData(id);
-  // }
-
   @Post(':id/index')
-  async syncData(@Param('id') id): Promise<any> {
+  async index(@Param('id') id): Promise<any> {
+    this.logger.debug(`Indexing Product: ${id}`);
     return await this.productsService.indexProduct(id);
   }
 
-  @Post('index')
-  async syncTest(@Body() findDto: FindProductsDto) {
-    await this.productsService.indexProductBatchAsync(findDto);
+  @Post(':id/index/map')
+  async getIndexable(@Param('id') id): Promise<any> {
+    return await this.productsService.getOneIndexable(id);
+  }
+
+  @Get(':id/index/current')
+  async getCurrentlyIndexed(@Param('id') id): Promise<any> {
+    if (await this.searchService.existsDocument(id)) {
+      return await this.searchService.getDocument(id);
+    }
   }
 
   @Post('find')

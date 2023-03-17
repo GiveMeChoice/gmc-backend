@@ -7,8 +7,8 @@ import { ProviderCategory } from '@app/provider-integration/model/provider-categ
 import { Review } from '@app/provider-integration/model/review.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable, Logger } from '@nestjs/common';
-import { PipelineError } from '../../shared/exception/pipeline.error';
-import { Mapper } from '../../shared/mapper/mapper.interface';
+import { PipelineError } from '../../exception/pipeline.error';
+import { Mapper } from '../../mapper/mapper.interface';
 import {
   RainforestApiClimatePledgeFriendlyDto,
   RainforestApiImageDto,
@@ -122,14 +122,14 @@ export class RainforestApiMapper
       ? {
           code: categoriesFlat
             .split(' > ')
-            .slice(0, 2)
+            .slice(0, 3)
             .join('_')
             .toLowerCase() // lowercase only
             .replace(/\&/g, 'and') // spaces -> dashes
             .replace(/\s+/g, '-') // spaces -> dashes
             .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
             .trim(), // remove whitespace;,
-          description: categoriesFlat.split(' > ').slice(0, 2).join(' > '),
+          description: categoriesFlat.split(' > ').slice(0, 3).join(' > '),
         }
       : {
           code: normalizeIdCode(source.category),

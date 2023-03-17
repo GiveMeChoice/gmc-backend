@@ -2,15 +2,15 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
-} from '../etl/shared/extractor/extractor.container';
+} from '../etl/extractor/extractor.container';
 import {
   MapperContainer,
   MAPPER_CONTAINER,
-} from '../etl/shared/mapper/mapper.container';
+} from '../etl/mapper/mapper.container';
 import {
   PipelineContainer,
   PIPELINE_CONTAINER,
-} from '../etl/shared/pipeline/pipeline.container';
+} from '../etl/cache/pipeline/pipeline.container';
 import { ProductDataDto } from '../model/dto/product-data.dto';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '../model/enum/provider-key.enum';

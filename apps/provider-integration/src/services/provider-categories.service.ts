@@ -1,11 +1,13 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable, Logger } from '@nestjs/common';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository } from 'typeorm';
+import { In, Like, Repository, TreeRepository } from 'typeorm';
 import { Category } from '../model/category.entity';
 import { ProviderCategory } from '../model/provider-category.entity';
+import { CategoriesService } from './categories.service';
+import { ProductsService } from './products.service';
 
 @Injectable()
 export class ProviderCategoriesService {
@@ -14,8 +16,9 @@ export class ProviderCategoriesService {
   constructor(
     @InjectRepository(ProviderCategory)
     private readonly providerCategoriesRepo: Repository<ProviderCategory>,
-    @InjectRepository(Category)
-    private readonly categoryRepo: TreeRepository<Category>,
+    private readonly categoryService: CategoriesService,
+    @Inject(forwardRef(() => ProductsService))
+    private readonly productsService: ProductsService,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<ProviderCategory>> {
@@ -39,10 +42,21 @@ export class ProviderCategoriesService {
     findDto: Partial<ProviderCategory>,
     pageRequest?: PageRequest,
   ): Promise<Page<ProviderCategory>> {
+    const categoryIds = [];
+    if (findDto.categoryId) {
+      const descendents = (await this.categoryService.findDescendents(
+        findDto.categoryId,
+      )) as Category[];
+      for (const descendent of descendents) {
+        categoryIds.push(descendent.id);
+      }
+    }
     const [data, count] = await this.providerCategoriesRepo
       .createQueryBuilder('category')
       .where({
         ...findDto,
+        ...(findDto.code && { code: Like(`${findDto.code}%`) }),
+        ...(findDto.categoryId && { categoryId: In(categoryIds) }),
       })
       .setFindOptions({
         ...pageRequest,
@@ -89,6 +103,17 @@ export class ProviderCategoriesService {
     await this.providerCategoriesRepo.save({
       id,
       categoryId: categoryId ? categoryId : null,
+    });
+    const ids = await this.productsService.findIds({
+      providerCategory: {
+        id,
+      },
+    });
+    Logger.debug(`Reindexing ${ids.data.length} products`);
+    await this.productsService.indexProductBatchAsync({
+      providerCategory: {
+        id,
+      },
     });
     return await this.findOne(id);
   }

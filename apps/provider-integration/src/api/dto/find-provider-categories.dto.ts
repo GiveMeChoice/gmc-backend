@@ -7,5 +7,8 @@ export class FindProviderCategoriesDto extends PartialType(ProviderCategory) {
   providerId?: string;
 
   @IsOptional()
+  code?: string;
+
+  @IsOptional()
   categoryId?: string;
 }

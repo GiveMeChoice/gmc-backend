@@ -6,16 +6,16 @@ import { ProviderKey } from '../../../model/enum/provider-key.enum';
 import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
-} from '../../shared/extractor/extractor.container';
+} from '../../extractor/extractor.container';
 import {
   LoaderContainer,
   LOADER_CONTAINER,
-} from '../../shared/loader/loader.container';
+} from '../../loader/loader.container';
 import {
   MapperContainer,
   MAPPER_CONTAINER,
-} from '../../shared/mapper/mapper.container';
-import { Pipeline } from '../../shared/pipeline/pipeline.interface';
+} from '../../mapper/mapper.container';
+import { Pipeline } from '../../cache/pipeline/pipeline.interface';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiExtractor } from './rainforest-api.extractor';
 import { RainforestApiLoader } from './rainforest-api.loader';

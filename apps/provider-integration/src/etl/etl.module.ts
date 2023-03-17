@@ -11,24 +11,18 @@ import { RainforestApiExtractor } from './impl/rainforest-api/rainforest-api.ext
 import { RainforestApiLoader } from './impl/rainforest-api/rainforest-api.loader';
 import { RainforestApiMapper } from './impl/rainforest-api/rainforest-api.mapper';
 import { RainforestApiPipeline } from './impl/rainforest-api/rainforest-api.pipeline';
-import { ProductCacheManager } from './shared/cache/product-cache.manager';
-import { SourceCacheManager } from './shared/cache/source-cache.manager';
+import { ProductCacheManager } from './cache/product-cache.manager';
+import { SourceCacheManager } from './cache/source-cache.manager';
 import {
   ExtractorContainer,
   EXTRACTOR_CONTAINER,
-} from './shared/extractor/extractor.container';
-import {
-  LoaderContainer,
-  LOADER_CONTAINER,
-} from './shared/loader/loader.container';
-import {
-  MapperContainer,
-  MAPPER_CONTAINER,
-} from './shared/mapper/mapper.container';
+} from './extractor/extractor.container';
+import { LoaderContainer, LOADER_CONTAINER } from './loader/loader.container';
+import { MapperContainer, MAPPER_CONTAINER } from './mapper/mapper.container';
 import {
   PipelineContainer,
   PIPELINE_CONTAINER,
-} from './shared/pipeline/pipeline.container';
+} from './cache/pipeline/pipeline.container';
 
 @Module({
   imports: [

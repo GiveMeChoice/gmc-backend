@@ -3,18 +3,25 @@ import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
 import { MessagingService } from '@lib/messaging';
 import { SearchService } from '@lib/search';
-import { Injectable, Logger } from '@nestjs/common';
+import { SearchCategoryDto } from '@lib/search/dto/search-category.dto';
+import { SearchProductDto } from '@lib/search/dto/search-product.dto';
+import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import * as moment from 'moment';
-import { In, Repository } from 'typeorm';
+import {
+  FindOptionsRelations,
+  FindOptionsSelect,
+  In,
+  Repository,
+} from 'typeorm';
 import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
 import { Brand } from '../model/brand.entity';
+import { Category } from '../model/category.entity';
 import { ProductIntegrationStatus } from '../model/enum/product-integration-status.enum';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
-import { ProviderKey } from '../model/enum/provider-key.enum';
 import { Label } from '../model/label.entity';
 import { ProductSource } from '../model/product-source.entity';
 import { Product } from '../model/product.entity';
@@ -23,8 +30,46 @@ import { Provider } from '../model/provider.entity';
 import { SourceRun } from '../model/source-run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
 import { BrandsService } from './brands.service';
+import { CategoriesService } from './categories.service';
 import { LabelsService } from './labels.service';
 import { ProviderCategoriesService } from './provider-categories.service';
+
+const searchRelevantFieldsFindOptions = {
+  relations: {
+    labels: true,
+    provider: true,
+    providerCategory: true,
+    brand: true,
+  } as FindOptionsRelations<Product>,
+  select: {
+    id: true,
+    shortId: true,
+    sku: true,
+    title: true,
+    description: true,
+    price: true,
+    currency: true,
+    listImage: true,
+    rating: true,
+    ratingsTotal: true,
+    provider: {
+      key: true,
+    },
+    labels: {
+      code: true,
+      description: true,
+    },
+    providerCategory: {
+      code: true,
+      description: true,
+      categoryId: true,
+    },
+    brand: {
+      code: true,
+      description: true,
+    },
+  } as FindOptionsSelect<Product>,
+};
 
 @Injectable()
 export class ProductsService {
@@ -35,7 +80,9 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: LabelsService,
-    private readonly categoriesService: ProviderCategoriesService,
+    private readonly categoriesService: CategoriesService,
+    @Inject(forwardRef(() => ProviderCategoriesService))
+    private readonly providerCategoryService: ProviderCategoriesService,
     private readonly brandsService: BrandsService,
     private readonly messagingService: MessagingService,
     private readonly searchService: SearchService,
@@ -49,14 +96,98 @@ export class ProductsService {
     );
   }
 
-  async indexProduct(productId: string) {
-    const toCreate = await this.findOnetoCreate(productId);
-    return this.searchService.indexDocument(toCreate.shortId, toCreate);
+  async indexProduct(id: string) {
+    const toIndex = await this.getOneIndexable(id);
+    return await this.searchService.indexDocument(toIndex.id, toIndex);
+  }
+
+  async getOneIndexable(id: string): Promise<SearchProductDto> {
+    const product = await this.productsRepo.findOne({
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+      ...searchRelevantFieldsFindOptions,
+    });
+    return await this.mapToIndexable(product);
+  }
+
+  private async mapToIndexable(
+    product: Partial<Product>,
+  ): Promise<SearchProductDto> {
+    let category: Category = null;
+    if (product.providerCategory.categoryId) {
+      category = await this.categoriesService.findOne(
+        product.providerCategory.categoryId,
+      );
+    }
+    return {
+      id: product.shortId,
+      sku: product.sku,
+      provider: {
+        key: product.provider.key,
+        productId: product.providerProductId,
+        region: 'UK',
+        description: product.provider.description,
+      },
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      offerLink: product.offerLink,
+      images: {
+        list: {
+          url: product.listImage,
+        },
+        detail: {
+          url: product.mainImage,
+        },
+      },
+      brand: product.brand.code,
+      category: {
+        providerCategory: product.providerCategory.code,
+        gmcCategory: await this.mapSearchCategory(
+          product.providerCategory.categoryId,
+        ),
+      },
+    };
+  }
+  private async mapSearchCategory(
+    categoryId: string,
+  ): Promise<SearchCategoryDto> {
+    if (!categoryId) return null;
+
+    const category = (await this.categoriesService.findAncestors(
+      categoryId,
+      true,
+    )) as Category;
+    if (!category) return null;
+
+    let nodes: string[] = [];
+    nodes = this.flattenTree(category, nodes);
+    // return nodes;
+    const searchCategory: SearchCategoryDto = {
+      name: nodes[nodes.length - 1],
+      ...(nodes.length > 1 && {
+        subcategory: {
+          name: nodes[nodes.length - 2],
+          ...(nodes.length > 2 && {
+            subcategory: {
+              name: nodes[nodes.length - 3],
+            },
+          }),
+        },
+      }),
+    };
+    return searchCategory;
+  }
+
+  private flattenTree(node: Category, nodes: string[]): string[] {
+    nodes.push(node.name);
+    return node.parent && node.parent.name !== 'Root'
+      ? this.flattenTree(node.parent, nodes)
+      : nodes;
   }
 
   async indexProductBatchAsync(findDto: Partial<Product>) {
     findDto.integrationStatus = ProductIntegrationStatus.LIVE;
-    const BATCH_SIZE = 15;
+    const BATCH_SIZE = 30;
     const pageRequest: PageRequest = { skip: 0, take: BATCH_SIZE };
     let page = await this.findIds(findDto, pageRequest);
     if (page.meta.count > 0) {
@@ -80,47 +211,19 @@ export class ProductsService {
   }
 
   async indexProductBatch(productIds: string[]) {
-    const batchtoCreate = await this.productsRepo.find({
+    const batchToIndex = await this.productsRepo.find({
       where: { id: In(productIds) },
-      relations: {
-        labels: true,
-        provider: true,
-        providerCategory: true,
-        brand: true,
-      },
-      select: {
-        shortId: true,
-        sku: true,
-        title: true,
-        description: true,
-        price: true,
-        currency: true,
-        listImage: true,
-        rating: true,
-        ratingsTotal: true,
-        provider: {
-          key: true,
-        },
-        labels: {
-          code: true,
-          description: true,
-        },
-        providerCategory: {
-          code: true,
-          description: true,
-        },
-        brand: {
-          code: true,
-          description: true,
-        },
-      },
+      ...searchRelevantFieldsFindOptions,
     });
-    await this.searchService.bulk(
-      batchtoCreate.map((p) => ({
-        id: p.shortId,
-        ...p,
-      })),
-    );
+    const documentBatch = [];
+    for (const product of batchToIndex) {
+      documentBatch.push({
+        id: product.shortId,
+        ...(await this.mapToIndexable(product)),
+      });
+    }
+    this.logger.debug(`Index product batch: ${documentBatch.length} documents`);
+    await this.searchService.bulk(documentBatch);
   }
 
   async find(
@@ -152,6 +255,9 @@ export class ProductsService {
       },
       relations: {
         source: true,
+        providerCategory: {
+          category: true,
+        },
       },
       select: {
         source: {
@@ -279,91 +385,6 @@ export class ProductsService {
         },
         provider: {
           key: true,
-        },
-      },
-    });
-  }
-
-  async findtoCreate(
-    findDto: Partial<Product>,
-    pageRequest?: PageRequest,
-  ): Promise<Page<Product>> {
-    const [toCreate, count] = await this.productsRepo.findAndCount({
-      ...pageRequest,
-      where: {
-        ...findDto,
-      },
-      relations: {
-        labels: true,
-        provider: true,
-        providerCategory: true,
-        brand: true,
-      },
-      select: {
-        id: true,
-        shortId: true,
-        sku: true,
-        title: true,
-        description: true,
-        price: true,
-        currency: true,
-        listImage: true,
-        rating: true,
-        ratingsTotal: true,
-        provider: {
-          key: true,
-        },
-        labels: {
-          code: true,
-          description: true,
-        },
-        providerCategory: {
-          code: true,
-          description: true,
-        },
-        brand: {
-          code: true,
-          description: true,
-        },
-      },
-    });
-    return buildPage<Product>(toCreate, count, pageRequest);
-  }
-
-  findOnetoCreate(id: string): Promise<Product> {
-    return this.productsRepo.findOne({
-      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
-      relations: {
-        labels: true,
-        provider: true,
-        providerCategory: true,
-        brand: true,
-      },
-      select: {
-        id: true,
-        shortId: true,
-        sku: true,
-        title: true,
-        description: true,
-        price: true,
-        currency: true,
-        listImage: true,
-        rating: true,
-        ratingsTotal: true,
-        provider: {
-          key: true,
-        },
-        labels: {
-          code: true,
-          description: true,
-        },
-        providerCategory: {
-          code: true,
-          description: true,
-        },
-        brand: {
-          code: true,
-          description: true,
         },
       },
     });
@@ -529,7 +550,7 @@ export class ProductsService {
     if (category.id) {
       return category;
     } else {
-      const existing = await this.categoriesService.findOneByProvider(
+      const existing = await this.providerCategoryService.findOneByProvider(
         providerId,
         category.code,
       );

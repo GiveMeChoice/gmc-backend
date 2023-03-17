@@ -7,10 +7,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { lastValueFrom, map, Observable, tap } from 'rxjs';
 import { Readable } from 'stream';
-import { ProductCacheManager } from '../../shared/cache/product-cache.manager';
-import { PipelineError } from '../../shared/exception/pipeline.error';
-import { ExtractResult } from '../../shared/extractor/extract-result.interface';
-import { Extractor } from '../../shared/extractor/extractor.interface';
+import { ProductCacheManager } from '../../cache/product-cache.manager';
+import { PipelineError } from '../../exception/pipeline.error';
+import { ExtractResult } from '../../extractor/extract-result.interface';
+import { Extractor } from '../../extractor/extractor.interface';
 import { RainforestApiCollectionDto } from './dto/rainforest-api-collection.dto';
 import { RainforestApiProductDto } from './dto/rainforest-api-product.dto';
 
