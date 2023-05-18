@@ -21,7 +21,7 @@ export class CategoriesService {
   findOne(id: string): Promise<Category> {
     return this.categoryRepo.findOne({
       where: { id },
-      relations: { providerCategories: true },
+      relations: { merchantCategories: true },
     });
   }
 

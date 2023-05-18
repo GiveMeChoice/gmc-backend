@@ -1,6 +1,6 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
+import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { concatMap, lastValueFrom } from 'rxjs';
 import {
@@ -24,7 +24,7 @@ import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';
 export class EthicalSuperstorePipeline implements Pipeline {
   private readonly logger = new Logger(EthicalSuperstorePipeline.name);
 
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
   private readonly _extractor: EthicalSuperstoreExtractor;
   private readonly _mapper: EthicalSuperstoreMapper;
   private readonly _loader: EthicalSuperstoreLoader;
@@ -45,7 +45,7 @@ export class EthicalSuperstorePipeline implements Pipeline {
     ) as EthicalSuperstoreLoader;
   }
 
-  async executeSource(run: SourceRun) {
+  async executeSource(run: ProviderSourceRun) {
     try {
       run.sourceDate = new Date();
       await lastValueFrom(

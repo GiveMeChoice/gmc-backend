@@ -1,5 +1,5 @@
 import { Product } from '@app/provider-integration/model/product.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
+import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
@@ -25,7 +25,7 @@ import { RainforestApiMapper } from './rainforest-api.mapper';
 export class RainforestApiPipeline implements Pipeline {
   private readonly logger = new Logger(RainforestApiPipeline.name);
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
   private readonly _extractor: RainforestApiExtractor;
   private readonly _mapper: RainforestApiMapper;
   private readonly _loader: RainforestApiLoader;
@@ -46,7 +46,7 @@ export class RainforestApiPipeline implements Pipeline {
     ) as RainforestApiLoader;
   }
 
-  async executeSource(run: SourceRun) {
+  async executeSource(run: ProviderSourceRun) {
     try {
       const sourceStream = await this._extractor.extractSource(run.source);
       run.sourceDate = sourceStream.runDate;

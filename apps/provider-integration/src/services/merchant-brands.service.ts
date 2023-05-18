@@ -4,51 +4,55 @@ import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Brand } from '../model/brand.entity';
+import { MerchantBrand } from '../model/merchant-brand.entity';
 
 @Injectable()
-export class BrandsService {
+export class MerchantBrandsService {
   constructor(
-    @InjectRepository(Brand) private readonly brandsRepo: Repository<Brand>,
+    @InjectRepository(MerchantBrand)
+    private readonly brandsRepo: Repository<MerchantBrand>,
   ) {}
 
-  async findAll(pageRequest?: PageRequest): Promise<Page<Brand>> {
+  async findAll(pageRequest?: PageRequest): Promise<Page<MerchantBrand>> {
     const [data, count] = await this.brandsRepo.findAndCount({
       ...pageRequest,
     });
-    return buildPage<Brand>(data, count, pageRequest);
+    return buildPage<MerchantBrand>(data, count, pageRequest);
   }
 
-  findOne(id: string): Promise<Brand> {
+  findOne(id: string): Promise<MerchantBrand> {
     return this.brandsRepo.findOne({
       where: { id },
     });
   }
 
   async find(
-    findDto: Partial<Brand>,
+    findDto: Partial<MerchantBrand>,
     pageRequest?: PageRequest,
-  ): Promise<Page<Brand>> {
+  ): Promise<Page<MerchantBrand>> {
     const [data, count] = await this.brandsRepo.findAndCount({
       ...pageRequest,
       where: {
         ...findDto,
       },
     });
-    return buildPage<Brand>(data, count, pageRequest);
+    return buildPage<MerchantBrand>(data, count, pageRequest);
   }
 
-  findOneByProvider(providerId: string, title: string) {
+  findOneByMerchant(merchantId: string, title: string) {
     return this.brandsRepo.findOne({
-      where: { providerId, code: title },
+      where: { merchantId, code: title },
     });
   }
 
-  create(brand: Partial<Brand>): Promise<Brand> {
+  create(brand: Partial<MerchantBrand>): Promise<MerchantBrand> {
     return this.brandsRepo.save(brand);
   }
 
-  async update(id: string, brand: Partial<Brand>): Promise<Brand> {
+  async update(
+    id: string,
+    brand: Partial<MerchantBrand>,
+  ): Promise<MerchantBrand> {
     await this.brandsRepo.save({ id, ...brand });
     return await this.findOne(id);
   }

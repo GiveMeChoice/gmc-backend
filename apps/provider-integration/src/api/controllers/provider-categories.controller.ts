@@ -1,5 +1,5 @@
-import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
-import { ProviderCategoriesService } from '@app/provider-integration/services/provider-categories.service';
+import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
+import { MerchantCategoriesService } from '@app/provider-integration/services/merchant-categories.service';
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
@@ -21,18 +21,18 @@ export class ProviderCategoriesController {
   private readonly logger = new Logger(ProviderCategoriesController.name);
 
   constructor(
-    private readonly providerCategoriesService: ProviderCategoriesService,
+    private readonly providerCategoriesService: MerchantCategoriesService,
   ) {}
 
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-  ): Promise<Page<ProviderCategory>> {
+  ): Promise<Page<MerchantCategory>> {
     return await this.providerCategoriesService.findAll(pageRequest);
   }
 
   @Get(':id')
-  async getOne(@Param('id') id): Promise<ProviderCategory> {
+  async getOne(@Param('id') id): Promise<MerchantCategory> {
     const providerCategory = await this.providerCategoriesService.findOne(id);
     if (!providerCategory) {
       throw new Error(`Provider Category not found: ${id}`);
@@ -45,7 +45,7 @@ export class ProviderCategoriesController {
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateCategoryDto,
-  ): Promise<ProviderCategory> {
+  ): Promise<MerchantCategory> {
     this.logger.debug(`Updating provider category ${id}: ${updateDto}`);
     return this.providerCategoriesService.update(id, updateDto);
   }
@@ -54,7 +54,7 @@ export class ProviderCategoriesController {
   async assign(
     @Param('id') id: string,
     @Query('categoryId') categoryId?: string,
-  ): Promise<ProviderCategory> {
+  ): Promise<MerchantCategory> {
     this.logger.debug(`Updating provider category ${id}: ${categoryId}`);
     return this.providerCategoriesService.assignCategory(id, categoryId);
   }

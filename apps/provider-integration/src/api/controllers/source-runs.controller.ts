@@ -1,5 +1,5 @@
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
-import { SourceRunsService } from '@app/provider-integration/services/source-runs.service';
+import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
+import { ProviderSourceRunsService } from '@app/provider-integration/services/provider-source-runs.service';
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
@@ -18,13 +18,13 @@ import { FindRunsDto } from '../dto/find-runs.dto';
 export class SourceRunsController {
   private readonly logger = new Logger(SourceRunsController.name);
 
-  constructor(private readonly runsService: SourceRunsService) {}
+  constructor(private readonly runsService: ProviderSourceRunsService) {}
 
   @Post('find')
   async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindRunsDto,
-  ): Promise<Page<SourceRun>> {
+  ): Promise<Page<ProviderSourceRun>> {
     this.logger.debug(JSON.stringify(findDto));
     return await this.runsService.find(findDto, pageRequest);
   }
@@ -32,12 +32,12 @@ export class SourceRunsController {
   @Get()
   async getAllRuns(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-  ): Promise<Page<SourceRun>> {
+  ): Promise<Page<ProviderSourceRun>> {
     return await this.runsService.findAll(pageRequest);
   }
 
   @Get(':id')
-  async getRun(@Param('id') id): Promise<SourceRun> {
+  async getRun(@Param('id') id): Promise<ProviderSourceRun> {
     return await this.runsService.findOne(id);
   }
 }

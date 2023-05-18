@@ -18,28 +18,33 @@ import {
 import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
-import { Brand } from '../model/brand.entity';
+import { MerchantBrand } from '../model/merchant-brand.entity';
 import { Category } from '../model/category.entity';
-import { ProductIntegrationStatus } from '../model/enum/product-integration-status.enum';
+import { ProductStatus } from '../model/enum/product-status.enum';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
-import { Label } from '../model/label.entity';
-import { ProductSource } from '../model/product-source.entity';
+import { MerchantLabel } from '../model/merchant-label.entity';
+import { ProviderSource } from '../model/provider-source.entity';
 import { Product } from '../model/product.entity';
-import { ProviderCategory } from '../model/provider-category.entity';
+import { MerchantCategory } from '../model/merchant-category.entity';
 import { Provider } from '../model/provider.entity';
-import { SourceRun } from '../model/source-run.entity';
+import { ProviderSourceRun } from '../model/provider-source-run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
-import { BrandsService } from './brands.service';
+import { MerchantBrandsService } from './merchant-brands.service';
 import { CategoriesService } from './categories.service';
-import { LabelsService } from './labels.service';
-import { ProviderCategoriesService } from './provider-categories.service';
+import { MerchantLabelsService } from './merchant-labels.service';
+import { MerchantCategoriesService } from './merchant-categories.service';
+import { SearchLabelDto } from '@lib/search/dto/search-label.dto';
+import { LabelGroup } from '../model/label-group.entity';
+import { LabelGroupsService } from './label-groups.service';
+import { MerchantsService } from './merchants.service';
 
 const searchRelevantFieldsFindOptions = {
   relations: {
-    labels: true,
-    provider: true,
-    providerCategory: true,
-    brand: true,
+    merchantLabels: true,
+    merchant: true,
+    merchantCategory: true,
+    merchantBrand: true,
+    reviews: true,
   } as FindOptionsRelations<Product>,
   select: {
     id: true,
@@ -52,22 +57,6 @@ const searchRelevantFieldsFindOptions = {
     listImage: true,
     rating: true,
     ratingsTotal: true,
-    provider: {
-      key: true,
-    },
-    labels: {
-      code: true,
-      description: true,
-    },
-    providerCategory: {
-      code: true,
-      description: true,
-      categoryId: true,
-    },
-    brand: {
-      code: true,
-      description: true,
-    },
   } as FindOptionsSelect<Product>,
 };
 
@@ -76,14 +65,15 @@ export class ProductsService {
   private readonly logger = new Logger(ProductsService.name);
 
   constructor(
-    // private readonly messagingService: MessagingService,
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
-    private readonly labelsService: LabelsService,
+    private readonly labelsService: MerchantLabelsService,
     private readonly categoriesService: CategoriesService,
-    @Inject(forwardRef(() => ProviderCategoriesService))
-    private readonly providerCategoryService: ProviderCategoriesService,
-    private readonly brandsService: BrandsService,
+    private readonly labelGroupsService: LabelGroupsService,
+    private readonly merchantsService: MerchantsService,
+    @Inject(forwardRef(() => MerchantCategoriesService))
+    private readonly merchantCategoriesService: MerchantCategoriesService,
+    private readonly brandsService: MerchantBrandsService,
     private readonly messagingService: MessagingService,
     private readonly searchService: SearchService,
   ) {}
@@ -113,19 +103,21 @@ export class ProductsService {
     product: Partial<Product>,
   ): Promise<SearchProductDto> {
     let category: Category = null;
-    if (product.providerCategory.categoryId) {
+    if (product.merchantCategory.categoryId) {
       category = await this.categoriesService.findOne(
-        product.providerCategory.categoryId,
+        product.merchantCategory.categoryId,
       );
     }
     return {
       id: product.shortId,
+      merchantProductId: product.merchantProductId,
+      region: 'UK',
       sku: product.sku,
-      provider: {
-        key: product.provider.key,
-        productId: product.providerProductId,
-        region: 'UK',
-        description: product.provider.description,
+      merchant: {
+        key: product.merchant.key,
+        name: product.merchant.name,
+        description: product.merchant.description,
+        logoUrl: product.merchant.logoUrl,
       },
       title: product.title,
       description: product.description,
@@ -139,15 +131,23 @@ export class ProductsService {
           url: product.mainImage,
         },
       },
-      brand: product.brand.code,
+      brand: {
+        code: product.merchantBrand.code,
+        name: product.merchantBrand.name,
+        description: product.merchantBrand.description,
+        logoUrl: product.merchantBrand.logoUrl,
+        infoLink: product.merchantBrand.infoLink,
+      },
       category: {
-        providerCategory: product.providerCategory.code,
+        merchantCategory: product.merchantCategory.code,
         gmcCategory: await this.mapSearchCategory(
-          product.providerCategory.categoryId,
+          product.merchantCategory.categoryId,
         ),
       },
+      labels: await this.mapSearchLabels(product.merchantLabels),
     };
   }
+
   private async mapSearchCategory(
     categoryId: string,
   ): Promise<SearchCategoryDto> {
@@ -160,7 +160,7 @@ export class ProductsService {
     if (!category) return null;
 
     let nodes: string[] = [];
-    nodes = this.flattenTree(category, nodes);
+    nodes = this.flattenCategoryTree(category, nodes);
     // return nodes;
     const searchCategory: SearchCategoryDto = {
       name: nodes[nodes.length - 1],
@@ -178,15 +178,69 @@ export class ProductsService {
     return searchCategory;
   }
 
-  private flattenTree(node: Category, nodes: string[]): string[] {
-    nodes.push(node.name);
+  private async mapSearchLabels(
+    merchantLabels: MerchantLabel[],
+  ): Promise<SearchLabelDto[]> {
+    const labels = [];
+    this.logger.debug(merchantLabels.length);
+    for (const merchantLabel of merchantLabels) {
+      const label: SearchLabelDto = {
+        merchantLabel: {
+          code: merchantLabel.code,
+          name: merchantLabel.name,
+          description: merchantLabel.description,
+          logoUrl: merchantLabel.logoUrl,
+          infoLink: merchantLabel.infoLink,
+        },
+      };
+      this.logger.debug(`mapping label ${merchantLabel.code}`);
+      if (merchantLabel.groupId) {
+        const group = (await this.labelGroupsService.findAncestors(
+          merchantLabel.groupId,
+          true,
+        )) as LabelGroup;
+        if (group) {
+          let nodes = [];
+          nodes = this.flattenLabelGroupTree(group, nodes);
+          label.group = {
+            name: nodes[nodes.length - 1].name,
+            description: nodes[nodes.length - 1].description,
+            ...(nodes.length > 1 && {
+              sublabel: {
+                name: nodes[nodes.length - 2].name,
+                description: nodes[nodes.length - 2].description,
+                ...(nodes.length > 2 && {
+                  sublabel: {
+                    name: nodes[nodes.length - 3].name,
+                    description: nodes[nodes.length - 3].description,
+                  },
+                }),
+              },
+            }),
+          };
+        }
+      }
+      labels.push(label);
+    }
+    return labels;
+  }
+
+  private flattenCategoryTree(node: Category, flattened: string[]): string[] {
+    flattened.push(node.name);
     return node.parent && node.parent.name !== 'Root'
-      ? this.flattenTree(node.parent, nodes)
-      : nodes;
+      ? this.flattenCategoryTree(node.parent, flattened)
+      : flattened;
+  }
+
+  private flattenLabelGroupTree(node: LabelGroup, flattened: any[]): any[] {
+    flattened.push({ name: node.name, description: node.description });
+    return node.parent && node.parent.name !== 'Root'
+      ? this.flattenLabelGroupTree(node.parent, flattened)
+      : flattened;
   }
 
   async indexProductBatchAsync(findDto: Partial<Product>) {
-    findDto.integrationStatus = ProductIntegrationStatus.LIVE;
+    findDto.integrationStatus = ProductStatus.LIVE;
     const BATCH_SIZE = 30;
     const pageRequest: PageRequest = { skip: 0, take: BATCH_SIZE };
     let page = await this.findIds(findDto, pageRequest);
@@ -255,7 +309,7 @@ export class ProductsService {
       },
       relations: {
         source: true,
-        providerCategory: {
+        merchantCategory: {
           category: true,
         },
       },
@@ -297,19 +351,19 @@ export class ProductsService {
     );
   }
 
-  async existsByProvider(
-    providerId: string,
-    providerProductId: string,
+  async existsByMerchant(
+    merchantId: string,
+    merchantProductId: string,
   ): Promise<boolean> {
     return (
-      providerId &&
-      providerProductId &&
+      merchantId &&
+      merchantProductId &&
       (await this.productsRepo
         .createQueryBuilder('product')
         .select('product.id')
-        .where('product.providerId = :providerId', { providerId })
-        .andWhere('product.providerProductId = :providerProductId', {
-          providerProductId,
+        .where('product.merchantId = :merchantId', { merchantId })
+        .andWhere('product.merchantProductId = :merchantProductId', {
+          merchantProductId,
         })
         .getRawOne())
     );
@@ -327,7 +381,7 @@ export class ProductsService {
       .createQueryBuilder()
       .update(Product)
       .set({
-        integrationStatus: ProductIntegrationStatus.EXPIRED,
+        integrationStatus: ProductStatus.EXPIRED,
         expiresAt: null,
       })
       .where('expiresAt < :now', { now: new Date() })
@@ -340,30 +394,35 @@ export class ProductsService {
       .createQueryBuilder()
       .update(Product)
       .set({
-        integrationStatus: ProductIntegrationStatus.REMAP,
+        integrationStatus: ProductStatus.REMAP,
       })
       .where('providerId = :id', { id })
       .andWhere('integrationStatus != :expired', {
-        expired: ProductIntegrationStatus.EXPIRED,
+        expired: ProductStatus.EXPIRED,
       })
       .execute();
     return raw.affected;
   }
 
-  findByProvider(
-    providerId: string,
-    providerProductId?: string,
+  findByMerchant(
+    merchantId: string,
+    merchantProductId?: string,
   ): Promise<Product> {
     return this.productsRepo.findOneBy({
-      providerId,
-      providerProductId,
+      merchantId,
+      merchantProductId,
     });
   }
 
   findOne(id: string): Promise<Product> {
     return this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
-      relations: { provider: true, source: true },
+      relations: {
+        merchant: true,
+        source: {
+          provider: true,
+        },
+      },
     });
   }
 
@@ -372,25 +431,25 @@ export class ProductsService {
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {
         reviews: true,
-        labels: true,
+        merchantLabels: true,
         source: true,
-        provider: true,
-        providerCategory: true,
-        brand: true,
+        merchant: true,
+        merchantCategory: true,
+        merchantBrand: true,
       },
       select: {
         source: {
           identifier: true,
           description: true,
         },
-        provider: {
+        merchant: {
           key: true,
         },
       },
     });
   }
 
-  async getStatus(id: string): Promise<ProductIntegrationStatus> {
+  async getStatus(id: string): Promise<ProductStatus> {
     const { integrationStatus: status } = await this.productsRepo.findOne({
       select: {
         integrationStatus: true,
@@ -402,41 +461,57 @@ export class ProductsService {
     return status;
   }
 
-  async create(toCreate: Partial<Product>, run: SourceRun): Promise<Product> {
-    if (
-      !this.existsByProvider(run.source.providerId, toCreate.providerProductId)
-    ) {
+  async create(
+    product: Partial<Product>,
+    run: ProviderSourceRun,
+  ): Promise<Product> {
+    // check Merchant mapped from provider
+    if (!product.merchant || !product.merchant.key) {
+      throw new Error(`Merchant not mapped by provider! (Run ID: ${run.id}`);
+    }
+    product.merchant = await this.merchantsService.findOneByKey(
+      product.merchant.key,
+    );
+    if (!product.merchant.id) {
       throw new Error(
-        `Provider ${run.source.providerId} product ${toCreate.providerProductId} already exists!`,
+        `Merchant not found! (Key: ${product.merchant.key}) (Run ID: ${run.id})`,
       );
     }
-    toCreate.provider = run.source.provider;
-    toCreate.source = run.source;
-    toCreate.createdByRunId = run.id;
-    toCreate.keepAliveCount = 0;
-    toCreate.expiresAt = await this.renewExpirationDate(
+    // check product is new
+    if (
+      !this.existsByMerchant(run.source.providerId, product.merchantProductId)
+    ) {
+      throw new Error(
+        `Provider ${run.source.providerId} product ${product.merchantProductId} already exists!`,
+      );
+    }
+    // ok lets go!
+    product.source = run.source;
+    product.createdByRunId = run.id;
+    product.keepAliveCount = 0;
+    product.expiresAt = await this.renewExpirationDate(
       run.source.provider,
       run.source,
     );
-    if (toCreate.providerCategory) {
-      toCreate.providerCategory = await this.normalizeCategory(
-        run.source.providerId,
-        toCreate.providerCategory,
+    if (product.merchantCategory) {
+      product.merchantCategory = await this.normalizeCategory(
+        product.merchant.id,
+        product.merchantCategory,
       );
     }
-    if (toCreate.brand) {
-      toCreate.brand = await this.normalizeBrand(
-        run.source.providerId,
-        toCreate.brand,
+    if (product.merchantBrand) {
+      product.merchantBrand = await this.normalizeBrand(
+        product.merchant.id,
+        product.merchantBrand,
       );
     }
-    if (toCreate.labels) {
-      toCreate.labels = await this.normalizeLabels(
-        run.source.providerId,
-        toCreate.labels,
+    if (product.merchantLabels) {
+      product.merchantLabels = await this.normalizeLabels(
+        product.merchant.id,
+        product.merchantLabels,
       );
     }
-    return await this.productsRepo.save(Product.factory(toCreate));
+    return await this.productsRepo.save(Product.factory(product));
   }
 
   async update(
@@ -446,38 +521,48 @@ export class ProductsService {
   ): Promise<Product> {
     let expirationDate;
     if (renewExpiration) {
-      const { provider, source } = await this.productsRepo.findOne({
+      const { source } = await this.productsRepo.findOne({
         where: {
           id,
         },
         select: {
-          provider: {
-            expirationHours: true,
-          },
           source: {
             expirationHours: true,
+            provider: {
+              expirationHours: true,
+            },
           },
         },
       });
-      expirationDate = this.renewExpirationDate(provider, source);
+      expirationDate = this.renewExpirationDate(source.provider, source);
     }
 
-    if (updates.providerCategory || updates.brand || updates.labels) {
-      const { providerId } = await this.productsRepo.findOne({
+    if (
+      updates.merchantCategory ||
+      updates.merchantBrand ||
+      updates.merchantLabels
+    ) {
+      const { merchantId: providerId } = await this.productsRepo.findOne({
         where: { id },
-        select: { providerId: true },
+        select: { merchantId: true },
       });
-      if (updates.providerCategory) {
-        updates.providerCategory = await this.normalizeCategory(
+      if (updates.merchantCategory) {
+        updates.merchantCategory = await this.normalizeCategory(
           providerId,
-          updates.providerCategory,
+          updates.merchantCategory,
         );
       }
-      if (updates.brand) {
-        updates.brand = await this.normalizeBrand(providerId, updates.brand);
+      if (updates.merchantBrand) {
+        updates.merchantBrand = await this.normalizeBrand(
+          providerId,
+          updates.merchantBrand,
+        );
       }
-      if (updates.labels) {
-        updates.labels = await this.normalizeLabels(providerId, updates.labels);
+      if (updates.merchantLabels) {
+        updates.merchantLabels = await this.normalizeLabels(
+          providerId,
+          updates.merchantLabels,
+        );
       }
     }
     await this.productsRepo.save({
@@ -500,7 +585,7 @@ export class ProductsService {
   async refresh(
     id: string,
     updates: Partial<Product>,
-    source: ProductSource,
+    source: ProviderSource,
     runId: string,
     reason: ProductRefreshReason,
   ) {
@@ -513,7 +598,7 @@ export class ProductsService {
       updates.expiresAt = this.renewExpirationDate(source.provider, source);
       updates.keepAliveCount = 0;
       updates.refreshedByRunId = runId;
-      updates.integrationStatus = ProductIntegrationStatus.LIVE;
+      updates.integrationStatus = ProductStatus.LIVE;
       const product = await this.update(id, updates);
       await this.indexProductAsync(product.id);
       return product;
@@ -524,7 +609,7 @@ export class ProductsService {
     }
   }
 
-  async keepAlive(product: Product, run: SourceRun) {
+  async keepAlive(product: Product, run: ProviderSourceRun) {
     product.keepAliveCount++;
     product.expiresAt = this.renewExpirationDate(
       run.source.provider,
@@ -533,7 +618,10 @@ export class ProductsService {
     await this.productsRepo.save(product);
   }
 
-  private renewExpirationDate(provider: Provider, source: ProductSource): Date {
+  private renewExpirationDate(
+    provider: Provider,
+    source: ProviderSource,
+  ): Date {
     if (source && source.expirationHours) {
       return moment().add(source.runIntervalHours, 'hours').toDate();
     } else if (provider && provider.expirationHours) {
@@ -544,42 +632,44 @@ export class ProductsService {
   }
 
   private async normalizeCategory(
-    providerId: string,
-    category: ProviderCategory,
-  ): Promise<ProviderCategory> {
+    merchantId: string,
+    category: MerchantCategory,
+  ): Promise<MerchantCategory> {
     if (category.id) {
       return category;
     } else {
-      const existing = await this.providerCategoryService.findOneByProvider(
-        providerId,
+      const existing = await this.merchantCategoriesService.findOneByMerchant(
+        merchantId,
         category.code,
       );
       return existing
         ? existing
-        : ProviderCategory.factory(providerId, category.code, category);
+        : MerchantCategory.factory(merchantId, category.code, category);
     }
   }
 
   private async normalizeBrand(
-    providerId: string,
-    brand: Brand,
-  ): Promise<Brand> {
+    merchantId: string,
+    brand: MerchantBrand,
+  ): Promise<MerchantBrand> {
     if (brand.id) {
       return brand;
     } else {
-      const existing = await this.brandsService.findOneByProvider(
-        providerId,
+      const existing = await this.brandsService.findOneByMerchant(
+        merchantId,
         brand.code,
       );
-      return existing ? existing : Brand.factory(providerId, brand.code, brand);
+      return existing
+        ? existing
+        : MerchantBrand.factory(merchantId, brand.code, brand);
     }
   }
 
   private async normalizeLabels(
-    providerId: string,
-    rawLabels: Label[],
-  ): Promise<Label[]> {
-    const labels: Label[] = [];
+    merchantId: string,
+    rawLabels: MerchantLabel[],
+  ): Promise<MerchantLabel[]> {
+    const labels: MerchantLabel[] = [];
     for (const label of rawLabels) {
       if (labels.find((l) => l.code === label.code)) {
         // remove duplicates
@@ -588,8 +678,8 @@ export class ProductsService {
         // label was already on product, dont mess with it
         labels.push(label);
       } else {
-        const existing = await this.labelsService.findOneByProvider(
-          providerId,
+        const existing = await this.labelsService.findOneByMerchant(
+          merchantId,
           label.code,
         );
         if (existing) {
@@ -597,7 +687,7 @@ export class ProductsService {
           labels.push(existing);
         } else {
           // create new label
-          labels.push(Label.factory(providerId, label.code, label));
+          labels.push(MerchantLabel.factory(merchantId, label.code, label));
         }
       }
     }

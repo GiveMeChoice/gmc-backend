@@ -5,11 +5,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ProductSource } from './product-source.entity';
+import { ProviderSource } from './provider-source.entity';
 
 @Entity({ name: 'pi_source_run' })
-export class SourceRun {
-  constructor(source: ProductSource) {
+export class ProviderSourceRun {
+  constructor(source: ProviderSource) {
     this.source = source;
   }
 
@@ -19,11 +19,11 @@ export class SourceRun {
   @Column({ name: 'source_id' })
   readonly sourceId: string;
 
-  @ManyToOne(() => ProductSource, (source: ProductSource) => source.runs, {
+  @ManyToOne(() => ProviderSource, (source: ProviderSource) => source.runs, {
     cascade: true,
   })
   @JoinColumn({ name: 'source_id' })
-  source: ProductSource;
+  source: ProviderSource;
 
   @Column({ name: 'found_count', default: 0 })
   foundCount: number;
@@ -73,7 +73,7 @@ export class SourceRun {
   @Column({ name: 'error_message', nullable: true })
   errorMessage?: string;
 
-  public static factory(source: ProductSource) {
-    return new SourceRun(source);
+  public static factory(source: ProviderSource) {
+    return new ProviderSourceRun(source);
   }
 }

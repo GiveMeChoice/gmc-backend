@@ -1,12 +1,14 @@
-import { Brand } from '@app/provider-integration/model/brand.entity';
-import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
+import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
+import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { Label } from '@app/provider-integration/model/label.entity';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
-import { Review } from '@app/provider-integration/model/review.entity';
+import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
+import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
+import { Merchant } from '@app/provider-integration/model/merchant.entity';
+import { ProductReview } from '@app/provider-integration/model/product-review.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../exception/pipeline.error';
 import { Mapper } from '../../mapper/mapper.interface';
 import {
@@ -22,16 +24,19 @@ import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto
 export class RainforestApiMapper
   implements Mapper<RainforestApiSourceItemDto, RainforestApiProductDto>
 {
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
 
-  mapSourceItem(item: RainforestApiSourceItemDto): ProductDataDto {
+  mapSourceItem(item: RainforestApiSourceItemDto): ProviderProductDataDto {
     try {
-      const product: ProductDataDto = {
-        providerProductId: item.result.category_results.asin,
+      const product: ProviderProductDataDto = {
+        merchant: {
+          key: MerchantKey.AMAZON_UK,
+        } as Merchant,
+        merchantProductId: item.result.category_results.asin,
+        price: Number(item.result.category_results.price.value),
+        listImage: item.result.category_results.image,
+        offerLink: item.result.category_results.link,
       };
-      product.price = Number(item.result.category_results.price.value);
-      product.listImage = item.result.category_results.image;
-      product.offerLink = item.result.category_results.link;
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
@@ -40,30 +45,33 @@ export class RainforestApiMapper
 
   mapProductDetail(
     data: RainforestApiProductDto,
-    source: ProductSource,
-  ): ProductDataDto {
+    source: ProviderSource,
+  ): ProviderProductDataDto {
     try {
-      const product: ProductDataDto = {};
-      product.sku = data.product.asin;
-      product.title = data.product.title;
-      product.rating = data.product.rating;
-      product.ratingsTotal = data.product.ratings_total;
-      product.offerLink = data.product.link;
-      product.price = data.product.buybox_winner.price.value;
-      product.shippingPrice = this.mapShippingPrice(
-        data.product.buybox_winner.shipping,
-      );
-      product.currency = data.product.buybox_winner.price.currency;
-      product.mainImage = data.product.main_image.link;
-      product.secondaryImage = this.mapSecondaryImage(data.product.images);
-      product.description = this.mapDescription(data);
-      product.brand = this.mapBrand(data.product.brand) as Brand;
-      product.providerCategory = this.mapProviderCategory(
-        data.product.categories_flat,
-        source,
-      ) as ProviderCategory;
-      product.reviews = this.mapReviews(data.product.top_reviews) as Review[];
-      product.labels = this.mapLabels(data.climate_pledge_friendly) as Label[];
+      const product: ProviderProductDataDto = {
+        sku: data.product.asin,
+        title: data.product.title,
+        rating: data.product.rating,
+        ratingsTotal: data.product.ratings_total,
+        offerLink: data.product.link,
+        price: data.product.buybox_winner.price.value,
+        shippingPrice: this.mapShippingPrice(
+          data.product.buybox_winner.shipping,
+        ),
+        currency: data.product.buybox_winner.price.currency,
+        mainImage: data.product.main_image.link,
+        secondaryImage: this.mapSecondaryImage(data.product.images),
+        description: this.mapDescription(data),
+        merchantBrand: this.mapBrand(data.product.brand) as MerchantBrand,
+        merchantCategory: this.mapMerchantCategory(
+          data.product.categories_flat,
+          source,
+        ) as MerchantCategory,
+        reviews: this.mapReviews(data.product.top_reviews) as ProductReview[],
+        merchantLabels: this.mapMerchantLabels(
+          data.climate_pledge_friendly,
+        ) as MerchantLabel[],
+      };
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
@@ -107,17 +115,17 @@ export class RainforestApiMapper
     return data.product.description.trim();
   }
 
-  private mapBrand(brandName: string): Partial<Brand> {
+  private mapBrand(brandName: string): Partial<MerchantBrand> {
     return {
       code: normalizeIdCode(brandName),
-      description: brandName,
+      name: brandName,
     };
   }
 
-  private mapProviderCategory(
+  private mapMerchantCategory(
     categoriesFlat: string,
-    source: ProductSource,
-  ): Partial<ProviderCategory> {
+    source: ProviderSource,
+  ): Partial<MerchantCategory> {
     return categoriesFlat
       ? {
           code: categoriesFlat
@@ -139,7 +147,7 @@ export class RainforestApiMapper
 
   private mapReviews(
     topReviews: RainforestApiTopReviewDto[],
-  ): Partial<Review>[] {
+  ): Partial<ProductReview>[] {
     const reviews = !topReviews
       ? []
       : topReviews.map((review) => ({
@@ -162,14 +170,15 @@ export class RainforestApiMapper
     }
   }
 
-  private mapLabels(
+  private mapMerchantLabels(
     climatePledge: RainforestApiClimatePledgeFriendlyDto,
-  ): Partial<Label>[] {
+  ): Partial<MerchantLabel>[] {
     return [
       {
         code: normalizeIdCode(climatePledge.text),
+        name: climatePledge.text,
         description: climatePledge.text,
-        icon: climatePledge.image,
+        logoUrl: climatePledge.image,
       },
     ];
   }

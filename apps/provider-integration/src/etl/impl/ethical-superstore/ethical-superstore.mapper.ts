@@ -1,10 +1,10 @@
-import { Brand } from '@app/provider-integration/model/brand.entity';
-import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
+import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
+import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { Label } from '@app/provider-integration/model/label.entity';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
-import { ProviderCategory } from '@app/provider-integration/model/provider-category.entity';
-import { Review } from '@app/provider-integration/model/review.entity';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
+import { ProductReview } from '@app/provider-integration/model/product-review.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
@@ -17,22 +17,27 @@ import {
 } from './dto/ethical-superstore-product.dto';
 import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
 import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
+import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
+import { Merchant } from '@app/provider-integration/model/merchant.entity';
 
 @Injectable()
 export class EthicalSuperstoreMapper
   implements
     Mapper<EthicalSuperstoreSourceItemDto, EthicalSuperstoreProductDto>
 {
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
 
-  mapSourceItem(item: EthicalSuperstoreSourceItemDto): ProductDataDto {
+  mapSourceItem(item: EthicalSuperstoreSourceItemDto): ProviderProductDataDto {
     try {
-      const product: ProductDataDto = {
-        providerProductId: item.id,
+      const product: ProviderProductDataDto = {
+        merchant: {
+          key: MerchantKey.ETHICAL_SUPERSTORE,
+        } as Merchant,
+        merchantProductId: item.id,
+        price: item.price ? Number(item.price) : null,
+        listImage: item.image,
+        offerLink: `${ETHICAL_SUPERSTORE_BASE_URL}${item.href}`,
       };
-      product.price = item.price ? Number(item.price) : null;
-      product.listImage = item.image;
-      product.offerLink = `${ETHICAL_SUPERSTORE_BASE_URL}${item.href}`;
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
@@ -41,10 +46,10 @@ export class EthicalSuperstoreMapper
 
   mapProductDetail(
     data: EthicalSuperstoreProductDto,
-    source: ProductSource,
-  ): ProductDataDto {
+    source: ProviderSource,
+  ): ProviderProductDataDto {
     try {
-      const product: ProductDataDto = {
+      const product: ProviderProductDataDto = {
         ...this.mapImages(data),
       };
       product.sku = this.mapSku(data);
@@ -68,17 +73,19 @@ export class EthicalSuperstoreMapper
       product.price = data.productInfo.price.price;
       product.shippingPrice = product.price > 50 ? 0 : 4.95;
       product.currency = data.productInfo.price.currency;
-      product.brand = this.mapBrand(data) as Brand;
-      product.providerCategory = this.mapCategory(source) as ProviderCategory;
-      product.reviews = this.mapReviews(data.reviews) as Review[];
-      product.labels = this.mapLabels(data.ethicsAndTags) as Label[];
+      product.merchantBrand = this.mapBrand(data) as MerchantBrand;
+      product.merchantCategory = this.mapCategory(source) as MerchantCategory;
+      product.reviews = this.mapReviews(data.reviews) as ProductReview[];
+      product.merchantLabels = this.mapLabels(
+        data.ethicsAndTags,
+      ) as MerchantLabel[];
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
     }
   }
 
-  private mapImages(data: EthicalSuperstoreProductDto): ProductDataDto {
+  private mapImages(data: EthicalSuperstoreProductDto): ProviderProductDataDto {
     const primary = data.images.find((img) => img.isPrimary);
     const secondary = data.images.find((img) => !img.isPrimary);
     return {
@@ -94,19 +101,19 @@ export class EthicalSuperstoreMapper
       : null;
   }
 
-  private mapBrand(data: EthicalSuperstoreProductDto): Partial<Brand> {
+  private mapBrand(data: EthicalSuperstoreProductDto): Partial<MerchantBrand> {
     const brand = data.productInfo.brand
       ? data.productInfo.brand
       : data.manufacturer.name;
     return {
       code: normalizeIdCode(brand),
-      description: brand,
-      info: data.manufacturer ? data.manufacturer.description : null,
-      logo: data.manufacturer ? data.manufacturer.logo : null,
+      name: brand,
+      description: data.manufacturer ? data.manufacturer.description : null,
+      logoUrl: data.manufacturer ? data.manufacturer.logo : null,
     };
   }
 
-  private mapCategory(source: ProductSource): Partial<ProviderCategory> {
+  private mapCategory(source: ProviderSource): Partial<MerchantCategory> {
     return {
       code: source.identifier
         .split('/')
@@ -134,15 +141,18 @@ export class EthicalSuperstoreMapper
     };
   }
 
-  private mapReviews(reviews: EthicalSuperstoreReviewDto[]): Partial<Review>[] {
+  private mapReviews(
+    reviews: EthicalSuperstoreReviewDto[],
+  ): Partial<ProductReview>[] {
     return reviews;
   }
 
   private mapLabels(
     ethicsAndTags: EthicalSuperstoreEthicsAndTagsDto[],
-  ): Partial<Label>[] {
+  ): Partial<MerchantLabel>[] {
     return ethicsAndTags.map((tag) => ({
       code: normalizeIdCode(tag.title),
+      name: tag.title,
       description: tag.title,
       infoLink: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.href}`,
       icon: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.icon}`,

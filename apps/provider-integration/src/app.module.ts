@@ -12,7 +12,7 @@ import { CategoryController } from './api/controllers/categories.controller';
 import { EtlController } from './api/controllers/etl.controller';
 import { JobsController } from './api/controllers/jobs.controller';
 import { LabelGroupsController } from './api/controllers/label-groups.controller';
-import { LabelsController } from './api/controllers/labels.controller';
+import { MerchantLabelsController } from './api/controllers/labels.controller';
 import { SourceRunsController } from './api/controllers/source-runs.controller';
 import { ProductSourcesController } from './api/controllers/product-sources.controller';
 import { ProductsController } from './api/controllers/products.controller';
@@ -25,29 +25,32 @@ import { EtlModule } from './etl/etl.module';
 import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { SourceDueMonitorJob } from './jobs/source-due-monitor.job';
-import { Brand } from './model/brand.entity';
+import { MerchantBrand } from './model/merchant-brand.entity';
 import { Category } from './model/category.entity';
-import { ProviderCategory } from './model/provider-category.entity';
+import { MerchantCategory } from './model/merchant-category.entity';
 import { LabelGroup } from './model/label-group.entity';
-import { Label } from './model/label.entity';
-import { SourceRun } from './model/source-run.entity';
-import { ProductSource } from './model/product-source.entity';
+import { MerchantLabel } from './model/merchant-label.entity';
+import { ProviderSourceRun } from './model/provider-source-run.entity';
+import { ProviderSource } from './model/provider-source.entity';
 import { Product } from './model/product.entity';
 import { Provider } from './model/provider.entity';
-import { Review } from './model/review.entity';
-import { BrandsService } from './services/brands.service';
-import { ProviderCategoriesService } from './services/provider-categories.service';
+import { ProductReview } from './model/product-review.entity';
+import { MerchantBrandsService } from './services/merchant-brands.service';
+import { MerchantCategoriesService } from './services/merchant-categories.service';
 import { CategoriesService } from './services/categories.service';
 import { EtlService } from './services/etl.service';
 import { JobsService } from './services/jobs.service';
 import { LabelGroupsService } from './services/label-groups.service';
-import { LabelsService } from './services/labels.service';
-import { SourceRunsService } from './services/source-runs.service';
-import { ProductSourcesService } from './services/product-sources.service';
+import { MerchantLabelsService } from './services/merchant-labels.service';
+import { ProviderSourceRunsService } from './services/provider-source-runs.service';
+import { ProviderSourcesService } from './services/provider-sources.service';
 import { ProductsService } from './services/products.service';
 import { ProvidersService } from './services/providers.service';
 import { TasksService } from './services/tasks.service';
 import { PingController } from './api/controllers/ping.controller';
+import { Merchant } from './model/merchant.entity';
+import { MerchantsController } from './api/controllers/merchant.controller';
+import { MerchantsService } from './services/merchants.service';
 
 @Module({
   imports: [
@@ -58,15 +61,16 @@ import { PingController } from './api/controllers/ping.controller';
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
       Provider,
-      ProductSource,
-      SourceRun,
+      ProviderSource,
+      ProviderSourceRun,
       Product,
-      Label,
+      MerchantLabel,
       LabelGroup,
-      ProviderCategory,
+      MerchantCategory,
       Category,
-      Brand,
-      Review,
+      MerchantBrand,
+      ProductReview,
+      Merchant,
     ]),
     DatabaseModule,
     MessagingModule,
@@ -79,13 +83,14 @@ import { PingController } from './api/controllers/ping.controller';
     ProvidersController,
     ProductSourcesController,
     SourceRunsController,
-    LabelsController,
+    MerchantLabelsController,
     LabelGroupsController,
     ProviderCategoriesController,
     CategoryController,
     BrandsController,
     JobsController,
     ProductsController,
+    MerchantsController,
   ],
   providers: [
     // messaging
@@ -96,14 +101,15 @@ import { PingController } from './api/controllers/ping.controller';
     // core services
     EtlService,
     ProvidersService,
-    ProductSourcesService,
-    SourceRunsService,
+    ProviderSourcesService,
+    ProviderSourceRunsService,
     ProductsService,
-    LabelsService,
+    MerchantLabelsService,
     LabelGroupsService,
-    ProviderCategoriesService,
+    MerchantCategoriesService,
     CategoriesService,
-    BrandsService,
+    MerchantBrandsService,
+    MerchantsService,
     // helper services
     JobsService,
     TasksService,
@@ -121,8 +127,8 @@ import { PingController } from './api/controllers/ping.controller';
   ],
   exports: [
     ProvidersService,
-    ProductSourcesService,
-    SourceRunsService,
+    ProviderSourcesService,
+    ProviderSourceRunsService,
     ProductsService,
   ],
 })

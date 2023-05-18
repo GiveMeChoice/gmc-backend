@@ -40,7 +40,7 @@ const logger = new Logger('MessagingModule');
               prefetchCount:
                 configService.get<number>(
                   'rabbitmq.prefetch-count.channel-high',
-                ) || 10,
+                ) || 40,
             },
           },
           uri: configService.get('rabbitmq.uri'),

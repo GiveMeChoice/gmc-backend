@@ -1,0 +1,36 @@
+{
+  "name": "Root",
+  "children": [
+    {
+      "name": "Certifications",
+      "description": "Sustainable practices and/or impact have been certified by a third-party organization",
+      "children": []
+    },
+    {
+      "name": "Origin",
+      "description": "Product was partially or wholly produced in this country/region",
+      "children": [
+        {
+          "name": "China",
+          "description": "Made in China",
+          "children": []
+        },
+        {
+          "name": "Italy",
+          "description": "Made in Italy",
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Substance-Free",
+      "description": "Product does not contain one or more specific harmful substances",
+      "children": []
+    },
+    {
+      "name": "Uncategorized",
+      "description": "Label has yet to be categorized",
+      "children": []
+    }
+  ]
+}

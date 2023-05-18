@@ -1,4 +1,4 @@
-export enum ProductIntegrationStatus {
+export enum ProductStatus {
   PENDING = 'PENDING',
   LIVE = 'LIVE',
   REMAP = 'REMAP',

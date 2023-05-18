@@ -1,6 +1,5 @@
 import { Category } from '@app/provider-integration/model/category.entity';
 import { CategoriesService } from '@app/provider-integration/services/categories.service';
-import { SearchCategoryDto } from '@lib/search/dto/search-category.dto';
 import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
 
 @Controller('categories')

@@ -1,32 +1,28 @@
+import { SearchBrandDto } from './search-brand.dto';
 import { SearchCategoryDto } from './search-category.dto';
 import { SearchImageDto } from './search-image.dto';
 import { SearchLabelDto } from './search-label.dto';
+import { SearchMerchantDto } from './search-merchant.dto';
 
 export interface SearchProductDto {
   id?: string;
+  region?: string;
+  merchantProductId?: string;
   sku?: string;
-  provider?: {
-    key?: string;
-    productId?: string;
-    region?: string;
-    description?: string;
-  };
   title?: string;
   description?: string;
   price?: number;
   offerLink?: string;
+  merchant?: SearchMerchantDto;
   images?: {
     list?: SearchImageDto;
     detail?: SearchImageDto;
     other?: SearchImageDto[];
   };
-  brand?: string;
+  brand?: SearchBrandDto;
   category?: {
-    providerCategory?: string;
+    merchantCategory?: string;
     gmcCategory?: SearchCategoryDto;
   };
-  label?: {
-    providerLabel?: string;
-    gmcLabel?: SearchLabelDto;
-  }[];
+  labels?: SearchLabelDto[];
 }

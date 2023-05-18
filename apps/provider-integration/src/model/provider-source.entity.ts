@@ -8,13 +8,13 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { ProductSourceStatus } from './enum/product-source-status';
+import { ProviderSourceStatus } from './enum/provider-source-status';
 import { Product } from './product.entity';
-import { SourceRun } from './source-run.entity';
+import { ProviderSourceRun } from './provider-source-run.entity';
 
-@Entity({ name: 'pi_product_source' })
+@Entity({ name: 'pi_provider_source' })
 @Unique(['providerId', 'identifier'])
-export class ProductSource {
+export class ProviderSource {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
@@ -26,11 +26,11 @@ export class ProductSource {
 
   @Column({
     type: 'enum',
-    enum: ProductSourceStatus,
+    enum: ProviderSourceStatus,
     enumName: 'pi_product_source_status_enum',
-    default: ProductSourceStatus.READY,
+    default: ProviderSourceStatus.READY,
   })
-  status: ProductSourceStatus;
+  status: ProviderSourceStatus;
 
   @Column({ nullable: true })
   description?: string;
@@ -62,8 +62,8 @@ export class ProductSource {
   @Column({ name: 'source_link', nullable: true })
   sourceLink?: string;
 
-  @OneToMany(() => SourceRun, (run: SourceRun) => run.source)
-  runs: SourceRun[];
+  @OneToMany(() => ProviderSourceRun, (run: ProviderSourceRun) => run.source)
+  runs: ProviderSourceRun[];
 
   @OneToMany(() => Product, (product: Product) => product.source)
   products: Product[];

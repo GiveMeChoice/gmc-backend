@@ -13,25 +13,25 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { shortId } from '../utils/short-id';
-import { Brand } from './brand.entity';
-import { ProviderCategory } from './provider-category.entity';
+import { MerchantBrand } from './merchant-brand.entity';
+import { ProductStatus } from './enum/product-status.enum';
 import { ProductRefreshReason } from './enum/product-refresh-reason.enum';
-import { ProductIntegrationStatus } from './enum/product-integration-status.enum';
-import { Label } from './label.entity';
-import { ProductSource } from './product-source.entity';
-import { Provider } from './provider.entity';
-import { Review } from './review.entity';
+import { MerchantCategory } from './merchant-category.entity';
+import { MerchantLabel } from './merchant-label.entity';
+import { Merchant } from './merchant.entity';
+import { ProviderSource } from './provider-source.entity';
+import { ProductReview } from './product-review.entity';
 
 @Entity({ name: 'gmc_product' })
-@Index(['providerId', 'providerProductId'], { unique: true })
+@Index(['merchantId', 'merchantProductId'], { unique: true })
 @Unique(['shortId'])
 export class Product {
-  constructor(providerId: string, providerProductId: string) {
-    this.providerId = providerId;
-    this.providerProductId = providerProductId;
+  constructor(merchantId: string, merchantProductId: string) {
+    this.merchantId = merchantId;
+    this.merchantProductId = merchantProductId;
   }
   public static factory(data: Partial<Product>) {
-    const product = new Product(data.provider.id, data.providerProductId);
+    const product = new Product(data.merchant.id, data.merchantProductId);
     product.shortId = shortId();
     Object.assign(product, data);
     return product;
@@ -44,11 +44,11 @@ export class Product {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
-  @Column({ name: 'provider_id' })
-  readonly providerId: string;
+  @Column({ name: 'merchant_id' })
+  readonly merchantId: string;
 
-  @Column({ name: 'provider_product_id' })
-  readonly providerProductId: string;
+  @Column({ name: 'merchant_product_id' })
+  readonly merchantProductId: string;
 
   @Column({ name: 'short_id' })
   shortId: string;
@@ -67,9 +67,9 @@ export class Product {
   })
   updatedAt: Date;
 
-  @ManyToOne(() => Provider, (provider: Provider) => provider.products)
-  @JoinColumn({ name: 'provider_id' })
-  provider: Provider;
+  @ManyToOne(() => Merchant, (merchant: Merchant) => merchant.products)
+  @JoinColumn({ name: 'merchant_id' })
+  merchant: Merchant;
 
   /* 
   ///////////////////////
@@ -79,10 +79,10 @@ export class Product {
   @Column({
     name: 'integration_status',
     type: 'enum',
-    enum: ProductIntegrationStatus,
+    enum: ProductStatus,
     enumName: 'gmc_product_integration_status_enum',
   })
-  integrationStatus: ProductIntegrationStatus;
+  integrationStatus: ProductStatus;
 
   @Column({ name: 'source_id' })
   readonly sourceId: string;
@@ -120,9 +120,9 @@ export class Product {
   @Column({ name: 'error_message', nullable: true })
   errorMessage: string;
 
-  @ManyToOne(() => ProductSource, (source: ProductSource) => source.products)
+  @ManyToOne(() => ProviderSource, (source: ProviderSource) => source.products)
   @JoinColumn({ name: 'source_id' })
-  source: ProductSource;
+  source: ProviderSource;
 
   /* 
   ///////////////////////
@@ -176,25 +176,25 @@ export class Product {
   @Column({ name: 'offer_link', nullable: true })
   offerLink?: string;
 
-  @ManyToOne(() => Brand, (brand) => brand.products, {
+  @ManyToOne(() => MerchantBrand, (brand) => brand.products, {
     cascade: true,
     onUpdate: 'CASCADE',
   })
-  brand?: Brand;
+  merchantBrand?: MerchantBrand;
 
-  @ManyToOne(() => ProviderCategory, (category) => category.products, {
+  @ManyToOne(() => MerchantCategory, (category) => category.products, {
     cascade: true,
     onUpdate: 'CASCADE',
   })
-  providerCategory?: ProviderCategory;
+  merchantCategory?: MerchantCategory;
 
-  @OneToMany(() => Review, (reviews) => reviews.product, {
+  @OneToMany(() => ProductReview, (reviews) => reviews.product, {
     cascade: true,
     onDelete: 'CASCADE',
   })
-  reviews?: Review[];
+  reviews?: ProductReview[];
 
-  @ManyToMany(() => Label, (label) => label.products, {
+  @ManyToMany(() => MerchantLabel, (label) => label.products, {
     cascade: true,
     onUpdate: 'CASCADE',
   })
@@ -209,5 +209,5 @@ export class Product {
       referencedColumnName: 'id',
     },
   })
-  labels: Label[];
+  merchantLabels: MerchantLabel[];
 }

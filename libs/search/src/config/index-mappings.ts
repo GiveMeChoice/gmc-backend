@@ -3,20 +3,31 @@ import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 export const mappings: MappingTypeMapping = {
   properties: {
     id: { type: 'keyword' },
-    sku: { type: 'text' },
-    provider: {
-      type: 'object',
-      properties: {
-        key: { type: 'keyword' },
-        productId: { type: 'text' },
-        region: { type: 'keyword' },
-        description: { type: 'text' },
-      },
-    },
+    region: { type: 'keyword' },
+    merchantProductId: { type: 'text' },
+    sku: { type: 'keyword' },
     title: { type: 'text' },
     description: { type: 'text' },
     price: { type: 'float' },
     offerLink: { type: 'text', index: false },
+    merchant: {
+      type: 'object',
+      properties: {
+        key: { type: 'keyword' },
+        name: {
+          type: 'text',
+          fields: {
+            keyword: {
+              type: 'keyword',
+              ignore_above: 256,
+            },
+          },
+        },
+        description: { type: 'text' },
+        logoUrl: { type: 'text', index: false },
+        infoLink: { type: 'text', index: false },
+      },
+    },
     images: {
       type: 'nested',
       properties: {
@@ -41,18 +52,27 @@ export const mappings: MappingTypeMapping = {
       },
     },
     brand: {
-      type: 'text',
-      fields: {
-        keyword: {
-          type: 'keyword',
-          ignore_above: 256,
-        },
+      type: 'object',
+      properties: {
+        code: { type: 'keyword' },
+        name: { type: 'text' },
+        description: { type: 'text' },
+        logoUrl: { type: 'text' },
+        infoLink: { type: 'text' },
       },
     },
     category: {
       type: 'object',
       properties: {
-        providerCategory: { type: 'text' },
+        merchantCategory: {
+          type: 'text',
+          fields: {
+            keyword: {
+              type: 'keyword',
+              ignore_above: 256,
+            },
+          },
+        },
         gmcCategory: {
           type: 'object',
           properties: {
@@ -97,11 +117,20 @@ export const mappings: MappingTypeMapping = {
         },
       },
     },
-    label: {
-      type: 'object',
+    labels: {
+      type: 'nested',
       properties: {
-        providerLabel: { type: 'text' },
-        gmcLabel: {
+        merchantLabel: {
+          type: 'object',
+          properties: {
+            code: { type: 'keyword' },
+            name: { type: 'text' },
+            description: { type: 'text' },
+            logoUrl: { type: 'text', index: false },
+            infoLink: { type: 'text', index: false },
+          },
+        },
+        group: {
           type: 'object',
           properties: {
             name: {
@@ -113,6 +142,7 @@ export const mappings: MappingTypeMapping = {
                 },
               },
             },
+            description: { type: 'text' },
             sublabel: {
               type: 'object',
               properties: {
@@ -125,9 +155,11 @@ export const mappings: MappingTypeMapping = {
                     },
                   },
                 },
+                description: { type: 'text' },
                 sublabel: {
                   type: 'object',
                   properties: {
+                    description: { type: 'text' },
                     name: {
                       type: 'text',
                       fields: {

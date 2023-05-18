@@ -6,11 +6,13 @@ import {
   TreeChildren,
   TreeParent,
   OneToMany,
+  Unique,
 } from 'typeorm';
-import { ProviderCategory } from './provider-category.entity';
+import { MerchantCategory } from './merchant-category.entity';
 
 @Entity({ name: 'gmc_category' })
 @Tree('nested-set')
+@Unique(['name'])
 export class Category {
   constructor(name: string) {
     this.name = name;
@@ -28,6 +30,9 @@ export class Category {
   @TreeParent()
   parent: Category;
 
-  @OneToMany(() => ProviderCategory, (category) => category.category)
-  providerCategories: ProviderCategory[];
+  @OneToMany(
+    () => MerchantCategory,
+    (merchantCategory) => merchantCategory.category,
+  )
+  merchantCategories: MerchantCategory[];
 }

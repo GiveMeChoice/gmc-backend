@@ -4,7 +4,7 @@ import {
   CHANNEL_HIGH,
   DEFAULT_EXCHANGE,
 } from '@lib/messaging/messaging.constants';
-import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-integration-status.enum';
+import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IntegrateProductCommand } from '../messages/integrate-product.command';
@@ -37,10 +37,7 @@ export class RefreshProductConsumer
       );
       const { data } = msg;
       const status = await this.productsService.getStatus(data.productId);
-      if (
-        status === ProductIntegrationStatus.PENDING ||
-        status === ProductIntegrationStatus.REMAP
-      ) {
+      if (status === ProductStatus.PENDING || status === ProductStatus.REMAP) {
         await this.etlService.integrateProduct(
           data.productId,
           data.runId,

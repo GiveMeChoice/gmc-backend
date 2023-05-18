@@ -1,11 +1,11 @@
 import { IntegrateProductCommand } from '@app/provider-integration/messages/integrate-product.command';
-import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
-import { ProductIntegrationStatus } from '@app/provider-integration/model/enum/product-integration-status.enum';
+import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
+import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
+import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
 import { MessagingService } from '@lib/messaging';
@@ -25,28 +25,28 @@ export abstract class SharedLoader implements Loader {
   // Hooks -> can implement custom logic and return true to prevent default follow-on actions
   protected afterCreateHook?(
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
   ): Promise<boolean>;
   protected afterReloadHook?(
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
     reason: ProductRefreshReason,
   ): Promise<boolean>;
 
   // ABSTRACT STUFF
   abstract providerKey: ProviderKey;
   protected abstract isOfferUpdated(
-    sourceItem: ProductDataDto,
+    sourceItem: ProviderProductDataDto,
     product: Product,
   ): boolean;
   protected abstract pickOfferUpdatedSourceFields(
-    sourceItem: ProductDataDto,
-  ): ProductDataDto;
+    sourceItem: ProviderProductDataDto,
+  ): ProviderProductDataDto;
 
   async loadProductDetail(
     id: string,
-    productDetail: ProductDataDto,
-    source: ProductSource,
+    productDetail: ProviderProductDataDto,
+    source: ProviderSource,
     runId: string,
     reason: ProductRefreshReason,
   ) {
@@ -59,12 +59,15 @@ export abstract class SharedLoader implements Loader {
     );
   }
 
-  async loadSourceItem(sourceItem: ProductDataDto, run: SourceRun) {
+  async loadSourceItem(
+    sourceItem: ProviderProductDataDto,
+    run: ProviderSourceRun,
+  ) {
     run.foundCount++;
     try {
-      const product = await this.productsService.findByProvider(
-        run.source.provider.id,
-        sourceItem.providerProductId,
+      const product = await this.productsService.findByMerchant(
+        run.source.provider.merchantId,
+        sourceItem.merchantProductId,
       );
       if (!product) {
         await this.createProduct(sourceItem, run);
@@ -82,10 +85,13 @@ export abstract class SharedLoader implements Loader {
     return run;
   }
 
-  private async createProduct(sourceProduct: Partial<Product>, run: SourceRun) {
+  private async createProduct(
+    sourceProduct: Partial<Product>,
+    run: ProviderSourceRun,
+  ) {
     const toCreate: Partial<Product> = {
       ...sourceProduct,
-      integrationStatus: ProductIntegrationStatus.PENDING,
+      integrationStatus: ProductStatus.PENDING,
     };
     const created = await this.productsService.create(toCreate, run);
     run.createdCount++;
@@ -104,16 +110,16 @@ export abstract class SharedLoader implements Loader {
   }
 
   private async handleOwnedProduct(
-    sourceItem: ProductDataDto,
+    sourceItem: ProviderProductDataDto,
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
   ) {
     run.ownedCount++;
     switch (product.integrationStatus) {
-      case ProductIntegrationStatus.LIVE:
+      case ProductStatus.LIVE:
         await this.handleLiveProduct(sourceItem, product, run);
         break;
-      case ProductIntegrationStatus.REMAP:
+      case ProductStatus.REMAP:
         await this.reloadProduct(
           sourceItem,
           product,
@@ -121,7 +127,7 @@ export abstract class SharedLoader implements Loader {
           ProductRefreshReason.REQUESTED,
         );
         break;
-      case ProductIntegrationStatus.EXPIRED:
+      case ProductStatus.EXPIRED:
         await this.reloadProduct(
           sourceItem,
           product,
@@ -129,7 +135,7 @@ export abstract class SharedLoader implements Loader {
           ProductRefreshReason.EXPIRED,
         );
         break;
-      case ProductIntegrationStatus.PENDING:
+      case ProductStatus.PENDING:
         run.pendingCount++;
         await this.messagingService.sendToQueue(
           new IntegrateProductCommand({
@@ -145,9 +151,9 @@ export abstract class SharedLoader implements Loader {
   }
 
   private async handleLiveProduct(
-    sourceItem: ProductDataDto,
+    sourceItem: ProviderProductDataDto,
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
   ) {
     if (
       moment(run.sourceDate).isAfter(product.refreshedAt) &&
@@ -169,9 +175,9 @@ export abstract class SharedLoader implements Loader {
   }
 
   private async reloadProduct(
-    sourceItem: ProductDataDto,
+    sourceItem: ProviderProductDataDto,
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
     reason: ProductRefreshReason,
   ) {
     product = await this.productsService.update(
@@ -179,7 +185,7 @@ export abstract class SharedLoader implements Loader {
       {
         ...sourceItem,
         source: run.source, // ensure source adoption in case of foreign expired
-        integrationStatus: ProductIntegrationStatus.PENDING,
+        integrationStatus: ProductStatus.PENDING,
       },
       true,
     );
@@ -200,11 +206,11 @@ export abstract class SharedLoader implements Loader {
   }
 
   private async handleForeignProduct(
-    sourceItem: ProductDataDto,
+    sourceItem: ProviderProductDataDto,
     product: Product,
-    run: SourceRun,
+    run: ProviderSourceRun,
   ) {
-    if (product.integrationStatus === ProductIntegrationStatus.EXPIRED) {
+    if (product.integrationStatus === ProductStatus.EXPIRED) {
       // adopt expired foreign product
       await this.reloadProduct(
         sourceItem,

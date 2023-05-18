@@ -1,13 +1,13 @@
-import { Label } from '@app/provider-integration/model/label.entity';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class UpdateLabelDto extends PartialType(Label) {
+export class UpdateLabelDto extends PartialType(MerchantLabel) {
   @IsOptional()
   groupId?: string;
 
   @IsOptional()
-  icon?: string;
+  logoUrl?: string;
 
   @IsOptional()
   description?: string;

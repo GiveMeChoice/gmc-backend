@@ -1,8 +1,8 @@
-import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
+import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { SourceRun } from '@app/provider-integration/model/source-run.entity';
+import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
 import { EtlService } from '@app/provider-integration/services/etl.service';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { Controller, Logger, Post, Query } from '@nestjs/common';
@@ -17,7 +17,9 @@ export class EtlController {
   ) {}
 
   @Post('integrate-source')
-  async integrateSource(@Query('id') sourceId: string): Promise<SourceRun> {
+  async integrateSource(
+    @Query('id') sourceId: string,
+  ): Promise<ProviderSourceRun> {
     this.logger.debug(`Integrate source ${sourceId}`);
     return await this.etlService.inegrateSource(sourceId);
   }
@@ -56,7 +58,7 @@ export class EtlController {
   async mapProduct(
     @Query('id') productId: string,
     @Query('skipCache') skipCache: boolean,
-  ): Promise<ProductDataDto> {
+  ): Promise<ProviderProductDataDto> {
     this.logger.debug(
       `Map ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
     );

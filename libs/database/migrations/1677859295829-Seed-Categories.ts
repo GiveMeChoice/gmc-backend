@@ -40,7 +40,7 @@ export class SeedCategories1677859295829 implements MigrationInterface {
     this.logger.debug(current.name);
     let category = new Category(current.name);
     category.parent = parent;
-    category.providerCategories = [];
+    category.merchantCategories = [];
     category = await repo.save(category);
     for (const s of current.categories) {
       await this.buildCategoryTree(s, category, repo);

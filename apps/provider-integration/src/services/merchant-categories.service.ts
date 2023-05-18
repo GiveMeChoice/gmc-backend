@@ -5,43 +5,43 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Repository, TreeRepository } from 'typeorm';
 import { Category } from '../model/category.entity';
-import { ProviderCategory } from '../model/provider-category.entity';
+import { MerchantCategory } from '../model/merchant-category.entity';
 import { CategoriesService } from './categories.service';
 import { ProductsService } from './products.service';
 
 @Injectable()
-export class ProviderCategoriesService {
-  private readonly logger = new Logger(ProviderCategoriesService.name);
+export class MerchantCategoriesService {
+  private readonly logger = new Logger(MerchantCategoriesService.name);
 
   constructor(
-    @InjectRepository(ProviderCategory)
-    private readonly providerCategoriesRepo: Repository<ProviderCategory>,
+    @InjectRepository(MerchantCategory)
+    private readonly merchantCategoriesRepo: Repository<MerchantCategory>,
     private readonly categoryService: CategoriesService,
     @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
   ) {}
 
-  async findAll(pageRequest?: PageRequest): Promise<Page<ProviderCategory>> {
-    const [data, count] = await this.providerCategoriesRepo.findAndCount({
+  async findAll(pageRequest?: PageRequest): Promise<Page<MerchantCategory>> {
+    const [data, count] = await this.merchantCategoriesRepo.findAndCount({
       ...pageRequest,
       relations: {
         category: true,
       },
     });
-    return buildPage<ProviderCategory>(data, count, pageRequest);
+    return buildPage<MerchantCategory>(data, count, pageRequest);
   }
 
-  findOne(id: string): Promise<ProviderCategory> {
-    return this.providerCategoriesRepo.findOne({
+  findOne(id: string): Promise<MerchantCategory> {
+    return this.merchantCategoriesRepo.findOne({
       where: { id },
       relations: { category: true },
     });
   }
 
   async find(
-    findDto: Partial<ProviderCategory>,
+    findDto: Partial<MerchantCategory>,
     pageRequest?: PageRequest,
-  ): Promise<Page<ProviderCategory>> {
+  ): Promise<Page<MerchantCategory>> {
     const categoryIds = [];
     if (findDto.categoryId) {
       const descendents = (await this.categoryService.findDescendents(
@@ -51,7 +51,7 @@ export class ProviderCategoriesService {
         categoryIds.push(descendent.id);
       }
     }
-    const [data, count] = await this.providerCategoriesRepo
+    const [data, count] = await this.merchantCategoriesRepo
       .createQueryBuilder('category')
       .where({
         ...findDto,
@@ -72,48 +72,47 @@ export class ProviderCategoriesService {
       })
       .loadRelationCountAndMap('category.productCount', 'category.products')
       .getManyAndCount();
-    return buildPage<ProviderCategory>(data, count, pageRequest);
+    return buildPage<MerchantCategory>(data, count, pageRequest);
   }
 
-  findOneByProvider(providerId: string, title: string) {
-    return this.providerCategoriesRepo.findOne({
-      where: { providerId, code: title },
+  findOneByMerchant(merchantId: string, title: string) {
+    return this.merchantCategoriesRepo.findOne({
+      where: { merchantId, code: title },
     });
   }
 
-  create(category: Partial<ProviderCategory>): Promise<ProviderCategory> {
-    return this.providerCategoriesRepo.save(category);
+  create(category: Partial<MerchantCategory>): Promise<MerchantCategory> {
+    return this.merchantCategoriesRepo.save(category);
   }
 
   async update(
     id: string,
-    category: Partial<ProviderCategory>,
-  ): Promise<ProviderCategory> {
-    // this.logger.debug(JSON.stringify());
-    await this.providerCategoriesRepo.save({ id, ...category });
+    category: Partial<MerchantCategory>,
+  ): Promise<MerchantCategory> {
+    await this.merchantCategoriesRepo.save({ id, ...category });
     return await this.findOne(id);
   }
 
   async assignCategory(
     id: string,
     categoryId: string,
-  ): Promise<ProviderCategory> {
+  ): Promise<MerchantCategory> {
     const pc = await this.findOne(id);
     if (!pc) throw new Error(`Provider Category Not Found: ${id}`);
-    await this.providerCategoriesRepo.save({
+    await this.merchantCategoriesRepo.save({
       id,
       categoryId: categoryId ? categoryId : null,
     });
     const ids = await this.productsService.findIds({
-      providerCategory: {
+      merchantCategory: {
         id,
-      },
+      } as MerchantCategory,
     });
     Logger.debug(`Reindexing ${ids.data.length} products`);
     await this.productsService.indexProductBatchAsync({
-      providerCategory: {
+      merchantCategory: {
         id,
-      },
+      } as MerchantCategory,
     });
     return await this.findOne(id);
   }

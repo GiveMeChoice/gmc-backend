@@ -1,10 +1,13 @@
-import { ProductDataDto } from '@app/provider-integration/model/dto/product-data.dto';
+import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
 
 export interface Mapper<I, P> {
   providerKey: ProviderKey;
 
-  mapSourceItem(item: I): ProductDataDto;
-  mapProductDetail(productDto: P, source: ProductSource): ProductDataDto;
+  mapSourceItem(item: I): ProviderProductDataDto;
+  mapProductDetail(
+    productDto: P,
+    source: ProviderSource,
+  ): ProviderProductDataDto;
 }

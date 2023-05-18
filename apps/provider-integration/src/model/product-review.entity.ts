@@ -1,8 +1,8 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from './product.entity';
 
-@Entity({ name: 'gmc_review' })
-export class Review {
+@Entity({ name: 'gmc_product_review' })
+export class ProductReview {
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 

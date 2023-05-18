@@ -11,13 +11,13 @@ import {
   PipelineContainer,
   PIPELINE_CONTAINER,
 } from '../etl/cache/pipeline/pipeline.container';
-import { ProductDataDto } from '../model/dto/product-data.dto';
+import { ProviderProductDataDto } from '../etl/dto/provider-product-data.dto';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '../model/enum/provider-key.enum';
 import { Product } from '../model/product.entity';
-import { SourceRun } from '../model/source-run.entity';
+import { ProviderSourceRun } from '../model/provider-source-run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
-import { ProductSourcesService } from './product-sources.service';
+import { ProviderSourcesService } from './provider-sources.service';
 import { ProductsService } from './products.service';
 import { ProvidersService } from './providers.service';
 
@@ -32,12 +32,12 @@ export class EtlService {
     private readonly extractorContainer: ExtractorContainer,
     @Inject(MAPPER_CONTAINER)
     private readonly mapperContainer: MapperContainer,
-    private readonly productSourcesService: ProductSourcesService,
+    private readonly productSourcesService: ProviderSourcesService,
     private readonly productsService: ProductsService,
     private readonly providersService: ProvidersService,
   ) {}
 
-  async inegrateSource(sourceId: string): Promise<SourceRun> {
+  async inegrateSource(sourceId: string): Promise<ProviderSourceRun> {
     const source = await this.productSourcesService.findOne(sourceId);
     let run = await this.productSourcesService.startRun(source);
     this.logger.debug(
@@ -66,7 +66,9 @@ export class EtlService {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
     try {
-      const pipeline = this.pipelineContainer.getPipeline(product.provider.key);
+      const pipeline = this.pipelineContainer.getPipeline(
+        product.source.provider.key,
+      );
       return (await pipeline.executeProduct(product, runId, reason)) as Product;
     } catch (err) {
       return await this.productsService.update(productId, {
@@ -80,7 +82,7 @@ export class EtlService {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
     const extractor = this.extractorContainer.getExtractor(
-      product.provider.key,
+      product.source.provider.key,
     );
     return await extractor.extractProduct(product, skipCache);
   }
@@ -88,13 +90,13 @@ export class EtlService {
   async mapProduct(
     productId: string,
     skipCache?: boolean,
-  ): Promise<ProductDataDto> {
+  ): Promise<ProviderProductDataDto> {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
     const extractor = this.extractorContainer.getExtractor(
-      product.provider.key,
+      product.source.provider.key,
     );
-    const mapper = this.mapperContainer.getMapper(product.provider.key);
+    const mapper = this.mapperContainer.getMapper(product.source.provider.key);
     return await mapper.mapProductDetail(
       (
         await extractor.extractProduct(product, skipCache)

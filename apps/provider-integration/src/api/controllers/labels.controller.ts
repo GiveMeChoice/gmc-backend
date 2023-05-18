@@ -1,5 +1,5 @@
-import { Label } from '@app/provider-integration/model/label.entity';
-import { LabelsService } from '@app/provider-integration/services/labels.service';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
+import { MerchantLabelsService } from '@app/provider-integration/services/merchant-labels.service';
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
@@ -17,29 +17,29 @@ import { FindLabelsDto } from '../dto/find-labels.dto';
 import { UpdateLabelDto } from '../dto/update-label.dto';
 
 @Controller('labels')
-export class LabelsController {
-  private readonly logger = new Logger(LabelsController.name);
+export class MerchantLabelsController {
+  private readonly logger = new Logger(MerchantLabelsController.name);
 
-  constructor(private readonly labelsService: LabelsService) {}
+  constructor(private readonly merchantLabelsService: MerchantLabelsService) {}
 
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-  ): Promise<Page<Label>> {
-    return await this.labelsService.findAll(pageRequest);
+  ): Promise<Page<MerchantLabel>> {
+    return await this.merchantLabelsService.findAll(pageRequest);
   }
 
   @Get(':id')
-  async getOne(@Param('id') id): Promise<Label> {
-    return await this.labelsService.findOne(id);
+  async getOne(@Param('id') id): Promise<MerchantLabel> {
+    return await this.merchantLabelsService.findOne(id);
   }
 
   @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateLabelDto,
-  ): Promise<Label> {
-    return this.labelsService.update(id, updateDto);
+  ): Promise<MerchantLabel> {
+    return this.merchantLabelsService.update(id, updateDto);
   }
 
   @Post('find')
@@ -48,6 +48,6 @@ export class LabelsController {
     @Body() findDto: FindLabelsDto,
   ) {
     this.logger.debug(JSON.stringify(findDto));
-    return await this.labelsService.find(findDto, pageRequest);
+    return await this.merchantLabelsService.find(findDto, pageRequest);
   }
 }

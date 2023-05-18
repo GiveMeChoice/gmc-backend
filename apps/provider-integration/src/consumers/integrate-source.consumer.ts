@@ -4,9 +4,9 @@ import { DEFAULT_EXCHANGE } from '@lib/messaging/messaging.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
-import { ProductSourceStatus } from '../model/enum/product-source-status';
+import { ProviderSourceStatus } from '../model/enum/provider-source-status';
 import { EtlService } from '../services/etl.service';
-import { ProductSourcesService } from '../services/product-sources.service';
+import { ProviderSourcesService } from '../services/provider-sources.service';
 
 @Injectable()
 export class IntegrateSourceConsumer
@@ -15,7 +15,7 @@ export class IntegrateSourceConsumer
   private readonly logger = new Logger(IntegrateSourceConsumer.name);
 
   constructor(
-    private readonly sourcesService: ProductSourcesService,
+    private readonly sourcesService: ProviderSourcesService,
     private readonly etlService: EtlService,
   ) {}
 
@@ -38,7 +38,7 @@ export class IntegrateSourceConsumer
       const source = await this.sourcesService.findOne(data.productSourceId);
       if (
         // must be due and cant be DOWN or BUSY
-        source.status === ProductSourceStatus.READY &&
+        source.status === ProviderSourceStatus.READY &&
         this.sourcesService.isDue(source)
       ) {
         await this.etlService.inegrateSource(data.productSourceId);

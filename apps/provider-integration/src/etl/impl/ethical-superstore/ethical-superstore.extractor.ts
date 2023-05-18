@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
@@ -24,7 +24,7 @@ export class EthicalSuperstoreExtractor
 {
   private readonly logger = new Logger(EthicalSuperstoreExtractor.name);
 
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
 
   constructor(
     private readonly httpService: HttpService,
@@ -33,7 +33,7 @@ export class EthicalSuperstoreExtractor
   ) {}
 
   extractSource(
-    source: ProductSource,
+    source: ProviderSource,
   ): Observable<EthicalSuperstoreSourceItemDto> {
     try {
       return this.fetchSource(source).pipe(
@@ -63,7 +63,7 @@ export class EthicalSuperstoreExtractor
     }
   }
 
-  private fetchSource(source: ProductSource): Observable<string> {
+  private fetchSource(source: ProviderSource): Observable<string> {
     const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.identifier}?limit=192`;
     this.logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
@@ -110,7 +110,7 @@ export class EthicalSuperstoreExtractor
         cachedResponse =
           await this.productCacheManager.get<EthicalSuperstoreProductDto>(
             this.providerKey,
-            product.providerProductId,
+            product.merchantProductId,
           );
       }
       if (cachedResponse) {
@@ -125,7 +125,7 @@ export class EthicalSuperstoreExtractor
         );
         this.productCacheManager.put<EthicalSuperstoreProductDto>(
           this.providerKey,
-          product.providerProductId,
+          product.merchantProductId,
           extractedData,
         );
         return {

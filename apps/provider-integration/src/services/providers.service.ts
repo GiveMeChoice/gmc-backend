@@ -6,12 +6,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FindProvidersDto } from '../api/dto/find-providers.dto';
 import { ProviderKey } from '../model/enum/provider-key.enum';
+import { ProviderSource } from '../model/provider-source.entity';
 import { Provider } from '../model/provider.entity';
 
 @Injectable()
 export class ProvidersService {
   constructor(
     @InjectRepository(Provider) private providersRepo: Repository<Provider>,
+    @InjectRepository(ProviderSource)
+    private sourcesRepo: Repository<ProviderSource>,
   ) {}
 
   async find(
@@ -22,11 +25,20 @@ export class ProvidersService {
       .createQueryBuilder('provider')
       .where({ ...findDto })
       .setFindOptions({ ...pageRequest })
-      .loadRelationCountAndMap('provider.labelCount', 'provider.labels')
-      .loadRelationCountAndMap('provider.productCount', 'provider.products')
-      .loadRelationCountAndMap('provider.categoryCount', 'provider.categories')
       .loadRelationCountAndMap('provider.sourcesCount', 'provider.sources')
       .getManyAndCount();
+
+    for (const provider of data) {
+      (provider as any).productCount = 0;
+      const data = await this.sourcesRepo
+        .createQueryBuilder('source')
+        .where({ providerId: provider.id })
+        .loadRelationCountAndMap('source.productCount', 'source.products')
+        .getMany();
+      for (const source of data) {
+        (provider as any).productCount += (source as any).productCount;
+      }
+    }
     return buildPage<Provider>(data, count, pageRequest);
   }
 

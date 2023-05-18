@@ -1,10 +1,10 @@
-import { Label } from '@app/provider-integration/model/label.entity';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class FindLabelsDto extends PartialType(Label) {
+export class FindLabelsDto extends PartialType(MerchantLabel) {
   @IsOptional()
-  providerId?: string;
+  merchantId?: string;
 
   @IsOptional()
   groupId?: string;

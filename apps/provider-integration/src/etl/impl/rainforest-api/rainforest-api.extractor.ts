@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProductSource } from '@app/provider-integration/model/product-source.entity';
+import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { S3Service } from '@lib/aws/services/s3.service';
 import { HttpService } from '@nestjs/axios';
@@ -30,7 +30,7 @@ export class RainforestApiExtractor
 {
   private readonly logger = new Logger(RainforestApiExtractor.name);
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
   public static readonly BASE_URL = 'https://api.rainforestapi.com';
   private readonly _apiKey: string;
   private readonly _zipCode: string;
@@ -43,9 +43,10 @@ export class RainforestApiExtractor
   ) {
     this._apiKey = configService.get('rainforest.api_key');
     this._zipCode = configService.get('rainforest.zip-code');
+    this.logger.debug('zip code: ' + this._zipCode);
   }
 
-  async extractSource(source: ProductSource): Promise<SourceStream> {
+  async extractSource(source: ProviderSource): Promise<SourceStream> {
     try {
       const sourceKey = await lastValueFrom(
         this.fetchLatestCollectionResultKey(source.identifier),
@@ -93,7 +94,7 @@ export class RainforestApiExtractor
         ? null
         : await this.cacheManager.get<RainforestApiProductDto>(
             this.providerKey,
-            product.providerProductId,
+            product.merchantProductId,
           );
       return cachedResponse
         ? {
@@ -102,7 +103,7 @@ export class RainforestApiExtractor
             data: cachedResponse.data,
           }
         : await lastValueFrom(
-            this.fetchProduct(product.providerProductId).pipe(
+            this.fetchProduct(product.merchantProductId).pipe(
               map((data) => ({
                 sourceDate: new Date(),
                 fromCache: false,
@@ -111,7 +112,7 @@ export class RainforestApiExtractor
               tap((result) =>
                 this.cacheManager.put(
                   this.providerKey,
-                  product.providerProductId,
+                  product.merchantProductId,
                   this.removeUnusedElements(result.data),
                 ),
               ),

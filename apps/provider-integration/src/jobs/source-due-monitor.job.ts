@@ -1,7 +1,7 @@
 import { MessagingService } from '@lib/messaging';
 import { Injectable, Logger } from '@nestjs/common';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
-import { ProductSourcesService } from '../services/product-sources.service';
+import { ProviderSourcesService } from '../services/provider-sources.service';
 import { JobBase } from './shared/job-base.abstract';
 import { JobName } from './shared/job-name.enum';
 import { Job } from './shared/job.interface';
@@ -9,7 +9,7 @@ import { Job } from './shared/job.interface';
 @Injectable()
 export class SourceDueMonitorJob extends JobBase {
   constructor(
-    private readonly sourcesService: ProductSourcesService,
+    private readonly sourcesService: ProviderSourcesService,
     private readonly messagingService: MessagingService,
   ) {
     super();

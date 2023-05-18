@@ -1,5 +1,5 @@
-import { Brand } from '@app/provider-integration/model/brand.entity';
-import { BrandsService } from '@app/provider-integration/services/brands.service';
+import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
+import { MerchantBrandsService } from '@app/provider-integration/services/merchant-brands.service';
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
@@ -20,17 +20,17 @@ import { UpdateBrandDto } from '../dto/update-brand.dto';
 export class BrandsController {
   private readonly logger = new Logger(BrandsController.name);
 
-  constructor(private readonly brandsService: BrandsService) {}
+  constructor(private readonly brandsService: MerchantBrandsService) {}
 
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-  ): Promise<Page<Brand>> {
+  ): Promise<Page<MerchantBrand>> {
     return await this.brandsService.findAll(pageRequest);
   }
 
   @Get(':id')
-  async getOne(@Param('id') id): Promise<Brand> {
+  async getOne(@Param('id') id): Promise<MerchantBrand> {
     return await this.brandsService.findOne(id);
   }
 
@@ -38,7 +38,7 @@ export class BrandsController {
   async update(
     @Param('id') id: string,
     @Body() updateDto: UpdateBrandDto,
-  ): Promise<Brand> {
+  ): Promise<MerchantBrand> {
     return this.brandsService.update(id, updateDto);
   }
 
