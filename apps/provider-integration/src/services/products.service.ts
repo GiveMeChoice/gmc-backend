@@ -23,11 +23,11 @@ import { Category } from '../model/category.entity';
 import { ProductStatus } from '../model/enum/product-status.enum';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { MerchantLabel } from '../model/merchant-label.entity';
-import { ProviderSource } from '../model/provider-source.entity';
+import { Channel } from '../model/channel.entity';
 import { Product } from '../model/product.entity';
 import { MerchantCategory } from '../model/merchant-category.entity';
 import { Provider } from '../model/provider.entity';
-import { ProviderSourceRun } from '../model/provider-source-run.entity';
+import { Run } from '../model/run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
 import { MerchantBrandsService } from './merchant-brands.service';
 import { CategoriesService } from './categories.service';
@@ -110,19 +110,19 @@ export class ProductsService {
     }
     return {
       id: product.shortId,
-      merchantProductId: product.merchantProductId,
+      merchantProductId: product.merchantProductNumber,
       region: 'UK',
       sku: product.sku,
       merchant: {
         key: product.merchant.key,
         name: product.merchant.name,
         description: product.merchant.description,
-        logoUrl: product.merchant.logoUrl,
+        logoUrl: product.merchant.logo,
       },
       title: product.title,
       description: product.description,
       price: product.price,
-      offerLink: product.offerLink,
+      offerLink: product.offerUrl,
       images: {
         list: {
           url: product.listImage,
@@ -240,7 +240,7 @@ export class ProductsService {
   }
 
   async indexProductBatchAsync(findDto: Partial<Product>) {
-    findDto.integrationStatus = ProductStatus.LIVE;
+    findDto.status = ProductStatus.LIVE;
     const BATCH_SIZE = 30;
     const pageRequest: PageRequest = { skip: 0, take: BATCH_SIZE };
     let page = await this.findIds(findDto, pageRequest);
@@ -308,14 +308,14 @@ export class ProductsService {
         ...findDto,
       },
       relations: {
-        source: true,
+        channel: true,
         merchantCategory: {
           category: true,
         },
       },
       select: {
-        source: {
-          identifier: true,
+        channel: {
+          id: true,
           description: true,
         },
       },
@@ -381,7 +381,7 @@ export class ProductsService {
       .createQueryBuilder()
       .update(Product)
       .set({
-        integrationStatus: ProductStatus.EXPIRED,
+        status: ProductStatus.EXPIRED,
         expiresAt: null,
       })
       .where('expiresAt < :now', { now: new Date() })
@@ -394,7 +394,7 @@ export class ProductsService {
       .createQueryBuilder()
       .update(Product)
       .set({
-        integrationStatus: ProductStatus.REMAP,
+        status: ProductStatus.REMAP,
       })
       .where('providerId = :id', { id })
       .andWhere('integrationStatus != :expired', {
@@ -410,7 +410,7 @@ export class ProductsService {
   ): Promise<Product> {
     return this.productsRepo.findOneBy({
       merchantId,
-      merchantProductId,
+      merchantProductNumber: merchantProductId,
     });
   }
 
@@ -419,7 +419,7 @@ export class ProductsService {
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {
         merchant: true,
-        source: {
+        channel: {
           provider: true,
         },
       },
@@ -432,14 +432,14 @@ export class ProductsService {
       relations: {
         reviews: true,
         merchantLabels: true,
-        source: true,
+        channel: true,
         merchant: true,
         merchantCategory: true,
         merchantBrand: true,
       },
       select: {
-        source: {
-          identifier: true,
+        channel: {
+          id: true,
           description: true,
         },
         merchant: {
@@ -450,9 +450,9 @@ export class ProductsService {
   }
 
   async getStatus(id: string): Promise<ProductStatus> {
-    const { integrationStatus: status } = await this.productsRepo.findOne({
+    const { status: status } = await this.productsRepo.findOne({
       select: {
-        integrationStatus: true,
+        status: true,
       },
       where: {
         id,
@@ -461,10 +461,7 @@ export class ProductsService {
     return status;
   }
 
-  async create(
-    product: Partial<Product>,
-    run: ProviderSourceRun,
-  ): Promise<Product> {
+  async create(product: Partial<Product>, run: Run): Promise<Product> {
     // check Merchant mapped from provider
     if (!product.merchant || !product.merchant.key) {
       throw new Error(`Merchant not mapped by provider! (Run ID: ${run.id}`);
@@ -479,19 +476,22 @@ export class ProductsService {
     }
     // check product is new
     if (
-      !this.existsByMerchant(run.source.providerId, product.merchantProductId)
+      !this.existsByMerchant(
+        run.channel.providerId,
+        product.merchantProductNumber,
+      )
     ) {
       throw new Error(
-        `Provider ${run.source.providerId} product ${product.merchantProductId} already exists!`,
+        `Provider ${run.channel.providerId} product ${product.merchantProductNumber} already exists!`,
       );
     }
     // ok lets go!
-    product.source = run.source;
+    product.channel = run.channel;
     product.createdByRunId = run.id;
     product.keepAliveCount = 0;
     product.expiresAt = await this.renewExpirationDate(
-      run.source.provider,
-      run.source,
+      run.channel.provider,
+      run.channel,
     );
     if (product.merchantCategory) {
       product.merchantCategory = await this.normalizeCategory(
@@ -521,12 +521,12 @@ export class ProductsService {
   ): Promise<Product> {
     let expirationDate;
     if (renewExpiration) {
-      const { source } = await this.productsRepo.findOne({
+      const { channel: source } = await this.productsRepo.findOne({
         where: {
           id,
         },
         select: {
-          source: {
+          channel: {
             expirationHours: true,
             provider: {
               expirationHours: true,
@@ -585,43 +585,39 @@ export class ProductsService {
   async refresh(
     id: string,
     updates: Partial<Product>,
-    source: ProviderSource,
+    source: Channel,
     runId: string,
     reason: ProductRefreshReason,
   ) {
     if (!this.existsById(id)) throw new Error(`Product not found: ${id}`);
     try {
-      updates.hasIntegrationError = false;
       updates.errorMessage = null;
       updates.refreshedAt = new Date();
       updates.refreshReason = reason;
       updates.expiresAt = this.renewExpirationDate(source.provider, source);
       updates.keepAliveCount = 0;
       updates.refreshedByRunId = runId;
-      updates.integrationStatus = ProductStatus.LIVE;
+      updates.status = ProductStatus.LIVE;
       const product = await this.update(id, updates);
       await this.indexProductAsync(product.id);
       return product;
     } catch (err) {
       const errorMessage = formatErrorMessage(err);
       this.logger.error(`Product ${id} Refresh Failed: ${errorMessage}`);
-      return await this.update(id, { hasIntegrationError: true, errorMessage });
+      return await this.update(id, { errorMessage });
     }
   }
 
-  async keepAlive(product: Product, run: ProviderSourceRun) {
+  async keepAlive(product: Product, run: Run) {
     product.keepAliveCount++;
     product.expiresAt = this.renewExpirationDate(
-      run.source.provider,
-      run.source,
+      run.channel.provider,
+      run.channel,
     );
     await this.productsRepo.save(product);
   }
 
-  private renewExpirationDate(
-    provider: Provider,
-    source: ProviderSource,
-  ): Date {
+  private renewExpirationDate(provider: Provider, source: Channel): Date {
     if (source && source.expirationHours) {
       return moment().add(source.runIntervalHours, 'hours').toDate();
     } else if (provider && provider.expirationHours) {

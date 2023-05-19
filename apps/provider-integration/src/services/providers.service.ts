@@ -6,15 +6,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FindProvidersDto } from '../api/dto/find-providers.dto';
 import { ProviderKey } from '../model/enum/provider-key.enum';
-import { ProviderSource } from '../model/provider-source.entity';
+import { Channel } from '../model/channel.entity';
 import { Provider } from '../model/provider.entity';
 
 @Injectable()
 export class ProvidersService {
   constructor(
     @InjectRepository(Provider) private providersRepo: Repository<Provider>,
-    @InjectRepository(ProviderSource)
-    private sourcesRepo: Repository<ProviderSource>,
+    @InjectRepository(Channel)
+    private sourcesRepo: Repository<Channel>,
   ) {}
 
   async find(

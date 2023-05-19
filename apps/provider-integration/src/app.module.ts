@@ -13,8 +13,8 @@ import { EtlController } from './api/controllers/etl.controller';
 import { JobsController } from './api/controllers/jobs.controller';
 import { LabelGroupsController } from './api/controllers/label-groups.controller';
 import { MerchantLabelsController } from './api/controllers/labels.controller';
-import { SourceRunsController } from './api/controllers/source-runs.controller';
-import { ProductSourcesController } from './api/controllers/product-sources.controller';
+import { RunsController } from './api/controllers/runs.controller';
+import { ChannelsController } from './api/controllers/channels.controller';
 import { ProductsController } from './api/controllers/products.controller';
 import { ProvidersController } from './api/controllers/providers.controller';
 import { IntegrateSourceConsumer } from './consumers/integrate-source.consumer';
@@ -30,8 +30,8 @@ import { Category } from './model/category.entity';
 import { MerchantCategory } from './model/merchant-category.entity';
 import { LabelGroup } from './model/label-group.entity';
 import { MerchantLabel } from './model/merchant-label.entity';
-import { ProviderSourceRun } from './model/provider-source-run.entity';
-import { ProviderSource } from './model/provider-source.entity';
+import { Run } from './model/run.entity';
+import { Channel } from './model/channel.entity';
 import { Product } from './model/product.entity';
 import { Provider } from './model/provider.entity';
 import { ProductReview } from './model/product-review.entity';
@@ -42,8 +42,8 @@ import { EtlService } from './services/etl.service';
 import { JobsService } from './services/jobs.service';
 import { LabelGroupsService } from './services/label-groups.service';
 import { MerchantLabelsService } from './services/merchant-labels.service';
-import { ProviderSourceRunsService } from './services/provider-source-runs.service';
-import { ProviderSourcesService } from './services/provider-sources.service';
+import { RunsService } from './services/runs.service';
+import { ChannelsService } from './services/channels.service';
 import { ProductsService } from './services/products.service';
 import { ProvidersService } from './services/providers.service';
 import { TasksService } from './services/tasks.service';
@@ -61,8 +61,8 @@ import { MerchantsService } from './services/merchants.service';
     ScheduleModule.forRoot(),
     TypeOrmModule.forFeature([
       Provider,
-      ProviderSource,
-      ProviderSourceRun,
+      Channel,
+      Run,
       Product,
       MerchantLabel,
       LabelGroup,
@@ -81,8 +81,8 @@ import { MerchantsService } from './services/merchants.service';
     EtlController,
     PingController,
     ProvidersController,
-    ProductSourcesController,
-    SourceRunsController,
+    ChannelsController,
+    RunsController,
     MerchantLabelsController,
     LabelGroupsController,
     ProviderCategoriesController,
@@ -101,8 +101,8 @@ import { MerchantsService } from './services/merchants.service';
     // core services
     EtlService,
     ProvidersService,
-    ProviderSourcesService,
-    ProviderSourceRunsService,
+    ChannelsService,
+    RunsService,
     ProductsService,
     MerchantLabelsService,
     LabelGroupsService,
@@ -125,11 +125,6 @@ import { MerchantsService } from './services/merchants.service';
       inject: [SourceDueMonitorJob, ProductExpiredMonitorJob],
     },
   ],
-  exports: [
-    ProvidersService,
-    ProviderSourcesService,
-    ProviderSourceRunsService,
-    ProductsService,
-  ],
+  exports: [ProvidersService, ChannelsService, RunsService, ProductsService],
 })
 export class AppModule {}

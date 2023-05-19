@@ -1,22 +1,21 @@
-import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
+import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
 import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Merchant } from '@app/provider-integration/model/merchant.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { Provider } from '@app/provider-integration/model/provider.entity';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
-import { Merchant } from '@app/provider-integration/model/merchant.entity';
 
 export class FindProductsDto extends PartialType(Product) {
   @IsOptional()
-  merchantProductId?: string;
+  merchantProductNumber?: string;
 
   @IsOptional()
-  integrationStatus?: ProductStatus;
+  status?: ProductStatus;
 
   @IsOptional()
-  source?: ProviderSource;
+  channel?: Channel;
 
   @IsOptional()
   merchant?: Merchant;
@@ -25,7 +24,7 @@ export class FindProductsDto extends PartialType(Product) {
   shortId?: string;
 
   @IsOptional()
-  hasIntegrationError?: boolean;
+  errorMessage?: string;
 
   @IsOptional()
   label?: MerchantLabel;

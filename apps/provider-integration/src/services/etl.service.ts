@@ -1,23 +1,23 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
-  ExtractorContainer,
+  PIPELINE_CONTAINER,
+  PipelineContainer,
+} from '../etl/pipeline/pipeline.container';
+import { ProviderProductDataDto } from '../etl/dto/provider-product-data.dto';
+import {
   EXTRACTOR_CONTAINER,
+  ExtractorContainer,
 } from '../etl/extractor/extractor.container';
 import {
-  MapperContainer,
   MAPPER_CONTAINER,
+  MapperContainer,
 } from '../etl/mapper/mapper.container';
-import {
-  PipelineContainer,
-  PIPELINE_CONTAINER,
-} from '../etl/cache/pipeline/pipeline.container';
-import { ProviderProductDataDto } from '../etl/dto/provider-product-data.dto';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '../model/enum/provider-key.enum';
+import { Run } from '../model/run.entity';
 import { Product } from '../model/product.entity';
-import { ProviderSourceRun } from '../model/provider-source-run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
-import { ProviderSourcesService } from './provider-sources.service';
+import { ChannelsService } from './channels.service';
 import { ProductsService } from './products.service';
 import { ProvidersService } from './providers.service';
 
@@ -32,22 +32,22 @@ export class EtlService {
     private readonly extractorContainer: ExtractorContainer,
     @Inject(MAPPER_CONTAINER)
     private readonly mapperContainer: MapperContainer,
-    private readonly productSourcesService: ProviderSourcesService,
+    private readonly productSourcesService: ChannelsService,
     private readonly productsService: ProductsService,
     private readonly providersService: ProvidersService,
   ) {}
 
-  async inegrateSource(sourceId: string): Promise<ProviderSourceRun> {
+  async inegrateSource(sourceId: string): Promise<Run> {
     const source = await this.productSourcesService.findOne(sourceId);
     let run = await this.productSourcesService.startRun(source);
     this.logger.debug(
-      `Ingegrating Source: ${source.provider.key} - ${source.identifier} `,
+      `Ingegrating Source: ${source.provider.key} - ${source.id} `,
     );
     try {
       const pipeline = this.pipelineContainer.getPipeline(
-        run.source.provider.key,
+        run.channel.provider.key,
       );
-      run = await pipeline.executeSource(run);
+      run = await pipeline.executeChannel(run);
     } catch (err) {
       run.errorMessage = formatErrorMessage(err);
       this.logger.error(
@@ -67,12 +67,11 @@ export class EtlService {
     if (!product) throw new Error(`Product not found: ${productId}`);
     try {
       const pipeline = this.pipelineContainer.getPipeline(
-        product.source.provider.key,
+        product.channel.provider.key,
       );
       return (await pipeline.executeProduct(product, runId, reason)) as Product;
     } catch (err) {
       return await this.productsService.update(productId, {
-        hasIntegrationError: true,
         errorMessage: formatErrorMessage(err),
       });
     }
@@ -82,7 +81,7 @@ export class EtlService {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
     const extractor = this.extractorContainer.getExtractor(
-      product.source.provider.key,
+      product.channel.provider.key,
     );
     return await extractor.extractProduct(product, skipCache);
   }
@@ -94,14 +93,14 @@ export class EtlService {
     const product = await this.productsService.findOne(productId);
     if (!product) throw new Error(`Product not found: ${productId}`);
     const extractor = this.extractorContainer.getExtractor(
-      product.source.provider.key,
+      product.channel.provider.key,
     );
-    const mapper = this.mapperContainer.getMapper(product.source.provider.key);
+    const mapper = this.mapperContainer.getMapper(product.channel.provider.key);
     return await mapper.mapProductDetail(
       (
         await extractor.extractProduct(product, skipCache)
       ).data,
-      product.source,
+      product.channel,
     );
   }
 

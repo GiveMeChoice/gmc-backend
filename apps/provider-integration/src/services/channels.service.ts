@@ -5,45 +5,45 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Like, Repository } from 'typeorm';
-import { ProviderSourceStatus } from '../model/enum/provider-source-status';
-import { ProviderSourceRun } from '../model/provider-source-run.entity';
-import { ProviderSource } from '../model/provider-source.entity';
-import { ProviderSourceRunsService } from './provider-source-runs.service';
+import { ChannelStatus } from '../model/enum/channel-status';
+import { Run } from '../model/run.entity';
+import { Channel } from '../model/channel.entity';
+import { RunsService } from './runs.service';
 
 @Injectable()
-export class ProviderSourcesService {
+export class ChannelsService {
   constructor(
-    @InjectRepository(ProviderSource)
-    private sourcesRepo: Repository<ProviderSource>,
-    private readonly runsService: ProviderSourceRunsService,
+    @InjectRepository(Channel)
+    private channelsRepo: Repository<Channel>,
+    private readonly runsService: RunsService,
   ) {}
 
   async find(
-    findDto: Partial<ProviderSource>,
+    findDto: Partial<Channel>,
     pageRequest?: PageRequest,
-  ): Promise<Page<ProviderSource>> {
-    const [data, count] = await this.sourcesRepo
+  ): Promise<Page<Channel>> {
+    const [data, count] = await this.channelsRepo
       .createQueryBuilder('source')
       .where({
         ...findDto,
-        identifier: Like(`%${findDto.identifier ? findDto.identifier : ''}%`),
+        // identifier: Like(`%${findDto.identifier ? findDto.identifier : ''}%`),
       })
       .setFindOptions({ ...pageRequest })
       .loadRelationCountAndMap('source.runCount', 'source.runs')
       .loadRelationCountAndMap('source.productCount', 'source.products')
       .getManyAndCount();
-    return buildPage<ProviderSource>(data, count, pageRequest);
+    return buildPage<Channel>(data, count, pageRequest);
   }
 
-  async findAll(pageRequest?: PageRequest): Promise<Page<ProviderSource>> {
-    const [data, count] = await this.sourcesRepo.findAndCount({
+  async findAll(pageRequest?: PageRequest): Promise<Page<Channel>> {
+    const [data, count] = await this.channelsRepo.findAndCount({
       ...pageRequest,
     });
-    return buildPage<ProviderSource>(data, count, pageRequest);
+    return buildPage<Channel>(data, count, pageRequest);
   }
 
-  findOne(id: string): Promise<ProviderSource> {
-    return this.sourcesRepo.findOne({
+  findOne(id: string): Promise<Channel> {
+    return this.channelsRepo.findOne({
       where: { id },
       relations: {
         provider: true,
@@ -51,15 +51,12 @@ export class ProviderSourcesService {
     });
   }
 
-  async update(
-    id: string,
-    updates: Partial<ProviderSource>,
-  ): Promise<ProviderSource> {
-    await this.sourcesRepo.update(id, updates);
-    return this.sourcesRepo.findOne({ where: { id } });
+  async update(id: string, updates: Partial<Channel>): Promise<Channel> {
+    await this.channelsRepo.update(id, updates);
+    return this.channelsRepo.findOne({ where: { id } });
   }
 
-  async startRun(source: ProviderSource): Promise<ProviderSourceRun> {
+  async startRun(source: Channel): Promise<Run> {
     // validate source before starting
     if (!source) {
       throw new HttpException('Invalid Product Source', HttpStatus.BAD_REQUEST);
@@ -73,33 +70,33 @@ export class ProviderSourcesService {
     // }
 
     // set source to BUSY and create new source run
-    source.status = ProviderSourceStatus.BUSY;
-    const run = ProviderSourceRun.factory(source);
+    source.status = ChannelStatus.BUSY;
+    const run = Run.factory(source);
     run.runAt = new Date();
     return await this.runsService.create(run);
   }
 
-  async completeRun(run: ProviderSourceRun): Promise<ProviderSourceRun> {
+  async completeRun(run: Run): Promise<Run> {
     run.runTime = moment().diff(run.runAt, 'seconds', true);
-    run.source.lastRunAt = new Date();
+    run.channel.lastRunAt = new Date();
     if (run.errorMessage) {
-      run.source.retryCount++;
-      if (run.source.retryCount >= run.source.retryLimit) {
-        run.source.status = ProviderSourceStatus.DOWN;
+      run.channel.retryCount++;
+      if (run.channel.retryCount >= run.channel.retryLimit) {
+        run.channel.status = ChannelStatus.DOWN;
       } else {
-        run.source.status = ProviderSourceStatus.READY;
+        run.channel.status = ChannelStatus.READY;
       }
     } else {
-      run.source.ownedCount =
-        run.ownedCount + run.createdCount + run.adoptedCount;
-      run.source.status = ProviderSourceStatus.READY;
-      run.source.retryCount = 0;
+      // run.channel.ownedCount =
+      //   run.ownedCount + run.createdCount + run.adoptedCount;
+      run.channel.status = ChannelStatus.READY;
+      run.channel.retryCount = 0;
     }
     return await this.runsService.save(run);
   }
 
   async canRetryById(id: string): Promise<boolean> {
-    const { retryCount, retryLimit } = await this.sourcesRepo.findOne({
+    const { retryCount, retryLimit } = await this.channelsRepo.findOne({
       select: {
         retryCount: true,
         retryLimit: true,
@@ -109,13 +106,13 @@ export class ProviderSourcesService {
     return retryLimit == 0 || retryCount < retryLimit;
   }
 
-  canRetry(source: ProviderSource): boolean {
+  canRetry(source: Channel): boolean {
     return source.retryLimit == 0 || source.retryCount < source.retryLimit;
   }
 
   async isDueById(id: string): Promise<boolean> {
     return this.isDue(
-      await this.sourcesRepo.findOne({
+      await this.channelsRepo.findOne({
         where: {
           id,
           active: true,
@@ -127,7 +124,7 @@ export class ProviderSourcesService {
     );
   }
 
-  isDue(source: ProviderSource): boolean {
+  isDue(source: Channel): boolean {
     return (
       source.runIntervalHours &&
       (!source.lastRunAt ||
@@ -137,9 +134,9 @@ export class ProviderSourcesService {
     );
   }
 
-  async findAllDue(): Promise<ProviderSource[]> {
+  async findAllDue(): Promise<Channel[]> {
     return (
-      await this.sourcesRepo.find({
+      await this.channelsRepo.find({
         where: {
           active: true,
           provider: {

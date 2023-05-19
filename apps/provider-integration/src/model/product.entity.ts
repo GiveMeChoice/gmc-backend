@@ -19,62 +19,42 @@ import { ProductRefreshReason } from './enum/product-refresh-reason.enum';
 import { MerchantCategory } from './merchant-category.entity';
 import { MerchantLabel } from './merchant-label.entity';
 import { Merchant } from './merchant.entity';
-import { ProviderSource } from './provider-source.entity';
+import { Channel } from './channel.entity';
 import { ProductReview } from './product-review.entity';
+import { ProductImage } from './product-image.entity';
 
-@Entity({ name: 'gmc_product' })
-@Index(['merchantId', 'merchantProductId'], { unique: true })
+@Entity({ name: 'product' })
+@Index(['merchantId', 'merchantProductNumber'], { unique: true })
 @Unique(['shortId'])
 export class Product {
   constructor(merchantId: string, merchantProductId: string) {
     this.merchantId = merchantId;
-    this.merchantProductId = merchantProductId;
+    this.merchantProductNumber = merchantProductId;
   }
   public static factory(data: Partial<Product>) {
-    const product = new Product(data.merchant.id, data.merchantProductId);
+    const product = new Product(data.merchant.id, data.merchantProductNumber);
     product.shortId = shortId();
     Object.assign(product, data);
     return product;
   }
-  /* 
-  ///////////////////////
-    HEADER DATA
-  ///////////////////////
-  */
+
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
-
-  @Column({ name: 'merchant_id' })
-  readonly merchantId: string;
-
-  @Column({ name: 'merchant_product_id' })
-  readonly merchantProductId: string;
 
   @Column({ name: 'short_id' })
   shortId: string;
 
-  @CreateDateColumn({
-    name: 'created_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
+  @Column({ name: 'owner_channel_id' })
+  readonly ownerChannelId: string;
 
-  @UpdateDateColumn({
-    name: 'updated_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
+  @Column({ name: 'merchant_id' })
+  readonly merchantId: string;
 
-  @ManyToOne(() => Merchant, (merchant: Merchant) => merchant.products)
-  @JoinColumn({ name: 'merchant_id' })
-  merchant: Merchant;
+  @Column({ name: 'merchant_product_number' })
+  readonly merchantProductNumber: string;
 
   /* 
-  ///////////////////////
     INTEGRATION METADATA
-  ///////////////////////
   */
   @Column({
     name: 'integration_status',
@@ -82,10 +62,7 @@ export class Product {
     enum: ProductStatus,
     enumName: 'gmc_product_integration_status_enum',
   })
-  integrationStatus: ProductStatus;
-
-  @Column({ name: 'source_id' })
-  readonly sourceId: string;
+  status: ProductStatus;
 
   @Column({ name: 'created_by_run_id' })
   createdByRunId: string;
@@ -114,20 +91,27 @@ export class Product {
   @Column({ name: 'keep_alive_count', type: 'integer', default: 0 })
   keepAliveCount: number;
 
-  @Column({ name: 'has_integration_error', default: false })
-  hasIntegrationError: boolean;
-
   @Column({ name: 'error_message', nullable: true })
   errorMessage: string;
 
-  @ManyToOne(() => ProviderSource, (source: ProviderSource) => source.products)
-  @JoinColumn({ name: 'source_id' })
-  source: ProviderSource;
+  /* created/updated  */
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   /* 
-  ///////////////////////
     PRODUCT DATA
-  ///////////////////////
   */
   @Column({ nullable: true })
   sku?: string;
@@ -173,8 +157,18 @@ export class Product {
   @Column({ name: 'secondary_image', nullable: true })
   secondaryImage?: string;
 
-  @Column({ name: 'offer_link', nullable: true })
-  offerLink?: string;
+  @Column({ name: 'offer_url', nullable: true })
+  offerUrl?: string;
+
+  /* relatie  */
+
+  @ManyToOne(() => Channel, (source: Channel) => source.products)
+  @JoinColumn({ name: 'source_id' })
+  channel: Channel;
+
+  @ManyToOne(() => Merchant, (merchant: Merchant) => merchant.products)
+  @JoinColumn({ name: 'merchant_id' })
+  merchant: Merchant;
 
   @ManyToOne(() => MerchantBrand, (brand) => brand.products, {
     cascade: true,
@@ -187,12 +181,6 @@ export class Product {
     onUpdate: 'CASCADE',
   })
   merchantCategory?: MerchantCategory;
-
-  @OneToMany(() => ProductReview, (reviews) => reviews.product, {
-    cascade: true,
-    onDelete: 'CASCADE',
-  })
-  reviews?: ProductReview[];
 
   @ManyToMany(() => MerchantLabel, (label) => label.products, {
     cascade: true,
@@ -210,4 +198,16 @@ export class Product {
     },
   })
   merchantLabels: MerchantLabel[];
+
+  @OneToMany(() => ProductReview, (reviews) => reviews.product, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  reviews?: ProductReview[];
+
+  @OneToMany(() => ProductImage, (images) => images.product, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  images?: ProductImage[];
 }

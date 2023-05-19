@@ -4,52 +4,52 @@ import { buildPage } from '@lib/database/utils/build-page';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProviderSourceRun } from '../model/provider-source-run.entity';
+import { Run } from '../model/run.entity';
 
 @Injectable()
-export class ProviderSourceRunsService {
-  private readonly logger = new Logger(ProviderSourceRunsService.name);
+export class RunsService {
+  private readonly logger = new Logger(RunsService.name);
 
   constructor(
-    @InjectRepository(ProviderSourceRun)
-    private readonly runRepository: Repository<ProviderSourceRun>,
+    @InjectRepository(Run)
+    private readonly runRepository: Repository<Run>,
   ) {}
 
   async find(
-    findDto: Partial<ProviderSourceRun>,
+    findDto: Partial<Run>,
     pageRequest?: PageRequest,
-  ): Promise<Page<ProviderSourceRun>> {
+  ): Promise<Page<Run>> {
     const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
       where: { ...findDto },
       relations: {
-        source: true,
+        channel: true,
       },
       select: {
-        source: {
+        channel: {
           providerId: true,
-          identifier: true,
+          id: true,
           description: true,
         },
       },
     });
-    return buildPage<ProviderSourceRun>(data, count, pageRequest);
+    return buildPage<Run>(data, count, pageRequest);
   }
 
-  async findAll(pageRequest?: PageRequest): Promise<Page<ProviderSourceRun>> {
+  async findAll(pageRequest?: PageRequest): Promise<Page<Run>> {
     const [data, count] = await this.runRepository.findAndCount({
       ...pageRequest,
     });
-    return buildPage<ProviderSourceRun>(data, count, pageRequest);
+    return buildPage<Run>(data, count, pageRequest);
   }
 
   async findBySource(
     sourceId: string,
     pageRequest?: PageRequest,
-  ): Promise<ProviderSourceRun[]> {
+  ): Promise<Run[]> {
     return await this.runRepository.find({
       where: {
-        source: {
+        channel: {
           id: sourceId,
         },
       },
@@ -57,20 +57,20 @@ export class ProviderSourceRunsService {
     });
   }
 
-  async findOne(id: string): Promise<ProviderSourceRun> {
+  async findOne(id: string): Promise<Run> {
     return await this.runRepository.findOne({
       where: { id },
-      relations: { source: { provider: { merchant: true } } },
+      relations: { channel: { provider: true, merchant: true } },
     });
   }
 
-  async create(run: Partial<ProviderSourceRun>): Promise<ProviderSourceRun> {
+  async create(run: Partial<Run>): Promise<Run> {
     this.logger.debug(`Creating run: ${JSON.stringify(run)}`);
     const { id } = await this.runRepository.save(run);
     return await this.findOne(id);
   }
 
-  async save(run: ProviderSourceRun): Promise<ProviderSourceRun> {
+  async save(run: Run): Promise<Run> {
     return await this.runRepository.save(run);
   }
 }

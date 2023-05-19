@@ -5,25 +5,25 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { ProviderSource } from './provider-source.entity';
+import { Channel } from './channel.entity';
 
-@Entity({ name: 'pi_source_run' })
-export class ProviderSourceRun {
-  constructor(source: ProviderSource) {
-    this.source = source;
+@Entity({ name: 'pi_run' })
+export class Run {
+  constructor(channel: Channel) {
+    this.channel = channel;
   }
 
   @PrimaryGeneratedColumn('uuid')
   readonly id!: string;
 
-  @Column({ name: 'source_id' })
-  readonly sourceId: string;
+  @Column({ name: 'channel_id' })
+  readonly channelId: string;
 
-  @ManyToOne(() => ProviderSource, (source: ProviderSource) => source.runs, {
+  @ManyToOne(() => Channel, (channel: Channel) => channel.runs, {
     cascade: true,
   })
-  @JoinColumn({ name: 'source_id' })
-  source: ProviderSource;
+  @JoinColumn({ name: 'channel_id' })
+  channel: Channel;
 
   @Column({ name: 'found_count', default: 0 })
   foundCount: number;
@@ -58,8 +58,8 @@ export class ProviderSourceRun {
   @Column({ name: 'run_at', type: 'timestamptz' })
   runAt: Date;
 
-  @Column({ name: 'source_date', type: 'timestamptz', nullable: true })
-  sourceDate: Date;
+  @Column({ name: 'content_date', type: 'timestamptz', nullable: true })
+  contentDate: Date;
 
   @Column({
     name: 'run_time',
@@ -73,7 +73,7 @@ export class ProviderSourceRun {
   @Column({ name: 'error_message', nullable: true })
   errorMessage?: string;
 
-  public static factory(source: ProviderSource) {
-    return new ProviderSourceRun(source);
+  public static factory(source: Channel) {
+    return new Run(source);
   }
 }

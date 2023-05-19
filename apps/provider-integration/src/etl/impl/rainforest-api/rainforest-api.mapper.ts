@@ -6,7 +6,7 @@ import { MerchantCategory } from '@app/provider-integration/model/merchant-categ
 import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 import { ProductReview } from '@app/provider-integration/model/product-review.entity';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../exception/pipeline.error';
@@ -19,6 +19,7 @@ import {
   RainforestApiTopReviewDto,
 } from './dto/rainforest-api-product.dto';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
+import { ProductImage } from '@app/provider-integration/model/product-image.entity';
 
 @Injectable()
 export class RainforestApiMapper
@@ -26,16 +27,22 @@ export class RainforestApiMapper
 {
   providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
 
-  mapSourceItem(item: RainforestApiSourceItemDto): ProviderProductDataDto {
+  mapChannelItem(item: RainforestApiSourceItemDto): ProviderProductDataDto {
     try {
       const product: ProviderProductDataDto = {
         merchant: {
           key: MerchantKey.AMAZON_UK,
         } as Merchant,
-        merchantProductId: item.result.category_results.asin,
+        merchantProductNumber: item.result.category_results.asin,
         price: Number(item.result.category_results.price.value),
-        listImage: item.result.category_results.image,
-        offerLink: item.result.category_results.link,
+        images: [
+          {
+            url: item.result.category_results.image,
+            type: ProductImageType.LIST,
+            primary: true,
+          } as ProductImage,
+        ],
+        offerUrl: item.result.category_results.link,
       };
       return product;
     } catch (err) {
@@ -45,7 +52,7 @@ export class RainforestApiMapper
 
   mapProductDetail(
     data: RainforestApiProductDto,
-    source: ProviderSource,
+    channel: Channel,
   ): ProviderProductDataDto {
     try {
       const product: ProviderProductDataDto = {
@@ -53,19 +60,20 @@ export class RainforestApiMapper
         title: data.product.title,
         rating: data.product.rating,
         ratingsTotal: data.product.ratings_total,
-        offerLink: data.product.link,
+        offerUrl: data.product.link,
         price: data.product.buybox_winner.price.value,
         shippingPrice: this.mapShippingPrice(
           data.product.buybox_winner.shipping,
         ),
         currency: data.product.buybox_winner.price.currency,
+        images: 
         mainImage: data.product.main_image.link,
         secondaryImage: this.mapSecondaryImage(data.product.images),
         description: this.mapDescription(data),
         merchantBrand: this.mapBrand(data.product.brand) as MerchantBrand,
         merchantCategory: this.mapMerchantCategory(
           data.product.categories_flat,
-          source,
+          channel,
         ) as MerchantCategory,
         reviews: this.mapReviews(data.product.top_reviews) as ProductReview[],
         merchantLabels: this.mapMerchantLabels(
@@ -124,25 +132,23 @@ export class RainforestApiMapper
 
   private mapMerchantCategory(
     categoriesFlat: string,
-    source: ProviderSource,
+    source: Channel,
   ): Partial<MerchantCategory> {
-    return categoriesFlat
-      ? {
-          code: categoriesFlat
-            .split(' > ')
-            .slice(0, 3)
-            .join('_')
-            .toLowerCase() // lowercase only
-            .replace(/\&/g, 'and') // spaces -> dashes
-            .replace(/\s+/g, '-') // spaces -> dashes
-            .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
-            .trim(), // remove whitespace;,
-          description: categoriesFlat.split(' > ').slice(0, 3).join(' > '),
-        }
-      : {
-          code: normalizeIdCode(source.category),
-          description: source.description,
-        };
+    if (!categoriesFlat) {
+      throw new PipelineError('MAP_ERROR', 'Unable to find product category');
+    }
+    return {
+      code: categoriesFlat
+        .split(' > ')
+        .slice(0, 3)
+        .join('_')
+        .toLowerCase() // lowercase only
+        .replace(/\&/g, 'and') // spaces -> dashes
+        .replace(/\s+/g, '-') // spaces -> dashes
+        .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
+        .trim(), // remove whitespace;,
+      description: categoriesFlat.split(' > ').slice(0, 3).join(' > '),
+    };
   }
 
   private mapReviews(

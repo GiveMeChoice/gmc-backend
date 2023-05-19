@@ -1,4 +1,4 @@
-export enum ProviderSourceStatus {
+export enum ChannelStatus {
   READY = 'READY',
   BUSY = 'BUSY',
   DOWN = 'DOWN',

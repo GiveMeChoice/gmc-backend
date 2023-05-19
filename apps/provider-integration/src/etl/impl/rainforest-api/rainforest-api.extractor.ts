@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { S3Service } from '@lib/aws/services/s3.service';
 import { HttpService } from '@nestjs/axios';
@@ -46,10 +46,10 @@ export class RainforestApiExtractor
     this.logger.debug('zip code: ' + this._zipCode);
   }
 
-  async extractSource(source: ProviderSource): Promise<SourceStream> {
+  async extractChannel(source: Channel): Promise<SourceStream> {
     try {
       const sourceKey = await lastValueFrom(
-        this.fetchLatestCollectionResultKey(source.identifier),
+        this.fetchLatestCollectionResultKey(source.miscCode1),
       );
       this.logger.debug('Fetching latest collection result key', sourceKey);
       return {
@@ -94,7 +94,7 @@ export class RainforestApiExtractor
         ? null
         : await this.cacheManager.get<RainforestApiProductDto>(
             this.providerKey,
-            product.merchantProductId,
+            product.merchantProductNumber,
           );
       return cachedResponse
         ? {
@@ -103,7 +103,10 @@ export class RainforestApiExtractor
             data: cachedResponse.data,
           }
         : await lastValueFrom(
-            this.fetchProduct(product.merchantProductId).pipe(
+            this.fetchProduct(
+              product.merchantProductNumber,
+              product.channel,
+            ).pipe(
               map((data) => ({
                 sourceDate: new Date(),
                 fromCache: false,
@@ -112,7 +115,7 @@ export class RainforestApiExtractor
               tap((result) =>
                 this.cacheManager.put(
                   this.providerKey,
-                  product.merchantProductId,
+                  product.merchantProductNumber,
                   this.removeUnusedElements(result.data),
                 ),
               ),
@@ -156,7 +159,10 @@ export class RainforestApiExtractor
     return dto;
   }
 
-  private fetchProduct(asin: string): Observable<RainforestApiProductDto> {
+  private fetchProduct(
+    asin: string,
+    channel: Channel,
+  ): Observable<RainforestApiProductDto> {
     return this.httpService
       .get<RainforestApiProductDto>(
         `${RainforestApiExtractor.BASE_URL}/request`,
@@ -164,10 +170,10 @@ export class RainforestApiExtractor
           params: {
             api_key: this._apiKey,
             type: 'product',
-            amazon_domain: 'amazon.co.uk',
+            amazon_domain: channel.miscCode2,
             asin,
             include_html: false,
-            zip_code: this._zipCode,
+            zip_code: channel.miscCode3 ? channel.miscCode3 : '',
           },
         },
       )

@@ -1,6 +1,6 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
+import { Run } from '@app/provider-integration/model/run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { concatMap, lastValueFrom } from 'rxjs';
 import {
@@ -15,7 +15,7 @@ import {
   MapperContainer,
   MAPPER_CONTAINER,
 } from '../../mapper/mapper.container';
-import { Pipeline } from '../../cache/pipeline/pipeline.interface';
+import { Pipeline } from '../../pipeline/pipeline.interface';
 import { EthicalSuperstoreExtractor } from './ethical-superstore.extractor';
 import { EthicalSuperstoreLoader } from './ethical-superstore.loader';
 import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';
@@ -45,15 +45,15 @@ export class EthicalSuperstorePipeline implements Pipeline {
     ) as EthicalSuperstoreLoader;
   }
 
-  async executeSource(run: ProviderSourceRun) {
+  async executeChannel(run: Run) {
     try {
-      run.sourceDate = new Date();
+      run.contentDate = new Date();
       await lastValueFrom(
-        this._extractor.extractSource(run.source).pipe(
+        this._extractor.extractChannel(run.channel).pipe(
           concatMap(async (sourceItem) => {
             if (sourceItem.inStock) {
-              const sourceProduct = this._mapper.mapSourceItem(sourceItem);
-              await this._loader.loadSourceItem(sourceProduct, run);
+              const sourceProduct = this._mapper.mapChannelItem(sourceItem);
+              await this._loader.loadChannelItem(sourceProduct, run);
             }
           }),
         ),
@@ -69,8 +69,8 @@ export class EthicalSuperstorePipeline implements Pipeline {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return await this._loader.loadProductDetail(
       product.id,
-      this._mapper.mapProductDetail(extracted.data, product.source),
-      product.source,
+      this._mapper.mapProductDetail(extracted.data, product.channel),
+      product.channel,
       runId,
       reason,
     );

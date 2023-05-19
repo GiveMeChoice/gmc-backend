@@ -1,30 +1,22 @@
 import {
   Column,
   Entity,
-  JoinColumn,
-  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
+import { Channel } from './channel.entity';
 import { ProviderKey } from './enum/provider-key.enum';
-import { Merchant } from './merchant.entity';
-import { ProviderSource } from './provider-source.entity';
 
 @Entity({ name: 'pi_provider' })
 @Unique(['key'])
 export class Provider {
-  constructor(merchantId: string, key: ProviderKey) {
-    this.merchantId = merchantId;
+  constructor(key: ProviderKey) {
     this.key = key;
   }
 
-  public static factory(
-    merchantId: string,
-    key: ProviderKey,
-    data: Partial<Provider>,
-  ) {
-    const provider = new Provider(merchantId, key);
+  public static factory(key: ProviderKey, data: Partial<Provider>) {
+    const provider = new Provider(key);
     Object.assign(provider, data);
     return provider;
   }
@@ -35,12 +27,9 @@ export class Provider {
   @Column({
     type: 'enum',
     enum: ProviderKey,
-    enumName: 'pi_provider_id_enum',
+    enumName: 'pi_provider_key_enum',
   })
   key: ProviderKey;
-
-  @Column({ name: 'merchant_id' })
-  readonly merchantId: string;
 
   @Column()
   description: string;
@@ -54,13 +43,6 @@ export class Provider {
   @Column({ name: 'expiration_hours', type: 'integer', default: 36 })
   expirationHours: number;
 
-  @ManyToOne(() => Merchant, (merchant) => merchant.providers)
-  @JoinColumn({ name: 'merchant_id' })
-  merchant: Merchant;
-
-  @OneToMany(
-    () => ProviderSource,
-    (productSource: ProviderSource) => productSource.provider,
-  )
-  sources: ProviderSource[];
+  @OneToMany(() => Channel, (productSource: Channel) => productSource.provider)
+  channels: Channel[];
 }

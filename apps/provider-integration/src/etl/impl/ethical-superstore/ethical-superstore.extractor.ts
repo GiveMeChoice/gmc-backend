@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
@@ -32,9 +32,7 @@ export class EthicalSuperstoreExtractor
     private readonly productCacheManager: ProductCacheManager,
   ) {}
 
-  extractSource(
-    source: ProviderSource,
-  ): Observable<EthicalSuperstoreSourceItemDto> {
+  extractChannel(source: Channel): Observable<EthicalSuperstoreSourceItemDto> {
     try {
       return this.fetchSource(source).pipe(
         map((html) => this.extractItemsFromHtml(html)),
@@ -63,8 +61,8 @@ export class EthicalSuperstoreExtractor
     }
   }
 
-  private fetchSource(source: ProviderSource): Observable<string> {
-    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.identifier}?limit=192`;
+  private fetchSource(source: Channel): Observable<string> {
+    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.miscCode1}?limit=192`;
     this.logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
@@ -110,7 +108,7 @@ export class EthicalSuperstoreExtractor
         cachedResponse =
           await this.productCacheManager.get<EthicalSuperstoreProductDto>(
             this.providerKey,
-            product.merchantProductId,
+            product.merchantProductNumber,
           );
       }
       if (cachedResponse) {
@@ -125,7 +123,7 @@ export class EthicalSuperstoreExtractor
         );
         this.productCacheManager.put<EthicalSuperstoreProductDto>(
           this.providerKey,
-          product.merchantProductId,
+          product.merchantProductNumber,
           extractedData,
         );
         return {
@@ -140,7 +138,7 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchProduct(product: Product): Observable<string> {
-    const url = product.offerLink;
+    const url = product.offerUrl;
     this.logger.debug(`Fetching Product: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }

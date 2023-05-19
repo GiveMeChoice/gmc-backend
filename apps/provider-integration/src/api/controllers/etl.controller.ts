@@ -2,7 +2,7 @@ import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provid
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
-import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
+import { Run } from '@app/provider-integration/model/run.entity';
 import { EtlService } from '@app/provider-integration/services/etl.service';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { Controller, Logger, Post, Query } from '@nestjs/common';
@@ -17,9 +17,7 @@ export class EtlController {
   ) {}
 
   @Post('integrate-source')
-  async integrateSource(
-    @Query('id') sourceId: string,
-  ): Promise<ProviderSourceRun> {
+  async integrateSource(@Query('id') sourceId: string): Promise<Run> {
     this.logger.debug(`Integrate source ${sourceId}`);
     return await this.etlService.inegrateSource(sourceId);
   }

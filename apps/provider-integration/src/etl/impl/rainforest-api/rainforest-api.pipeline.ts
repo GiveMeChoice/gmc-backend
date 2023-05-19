@@ -1,5 +1,5 @@
 import { Product } from '@app/provider-integration/model/product.entity';
-import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
+import { Run } from '@app/provider-integration/model/run.entity';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
@@ -15,7 +15,7 @@ import {
   MapperContainer,
   MAPPER_CONTAINER,
 } from '../../mapper/mapper.container';
-import { Pipeline } from '../../cache/pipeline/pipeline.interface';
+import { Pipeline } from '../../pipeline/pipeline.interface';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiExtractor } from './rainforest-api.extractor';
 import { RainforestApiLoader } from './rainforest-api.loader';
@@ -46,20 +46,20 @@ export class RainforestApiPipeline implements Pipeline {
     ) as RainforestApiLoader;
   }
 
-  async executeSource(run: ProviderSourceRun) {
+  async executeChannel(run: Run) {
     try {
-      const sourceStream = await this._extractor.extractSource(run.source);
-      run.sourceDate = sourceStream.runDate;
+      const sourceStream = await this._extractor.extractChannel(run.channel);
+      run.contentDate = sourceStream.runDate;
       await csv()
         .fromStream(sourceStream.stream)
         .subscribe(async (item: RainforestApiSourceItemDto) => {
           if (
-            // only pull items from source that have a listed price and are not sponsored
+            // only pull items from channel that have a listed price and are not sponsored
             !item.result.category_results.sponsored &&
             item.result.category_results.price.value
           ) {
-            const sourceProduct = this._mapper.mapSourceItem(item);
-            await this._loader.loadSourceItem(sourceProduct, run);
+            const sourceProduct = this._mapper.mapChannelItem(item);
+            await this._loader.loadChannelItem(sourceProduct, run);
           }
         });
     } catch (err) {
@@ -73,8 +73,8 @@ export class RainforestApiPipeline implements Pipeline {
     const extracted = await this._extractor.extractProduct(product, skipCache);
     return await this._loader.loadProductDetail(
       product.id,
-      this._mapper.mapProductDetail(extracted.data, product.source),
-      product.source,
+      this._mapper.mapProductDetail(extracted.data, product.channel),
+      product.channel,
       runId,
       reason,
     );

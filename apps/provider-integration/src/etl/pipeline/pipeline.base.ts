@@ -2,8 +2,8 @@ import { IntegrateProductCommand } from '@app/provider-integration/messages/inte
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
 import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProviderSourceRun } from '@app/provider-integration/model/provider-source-run.entity';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Run } from '@app/provider-integration/model/run.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';

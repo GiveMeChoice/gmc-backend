@@ -5,12 +5,13 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from 'typeorm';
-import { MerchantBrand } from './merchant-brand.entity';
+import { Channel } from './channel.entity';
 import { MerchantKey } from './enum/merchant-key.enum';
+import { Region } from './enum/region.enum';
+import { MerchantBrand } from './merchant-brand.entity';
 import { MerchantCategory } from './merchant-category.entity';
 import { MerchantLabel } from './merchant-label.entity';
 import { Product } from './product.entity';
-import { Provider } from './provider.entity';
 
 @Entity({ name: 'gmc_merchant' })
 @Unique(['key'])
@@ -25,17 +26,27 @@ export class Merchant {
   })
   key: MerchantKey;
 
+  @Column({
+    type: 'enum',
+    enum: Region,
+    enumName: 'gmc_region_enum',
+  })
+  region: Region;
+
   @Column()
   name: string;
 
   @Column({ nullable: true })
   description: string;
 
-  @Column({ name: 'logo_url', nullable: true })
-  logoUrl: string;
+  @Column({ nullable: true })
+  logo: string;
 
-  @Column({ name: 'info_link', nullable: true })
-  infoLink: string;
+  @Column({ nullable: true })
+  url: string;
+
+  @OneToMany(() => Channel, (channel) => channel.merchant)
+  channels: Channel[];
 
   @OneToMany(() => Product, (product) => product.merchant)
   products: Product[];
@@ -48,7 +59,4 @@ export class Merchant {
 
   @OneToMany(() => MerchantCategory, (category) => category.merchant)
   categories: MerchantCategory[];
-
-  @OneToMany(() => Provider, (provider) => provider.merchant)
-  providers: Provider[];
 }

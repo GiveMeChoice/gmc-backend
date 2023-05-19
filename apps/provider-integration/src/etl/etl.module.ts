@@ -22,7 +22,7 @@ import { MapperContainer, MAPPER_CONTAINER } from './mapper/mapper.container';
 import {
   PipelineContainer,
   PIPELINE_CONTAINER,
-} from './cache/pipeline/pipeline.container';
+} from './pipeline/pipeline.container';
 
 @Module({
   imports: [

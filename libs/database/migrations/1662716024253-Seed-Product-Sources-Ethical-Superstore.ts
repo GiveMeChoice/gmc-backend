@@ -1,5 +1,5 @@
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { Provider } from '@app/provider-integration/model/provider.entity';
 import { Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
@@ -16,7 +16,7 @@ export class SeedProductSourcesEthicalSuperstore1662716024253
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Migration');
     const providerRepo = queryRunner.connection.getRepository(Provider);
-    const sourceRepo = queryRunner.connection.getRepository(ProviderSource);
+    const sourceRepo = queryRunner.connection.getRepository(Channel);
     const csvFile = path.join(
       __dirname,
       '../seeds/pi-product-sources-ethical-superstore.seed.csv',
@@ -34,7 +34,7 @@ export class SeedProductSourcesEthicalSuperstore1662716024253
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const repo = queryRunner.connection.getRepository(ProviderSource);
+    const repo = queryRunner.connection.getRepository(Channel);
     this.logger.log('Reverting migration');
     await repo.query('DELETE FROM pi_product_source');
   }

@@ -1,8 +1,8 @@
-import { ProviderSource } from '@app/provider-integration/model/provider-source.entity';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { PartialType } from '@nestjs/mapped-types';
 import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
-export class UpdateSourceDto extends PartialType(ProviderSource) {
+export class UpdateChannelDto extends PartialType(Channel) {
   @IsOptional()
   active?: boolean;
 
