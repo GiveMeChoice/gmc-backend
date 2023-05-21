@@ -1,3 +1,3 @@
-key,merchantKey,description,active
-rainforest-api-uk,amazon-uk,An awesome API for a really big internet store (UK Edition),false
-ethical-superstore-web,ethical-superstore,www.EthicalSuperstore.com Web Scraper,false
+key,description,active
+rainforest-api,An awesome API for a really big internet store,false
+ethical-superstore-web,Ethical Superstore Web Scraper,false

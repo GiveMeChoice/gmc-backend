@@ -8,12 +8,12 @@ import { Run } from '@app/provider-integration/model/run.entity';
 export interface Loader {
   providerKey: ProviderKey;
 
-  loadProductDetail(
+  loadChannelItem(channelItem: ProviderProductDataDto, run: Run): Promise<Run>;
+  refreshProduct(
     id: string,
     productDetail: ProviderProductDataDto,
     source: Channel,
     runId: string,
     reason: ProductRefreshReason,
   ): Promise<Product>;
-  loadChannelItem(channelItem: ProviderProductDataDto, run: Run): Promise<Run>;
 }

@@ -41,7 +41,7 @@ export class IntegrateSourceConsumer
         source.status === ChannelStatus.READY &&
         this.sourcesService.isDue(source)
       ) {
-        await this.etlService.inegrateSource(data.productSourceId);
+        await this.etlService.inegrateProviderChannel(data.productSourceId);
       } else {
         this.logger.debug(
           `Source is NOT due and/or READY... Will not be integrated: ${data.productSourceId}`,

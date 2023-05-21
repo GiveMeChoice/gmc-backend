@@ -1,12 +1,14 @@
 import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
+import { Channel } from '@app/provider-integration/model/channel.entity';
 import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
 import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
 import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
+import { ProductImage } from '@app/provider-integration/model/product-image.entity';
 import { ProductReview } from '@app/provider-integration/model/product-review.entity';
-import { Channel } from '@app/provider-integration/model/channel.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable } from '@nestjs/common';
 import { PipelineError } from '../../exception/pipeline.error';
@@ -19,13 +21,12 @@ import {
   RainforestApiTopReviewDto,
 } from './dto/rainforest-api-product.dto';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
-import { ProductImage } from '@app/provider-integration/model/product-image.entity';
 
 @Injectable()
 export class RainforestApiMapper
   implements Mapper<RainforestApiSourceItemDto, RainforestApiProductDto>
 {
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
   mapChannelItem(item: RainforestApiSourceItemDto): ProviderProductDataDto {
     try {
@@ -51,39 +52,63 @@ export class RainforestApiMapper
   }
 
   mapProductDetail(
-    data: RainforestApiProductDto,
-    channel: Channel,
+    existingProduct: Product,
+    rainforestProduct: RainforestApiProductDto,
   ): ProviderProductDataDto {
     try {
       const product: ProviderProductDataDto = {
-        sku: data.product.asin,
-        title: data.product.title,
-        rating: data.product.rating,
-        ratingsTotal: data.product.ratings_total,
-        offerUrl: data.product.link,
-        price: data.product.buybox_winner.price.value,
+        sku: rainforestProduct.product.asin,
+        title: rainforestProduct.product.title,
+        rating: rainforestProduct.product.rating,
+        ratingsTotal: rainforestProduct.product.ratings_total,
+        offerUrl: rainforestProduct.product.link,
+        price: rainforestProduct.product.buybox_winner.price.value,
         shippingPrice: this.mapShippingPrice(
-          data.product.buybox_winner.shipping,
+          rainforestProduct.product.buybox_winner.shipping,
         ),
-        currency: data.product.buybox_winner.price.currency,
-        images: 
-        mainImage: data.product.main_image.link,
-        secondaryImage: this.mapSecondaryImage(data.product.images),
-        description: this.mapDescription(data),
-        merchantBrand: this.mapBrand(data.product.brand) as MerchantBrand,
+        currency: rainforestProduct.product.buybox_winner.price.currency,
+        images: this.mapImages(
+          existingProduct.images,
+          rainforestProduct.product.images,
+        ),
+        // mainImage: data.product.main_image.link,
+        // secondaryImage: this.mapSecondaryImage(data.product.images),
+        description: this.mapDescription(rainforestProduct),
+        merchantBrand: this.mapBrand(
+          rainforestProduct.product.brand,
+        ) as MerchantBrand,
         merchantCategory: this.mapMerchantCategory(
-          data.product.categories_flat,
-          channel,
+          rainforestProduct.product.categories_flat,
+          existingProduct.channel,
         ) as MerchantCategory,
-        reviews: this.mapReviews(data.product.top_reviews) as ProductReview[],
+        reviews: this.mapReviews(
+          rainforestProduct.product.top_reviews,
+        ) as ProductReview[],
         merchantLabels: this.mapMerchantLabels(
-          data.climate_pledge_friendly,
+          rainforestProduct.climate_pledge_friendly,
         ) as MerchantLabel[],
       };
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
     }
+  }
+
+  private mapImages(
+    existingImages: ProductImage[],
+    rainforestImages: RainforestApiImageDto[],
+  ) {
+    const images: ProductImage[] = [];
+    if (rainforestImages) {
+      rainforestImages.forEach((img, i) => {
+        images.push({
+          url: img.link,
+          type: ProductImageType.DETAIL,
+          primary: img.variant === 'MAIN',
+        } as ProductImage);
+      });
+    }
+    return images;
   }
 
   private mapShippingPrice(shipping: RainforestApiPriceDto): any {
@@ -147,7 +172,7 @@ export class RainforestApiMapper
         .replace(/\s+/g, '-') // spaces -> dashes
         .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
         .trim(), // remove whitespace;,
-      description: categoriesFlat.split(' > ').slice(0, 3).join(' > '),
+      name: categoriesFlat.split(' > ').slice(0, 3).join(' > '),
     };
   }
 
@@ -184,7 +209,7 @@ export class RainforestApiMapper
         code: normalizeIdCode(climatePledge.text),
         name: climatePledge.text,
         description: climatePledge.text,
-        logoUrl: climatePledge.image,
+        logo: climatePledge.image,
       },
     ];
   }

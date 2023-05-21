@@ -56,23 +56,23 @@ export class Channel {
   lastRunAt?: Date;
 
   /* 
-    MAPPING CODES
+    ETL CONFIG CODES
   */
 
-  @Column({ name: 'MISC_CODE_1', nullable: true })
-  miscCode1: string;
+  @Column({ name: 'ETL_CODE_1', nullable: true })
+  etlCode1: string;
 
-  @Column({ name: 'MISC_CODE_2', nullable: true })
-  miscCode2: string;
+  @Column({ name: 'ETL_CODE_2', nullable: true })
+  etlCode2: string;
 
-  @Column({ name: 'MISC_CODE_3', nullable: true })
-  miscCode3: string;
+  @Column({ name: 'ETL_CODE_3', nullable: true })
+  etlCode3: string;
 
-  @Column({ name: 'MISC_CODE_4', nullable: true })
-  miscCode4: string;
+  @Column({ name: 'ETL_CODE_4', nullable: true })
+  etlCode4: string;
 
-  @Column({ name: 'MISC_CODE_5', nullable: true })
-  miscCode5: string;
+  @Column({ name: 'ETL_CODE_5', nullable: true })
+  etlCode5: string;
 
   /* relatie */
 

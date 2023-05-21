@@ -19,7 +19,7 @@ export class EtlController {
   @Post('integrate-source')
   async integrateSource(@Query('id') sourceId: string): Promise<Run> {
     this.logger.debug(`Integrate source ${sourceId}`);
-    return await this.etlService.inegrateSource(sourceId);
+    return await this.etlService.inegrateProviderChannel(sourceId);
   }
 
   @Post('integrate-product')

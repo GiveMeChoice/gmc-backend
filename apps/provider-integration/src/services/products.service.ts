@@ -19,7 +19,7 @@ import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
 import { MerchantBrand } from '../model/merchant-brand.entity';
-import { Category } from '../model/category.entity';
+import { GmcCategory } from '../model/gmc-category.entity';
 import { ProductStatus } from '../model/enum/product-status.enum';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { MerchantLabel } from '../model/merchant-label.entity';
@@ -30,12 +30,12 @@ import { Provider } from '../model/provider.entity';
 import { Run } from '../model/run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
 import { MerchantBrandsService } from './merchant-brands.service';
-import { CategoriesService } from './categories.service';
+import { GmcCategoriesService } from './gmc-categories.service';
 import { MerchantLabelsService } from './merchant-labels.service';
 import { MerchantCategoriesService } from './merchant-categories.service';
 import { SearchLabelDto } from '@lib/search/dto/search-label.dto';
-import { LabelGroup } from '../model/label-group.entity';
-import { LabelGroupsService } from './label-groups.service';
+import { GmcLabel } from '../model/gmc-label.entity';
+import { GmcLabelsService } from './gmc-labels.service';
 import { MerchantsService } from './merchants.service';
 
 const searchRelevantFieldsFindOptions = {
@@ -68,8 +68,8 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: MerchantLabelsService,
-    private readonly categoriesService: CategoriesService,
-    private readonly labelGroupsService: LabelGroupsService,
+    private readonly categoriesService: GmcCategoriesService,
+    private readonly labelGroupsService: GmcLabelsService,
     private readonly merchantsService: MerchantsService,
     @Inject(forwardRef(() => MerchantCategoriesService))
     private readonly merchantCategoriesService: MerchantCategoriesService,
@@ -102,10 +102,10 @@ export class ProductsService {
   private async mapToIndexable(
     product: Partial<Product>,
   ): Promise<SearchProductDto> {
-    let category: Category = null;
-    if (product.merchantCategory.categoryId) {
+    let category: GmcCategory = null;
+    if (product.merchantCategory.gmcCategoryId) {
       category = await this.categoriesService.findOne(
-        product.merchantCategory.categoryId,
+        product.merchantCategory.gmcCategoryId,
       );
     }
     return {
@@ -141,7 +141,7 @@ export class ProductsService {
       category: {
         merchantCategory: product.merchantCategory.code,
         gmcCategory: await this.mapSearchCategory(
-          product.merchantCategory.categoryId,
+          product.merchantCategory.gmcCategoryId,
         ),
       },
       labels: await this.mapSearchLabels(product.merchantLabels),
@@ -156,7 +156,7 @@ export class ProductsService {
     const category = (await this.categoriesService.findAncestors(
       categoryId,
       true,
-    )) as Category;
+    )) as GmcCategory;
     if (!category) return null;
 
     let nodes: string[] = [];
@@ -189,16 +189,16 @@ export class ProductsService {
           code: merchantLabel.code,
           name: merchantLabel.name,
           description: merchantLabel.description,
-          logoUrl: merchantLabel.logoUrl,
-          infoLink: merchantLabel.infoLink,
+          logoUrl: merchantLabel.logo,
+          infoLink: merchantLabel.url,
         },
       };
       this.logger.debug(`mapping label ${merchantLabel.code}`);
-      if (merchantLabel.groupId) {
+      if (merchantLabel.gmcLabelId) {
         const group = (await this.labelGroupsService.findAncestors(
-          merchantLabel.groupId,
+          merchantLabel.gmcLabelId,
           true,
-        )) as LabelGroup;
+        )) as GmcLabel;
         if (group) {
           let nodes = [];
           nodes = this.flattenLabelGroupTree(group, nodes);
@@ -225,14 +225,17 @@ export class ProductsService {
     return labels;
   }
 
-  private flattenCategoryTree(node: Category, flattened: string[]): string[] {
+  private flattenCategoryTree(
+    node: GmcCategory,
+    flattened: string[],
+  ): string[] {
     flattened.push(node.name);
     return node.parent && node.parent.name !== 'Root'
       ? this.flattenCategoryTree(node.parent, flattened)
       : flattened;
   }
 
-  private flattenLabelGroupTree(node: LabelGroup, flattened: any[]): any[] {
+  private flattenLabelGroupTree(node: GmcLabel, flattened: any[]): any[] {
     flattened.push({ name: node.name, description: node.description });
     return node.parent && node.parent.name !== 'Root'
       ? this.flattenLabelGroupTree(node.parent, flattened)
@@ -291,9 +294,9 @@ export class ProductsService {
         query.andWhere('label.code=:code', { code: findDto.label.code });
         addJoin = true;
       }
-      if (findDto.label.groupId) {
+      if (findDto.label.gmcLabelId) {
         query.andWhere('label.group=:groupId', {
-          groupId: findDto.label.groupId,
+          groupId: findDto.label.gmcLabelId,
         });
         addJoin = true;
       }
@@ -310,7 +313,7 @@ export class ProductsService {
       relations: {
         channel: true,
         merchantCategory: {
-          category: true,
+          gmcCategory: true,
         },
       },
       select: {
@@ -521,7 +524,7 @@ export class ProductsService {
   ): Promise<Product> {
     let expirationDate;
     if (renewExpiration) {
-      const { channel: source } = await this.productsRepo.findOne({
+      const { channel } = await this.productsRepo.findOne({
         where: {
           id,
         },
@@ -534,7 +537,7 @@ export class ProductsService {
           },
         },
       });
-      expirationDate = this.renewExpirationDate(source.provider, source);
+      expirationDate = this.renewExpirationDate(channel.provider, channel);
     }
 
     if (
@@ -542,25 +545,25 @@ export class ProductsService {
       updates.merchantBrand ||
       updates.merchantLabels
     ) {
-      const { merchantId: providerId } = await this.productsRepo.findOne({
+      const { merchantId } = await this.productsRepo.findOne({
         where: { id },
         select: { merchantId: true },
       });
       if (updates.merchantCategory) {
         updates.merchantCategory = await this.normalizeCategory(
-          providerId,
+          merchantId,
           updates.merchantCategory,
         );
       }
       if (updates.merchantBrand) {
         updates.merchantBrand = await this.normalizeBrand(
-          providerId,
+          merchantId,
           updates.merchantBrand,
         );
       }
       if (updates.merchantLabels) {
         updates.merchantLabels = await this.normalizeLabels(
-          providerId,
+          merchantId,
           updates.merchantLabels,
         );
       }

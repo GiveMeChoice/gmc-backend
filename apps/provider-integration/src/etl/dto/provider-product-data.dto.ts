@@ -1,5 +1,5 @@
 import { IntersectionType, PartialType, PickType } from '@nestjs/mapped-types';
-import { Category } from '../../model/category.entity';
+import { GmcCategory } from '../../model/gmc-category.entity';
 import { Product } from '../../model/product.entity';
 
 // make all properties optional

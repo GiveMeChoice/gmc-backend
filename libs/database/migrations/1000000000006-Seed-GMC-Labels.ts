@@ -1,22 +1,22 @@
-import { LabelGroup } from '@app/provider-integration/model/label-group.entity';
+import { GmcLabel } from '@app/provider-integration/model/gmc-label.entity';
 import { Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { MigrationInterface, QueryRunner, TreeRepository } from 'typeorm';
 
-export class SeedLabelGroups1670421246294 implements MigrationInterface {
-  private readonly logger = new Logger(SeedLabelGroups1670421246294.name);
+export class SeedGmcLabels1000000000006 implements MigrationInterface {
+  private readonly logger = new Logger(SeedGmcLabels1000000000006.name);
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Migration');
 
     const labelGroupsSeed = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, '../seeds/gmc-label-groups.seed.json'),
+        path.join(__dirname, '../seeds/gmc-labels.seed.json'),
         'utf-8',
       ),
     );
-    const repo = queryRunner.connection.getTreeRepository(LabelGroup);
+    const repo = queryRunner.connection.getTreeRepository(GmcLabel);
     try {
       await this.buildLabelGroupsTree(labelGroupsSeed, null, repo);
     } catch (e) {
@@ -28,17 +28,17 @@ export class SeedLabelGroups1670421246294 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Reverting Migration');
-    const repo = queryRunner.connection.getRepository(LabelGroup);
+    const repo = queryRunner.connection.getRepository(GmcLabel);
     await repo.query('DELETE FROM gmc_label_group');
   }
 
   private async buildLabelGroupsTree(
     current: any,
-    parent: LabelGroup,
-    repo: TreeRepository<LabelGroup>,
+    parent: GmcLabel,
+    repo: TreeRepository<GmcLabel>,
   ) {
     this.logger.debug(current.name);
-    let labelGroup = new LabelGroup(current.name);
+    let labelGroup = new GmcLabel(current.name);
     labelGroup.description = current.description;
     labelGroup.parent = parent;
     labelGroup.merchantLabels = [];

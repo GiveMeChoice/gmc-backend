@@ -20,6 +20,7 @@ import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
 import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 import { ProductImage } from '@app/provider-integration/model/product-image.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 
 @Injectable()
 export class EthicalSuperstoreMapper
@@ -52,14 +53,14 @@ export class EthicalSuperstoreMapper
   }
 
   mapProductDetail(
-    data: EthicalSuperstoreProductDto,
-    source: Channel,
+    existingProduct: Product,
+    ethicalSuperstoreProduct: EthicalSuperstoreProductDto,
   ): ProviderProductDataDto {
     try {
       const product: ProviderProductDataDto = {};
-      product.sku = this.mapSku(data);
-      product.title = data.productInfo.title;
-      product.description = data.productInfo.description
+      product.sku = this.mapSku(ethicalSuperstoreProduct);
+      product.title = ethicalSuperstoreProduct.productInfo.title;
+      product.description = ethicalSuperstoreProduct.productInfo.description
         .replace('�', '')
         .replace('�', '')
         .replace('�', '')
@@ -72,18 +73,24 @@ export class EthicalSuperstoreMapper
         .replace('����', '•')
         .replace('����', '•');
 
-      product.rating = data.rating;
-      product.ratingsTotal = data.reviewCount;
-      product.price = data.productInfo.price.price;
+      product.rating = ethicalSuperstoreProduct.rating;
+      product.ratingsTotal = ethicalSuperstoreProduct.reviewCount;
+      product.price = ethicalSuperstoreProduct.productInfo.price.price;
       product.shippingPrice = product.price > 50 ? 0 : 4.95;
-      product.currency = data.productInfo.price.currency;
-      product.merchantBrand = this.mapBrand(data) as MerchantBrand;
-      product.merchantCategory = this.mapCategory(source) as MerchantCategory;
-      product.reviews = this.mapReviews(data.reviews) as ProductReview[];
+      product.currency = ethicalSuperstoreProduct.productInfo.price.currency;
+      product.merchantBrand = this.mapBrand(
+        ethicalSuperstoreProduct,
+      ) as MerchantBrand;
+      product.merchantCategory = this.mapCategory(
+        existingProduct.channel,
+      ) as MerchantCategory;
+      product.reviews = this.mapReviews(
+        ethicalSuperstoreProduct.reviews,
+      ) as ProductReview[];
       product.merchantLabels = this.mapLabels(
-        data.ethicsAndTags,
+        ethicalSuperstoreProduct.ethicsAndTags,
       ) as MerchantLabel[];
-      product.images.concat(this.mapImages(data));
+      product.images.concat(this.mapImages(ethicalSuperstoreProduct));
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
@@ -131,9 +138,9 @@ export class EthicalSuperstoreMapper
     };
   }
 
-  private mapCategory(source: Channel): Partial<MerchantCategory> {
+  private mapCategory(channel: Channel): Partial<MerchantCategory> {
     return {
-      code: source.miscCode1
+      code: channel.etlCode1
         .split('/')
         .map((s) =>
           (s.endsWith('.htm') ? s.slice(0, -3) : s)
@@ -147,7 +154,7 @@ export class EthicalSuperstoreMapper
         .replace(/\s+/g, '-') // spaces -> dashes
         .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
         .trim(), // remove whitespace;,
-      description: source.miscCode1
+      name: channel.etlCode1
         .split('/')
         .map((s) =>
           (s.endsWith('.htm') ? s.slice(0, -3) : s)

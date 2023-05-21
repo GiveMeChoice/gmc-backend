@@ -25,36 +25,24 @@ import { ProvidersService } from './providers.service';
 export class EtlService {
   private readonly logger = new Logger(EtlService.name);
 
+  @Inject(PIPELINE_CONTAINER)
+  private readonly pipelineContainer: PipelineContainer;
+  @Inject(EXTRACTOR_CONTAINER)
+  private readonly extractorContainer: ExtractorContainer;
+  @Inject(MAPPER_CONTAINER)
+  private readonly mapperContainer: MapperContainer;
+
   constructor(
-    @Inject(PIPELINE_CONTAINER)
-    private readonly pipelineContainer: PipelineContainer,
-    @Inject(EXTRACTOR_CONTAINER)
-    private readonly extractorContainer: ExtractorContainer,
-    @Inject(MAPPER_CONTAINER)
-    private readonly mapperContainer: MapperContainer,
-    private readonly productSourcesService: ChannelsService,
+    private readonly channelsService: ChannelsService,
     private readonly productsService: ProductsService,
     private readonly providersService: ProvidersService,
   ) {}
 
-  async inegrateSource(sourceId: string): Promise<Run> {
-    const source = await this.productSourcesService.findOne(sourceId);
-    let run = await this.productSourcesService.startRun(source);
-    this.logger.debug(
-      `Ingegrating Source: ${source.provider.key} - ${source.id} `,
-    );
-    try {
-      const pipeline = this.pipelineContainer.getPipeline(
-        run.channel.provider.key,
-      );
-      run = await pipeline.executeChannel(run);
-    } catch (err) {
-      run.errorMessage = formatErrorMessage(err);
-      this.logger.error(
-        `Source ${sourceId} Integration Failed: ${run.errorMessage}`,
-      );
-    }
-    return await this.productSourcesService.completeRun(run);
+  async inegrateProviderChannel(channelId: string): Promise<Run> {
+    const channel = await this.channelsService.findOne(channelId);
+    const pipeline = this.pipelineContainer.getPipeline(channel.provider.key);
+    this.logger.debug(`Starting Provider Channel Pipeline: ${channel.id}`);
+    return await pipeline.execute(channel);
   }
 
   async integrateProduct(
@@ -69,7 +57,7 @@ export class EtlService {
       const pipeline = this.pipelineContainer.getPipeline(
         product.channel.provider.key,
       );
-      return (await pipeline.executeProduct(product, runId, reason)) as Product;
+      return await pipeline.refreshProduct(product, runId, reason);
     } catch (err) {
       return await this.productsService.update(productId, {
         errorMessage: formatErrorMessage(err),

@@ -10,10 +10,10 @@ import {
 } from 'typeorm';
 import { MerchantLabel } from './merchant-label.entity';
 
-@Entity({ name: 'gmc_label_group' })
+@Entity({ name: 'gmc_label' })
 @Tree('nested-set')
-@Unique(['name'])
-export class LabelGroup {
+// @Unique(['name'])
+export class GmcLabel {
   constructor(name: string) {
     this.name = name;
   }
@@ -28,11 +28,11 @@ export class LabelGroup {
   description?: string;
 
   @TreeChildren()
-  children: LabelGroup[];
+  children: GmcLabel[];
 
   @TreeParent()
-  parent: LabelGroup;
+  parent: GmcLabel;
 
-  @OneToMany(() => MerchantLabel, (merchantLabel) => merchantLabel.group)
+  @OneToMany(() => MerchantLabel, (merchantLabel) => merchantLabel.gmcLabel)
   merchantLabels: MerchantLabel[];
 }

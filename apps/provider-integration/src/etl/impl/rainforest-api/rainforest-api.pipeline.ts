@@ -1,65 +1,47 @@
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Run } from '@app/provider-integration/model/run.entity';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as csv from 'csvtojson';
 import { ProviderKey } from '../../../model/enum/provider-key.enum';
-import {
-  ExtractorContainer,
-  EXTRACTOR_CONTAINER,
-} from '../../extractor/extractor.container';
-import {
-  LoaderContainer,
-  LOADER_CONTAINER,
-} from '../../loader/loader.container';
-import {
-  MapperContainer,
-  MAPPER_CONTAINER,
-} from '../../mapper/mapper.container';
-import { Pipeline } from '../../pipeline/pipeline.interface';
+import { PipelineBase } from '../../pipeline/pipeline.base';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
 import { RainforestApiExtractor } from './rainforest-api.extractor';
 import { RainforestApiLoader } from './rainforest-api.loader';
 import { RainforestApiMapper } from './rainforest-api.mapper';
 
 @Injectable()
-export class RainforestApiPipeline implements Pipeline {
+export class RainforestApiPipeline extends PipelineBase {
   private readonly logger = new Logger(RainforestApiPipeline.name);
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
-  private readonly _extractor: RainforestApiExtractor;
-  private readonly _mapper: RainforestApiMapper;
-  private readonly _loader: RainforestApiLoader;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 
-  constructor(
-    @Inject(EXTRACTOR_CONTAINER) extractorFactory: ExtractorContainer,
-    @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer,
-    @Inject(LOADER_CONTAINER) loaderContainer: LoaderContainer,
-  ) {
-    this._extractor = extractorFactory.getExtractor(
-      this.providerKey,
-    ) as RainforestApiExtractor;
-    this._mapper = mapperContainer.getMapper(
-      this.providerKey,
-    ) as RainforestApiMapper;
-    this._loader = loaderContainer.getLoader(
-      this.providerKey,
-    ) as RainforestApiLoader;
-  }
-
-  async executeChannel(run: Run) {
+  async executeInternal(run: Run) {
     try {
-      const sourceStream = await this._extractor.extractChannel(run.channel);
-      run.contentDate = sourceStream.runDate;
+      const contentStream = await (
+        super.extractorContainer.getExtractor(
+          this.providerKey,
+        ) as RainforestApiExtractor
+      ).extractChannel(run.channel);
+
+      run.contentDate = contentStream.runDate;
       await csv()
-        .fromStream(sourceStream.stream)
+        .fromStream(contentStream.stream)
         .subscribe(async (item: RainforestApiSourceItemDto) => {
           if (
-            // only pull items from channel that have a listed price and are not sponsored
             !item.result.category_results.sponsored &&
             item.result.category_results.price.value
           ) {
-            const sourceProduct = this._mapper.mapChannelItem(item);
-            await this._loader.loadChannelItem(sourceProduct, run);
+            const sourceProduct = (
+              super.mapperContainer.getMapper(
+                this.providerKey,
+              ) as RainforestApiMapper
+            ).mapChannelItem(item);
+
+            await (
+              super.loaderContainer.getLoader(
+                this.providerKey,
+              ) as RainforestApiLoader
+            ).loadChannelItem(sourceProduct, run);
           }
         });
     } catch (err) {
@@ -69,14 +51,19 @@ export class RainforestApiPipeline implements Pipeline {
     return run;
   }
 
-  async executeProduct(product: Product, runId, reason, skipCache: boolean) {
-    const extracted = await this._extractor.extractProduct(product, skipCache);
-    return await this._loader.loadProductDetail(
-      product.id,
-      this._mapper.mapProductDetail(extracted.data, product.channel),
-      product.channel,
-      runId,
-      reason,
-    );
+  async refreshProduct(product: Product, runId, reason, skipCache: boolean) {
+    const extracted = await (
+      super.extractorContainer.getExtractor(
+        this.providerKey,
+      ) as RainforestApiExtractor
+    ).extractProduct(product, skipCache);
+
+    const mapped = (
+      super.mapperContainer.getMapper(this.providerKey) as RainforestApiMapper
+    ).mapProductDetail(product, extracted.data);
+
+    return await (
+      super.loaderContainer.getLoader(this.providerKey) as RainforestApiLoader
+    ).refreshProduct(product.id, mapped, product.channel, runId, reason);
   }
 }

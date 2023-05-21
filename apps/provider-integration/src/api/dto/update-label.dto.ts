@@ -4,10 +4,10 @@ import { IsOptional } from 'class-validator';
 
 export class UpdateLabelDto extends PartialType(MerchantLabel) {
   @IsOptional()
-  groupId?: string;
+  gmcLabelId?: string;
 
   @IsOptional()
-  logoUrl?: string;
+  logo?: string;
 
   @IsOptional()
   description?: string;

@@ -4,12 +4,12 @@ import * as csv from 'csvtojson';
 import * as path from 'path';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class SeedMerchants1662645991180 implements MigrationInterface {
-  private readonly logger = new Logger(SeedMerchants1662645991180.name);
+export class SeedMerchants1000000000002 implements MigrationInterface {
+  private readonly logger = new Logger(SeedMerchants1000000000002.name);
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    this.logger.log('Executing Migration');
-    const csvFile = path.join(__dirname, '../seeds/gmc-merchants.seed.csv');
+    this.logger.log('Executing Merchants Migration');
+    const csvFile = path.join(__dirname, '../seeds/merchants.seed.csv');
     this.logger.debug('Loading CSV Data: ' + csvFile);
     const merchants = await csv().fromFile(csvFile);
     await queryRunner.connection.getRepository(Merchant).save(merchants);
@@ -18,6 +18,6 @@ export class SeedMerchants1662645991180 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Reverting migration');
     const repo = queryRunner.connection.getRepository(Merchant);
-    await repo.query('DELETE FROM gmc_merchant');
+    await repo.query('DELETE FROM merchant');
   }
 }

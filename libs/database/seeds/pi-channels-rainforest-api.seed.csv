@@ -1,0 +1,10 @@
+providerKey,merchantKey,etlCode1,description,active,etlCode2,etlCode3
+rainforest-api,amazon-uk,6F28ECBF,Baby,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,F1A3C8C6,Beauty,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,DBECC84C,Fashion,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,476DEF2C,Garden & Outdoors,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,CC81EE8C,Grocery,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,76511C0E,Health & Personal Care,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,752B89E3,Home & Kitchen,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,A55C93FA,Pet Supplies,FALSE,https:///www.amazon.co.uk,SE21 8AX
+rainforest-api,amazon-uk,1D0AA44F,Toys & Games,FALSE,https:///www.amazon.co.uk,SE21 8AX

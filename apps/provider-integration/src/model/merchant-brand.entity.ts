@@ -11,7 +11,7 @@ import {
 import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
 
-@Entity({ name: 'gmc_merchant_brand' })
+@Entity({ name: 'merchant_brand' })
 @Index(['merchantId', 'code'], { unique: true })
 export class MerchantBrand {
   constructor(merchantId: string, name: string) {

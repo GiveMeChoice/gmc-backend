@@ -21,5 +21,5 @@ export class RainforestApiLoader extends SharedLoader {
     };
   }
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
 }

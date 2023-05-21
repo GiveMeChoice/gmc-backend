@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from './product.entity';
+import { ProductImageType } from './enum/product-image-type.enum';
 
 @Entity({ name: 'product_image' })
 export class ProductImage {
@@ -15,7 +16,7 @@ export class ProductImage {
   @Column({
     type: 'enum',
     enum: ProductImageType,
-    enumName: 'product_image_type__enum',
+    enumName: 'product_image_type_enum',
   })
   type?: ProductImageType;
 

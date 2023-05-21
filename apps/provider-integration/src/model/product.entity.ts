@@ -57,10 +57,10 @@ export class Product {
     INTEGRATION METADATA
   */
   @Column({
-    name: 'integration_status',
+    name: 'product_status',
     type: 'enum',
     enum: ProductStatus,
-    enumName: 'gmc_product_integration_status_enum',
+    enumName: 'product_status_enum',
   })
   status: ProductStatus;
 
@@ -74,10 +74,10 @@ export class Product {
   refreshedAt: Date;
 
   @Column({
-    name: 'refresh_reason',
+    name: 'product_refresh_reason',
     type: 'enum',
     enum: ProductRefreshReason,
-    enumName: 'gmc_product_refresh_reason_enum',
+    enumName: 'product_refresh_reason_enum',
     nullable: true,
   })
   refreshReason: ProductRefreshReason;

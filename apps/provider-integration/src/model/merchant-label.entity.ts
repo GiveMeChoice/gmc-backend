@@ -8,11 +8,11 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { LabelGroup } from './label-group.entity';
+import { GmcLabel } from './gmc-label.entity';
 import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
 
-@Entity({ name: 'gmc_merchant_label' })
+@Entity({ name: 'merchant_label' })
 @Index(['merchantId', 'code'], { unique: true })
 export class MerchantLabel {
   constructor(merchantId: string, code: string) {
@@ -45,14 +45,14 @@ export class MerchantLabel {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ name: 'info_link', nullable: true })
-  infoLink?: string;
+  @Column({ nullable: true })
+  logo?: string;
 
-  @Column({ name: 'logo_url', nullable: true })
-  logoUrl?: string;
+  @Column({ nullable: true })
+  url?: string;
 
-  @Column({ name: 'group_id', nullable: true })
-  groupId?: string;
+  @Column({ name: 'gmc_label_id', nullable: true })
+  gmcLabelId?: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -65,9 +65,9 @@ export class MerchantLabel {
   @JoinColumn({ name: 'merchant_id' })
   merchant: Merchant;
 
-  @ManyToOne(() => LabelGroup, (group) => group.merchantLabels)
-  @JoinColumn({ name: 'group_id' })
-  group?: LabelGroup;
+  @ManyToOne(() => GmcLabel, (group) => group.merchantLabels)
+  @JoinColumn({ name: 'gmc_label_id' })
+  gmcLabel?: GmcLabel;
 
   @ManyToMany(() => Product, (product) => product.merchantLabels)
   products: Product[];

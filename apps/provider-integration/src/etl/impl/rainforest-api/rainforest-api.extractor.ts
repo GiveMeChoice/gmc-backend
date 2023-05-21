@@ -30,7 +30,7 @@ export class RainforestApiExtractor
 {
   private readonly logger = new Logger(RainforestApiExtractor.name);
 
-  providerKey: ProviderKey = ProviderKey.RAINFOREST_API_UK;
+  providerKey: ProviderKey = ProviderKey.RAINFOREST_API;
   public static readonly BASE_URL = 'https://api.rainforestapi.com';
   private readonly _apiKey: string;
   private readonly _zipCode: string;
@@ -49,7 +49,7 @@ export class RainforestApiExtractor
   async extractChannel(source: Channel): Promise<SourceStream> {
     try {
       const sourceKey = await lastValueFrom(
-        this.fetchLatestCollectionResultKey(source.miscCode1),
+        this.fetchLatestCollectionResultKey(source.etlCode1),
       );
       this.logger.debug('Fetching latest collection result key', sourceKey);
       return {
@@ -170,10 +170,10 @@ export class RainforestApiExtractor
           params: {
             api_key: this._apiKey,
             type: 'product',
-            amazon_domain: channel.miscCode2,
+            amazon_domain: channel.etlCode2,
             asin,
             include_html: false,
-            zip_code: channel.miscCode3 ? channel.miscCode3 : '',
+            zip_code: channel.etlCode3 ? channel.etlCode3 : '',
           },
         },
       )

@@ -13,10 +13,10 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { FindLabelsDto } from '../dto/find-labels.dto';
+import { FindMerchantLabelsDto } from '../dto/find-merchant-labels.dto';
 import { UpdateLabelDto } from '../dto/update-label.dto';
 
-@Controller('labels')
+@Controller('merchant-labels')
 export class MerchantLabelsController {
   private readonly logger = new Logger(MerchantLabelsController.name);
 
@@ -45,7 +45,7 @@ export class MerchantLabelsController {
   @Post('find')
   async search(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindLabelsDto,
+    @Body() findDto: FindMerchantLabelsDto,
   ) {
     this.logger.debug(JSON.stringify(findDto));
     return await this.merchantLabelsService.find(findDto, pageRequest);

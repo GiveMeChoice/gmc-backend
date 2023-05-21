@@ -8,11 +8,11 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Category } from './category.entity';
+import { GmcCategory } from './gmc-category.entity';
 import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
 
-@Entity({ name: 'gmc_merchant_category' })
+@Entity({ name: 'merchant_category' })
 @Index(['merchantId', 'code'], { unique: true })
 export class MerchantCategory {
   constructor(merchantId: string, code: string) {
@@ -40,7 +40,7 @@ export class MerchantCategory {
   readonly code: string;
 
   @Column()
-  description: string;
+  name: string;
 
   @CreateDateColumn({
     name: 'created_at',
@@ -49,16 +49,16 @@ export class MerchantCategory {
   })
   createdAt: Date;
 
-  @Column({ name: 'category_id', nullable: true })
-  categoryId?: string;
+  @Column({ name: 'gmc_category_id', nullable: true })
+  gmcCategoryId?: string;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.categories)
   @JoinColumn({ name: 'merchant_id' })
   merchant: Merchant;
 
-  @ManyToOne(() => Category, (category) => category.merchantCategories)
-  @JoinColumn({ name: 'category_id' })
-  category?: Category;
+  @ManyToOne(() => GmcCategory, (gmcCategory) => gmcCategory.merchantCategories)
+  @JoinColumn({ name: 'gmc_category_id' })
+  gmcCategory?: GmcCategory;
 
   @OneToMany(() => Product, (product) => product.merchantCategory)
   products: Product[];

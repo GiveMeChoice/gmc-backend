@@ -2,7 +2,7 @@ import { MerchantCategory } from '@app/provider-integration/model/merchant-categ
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class FindProviderCategoriesDto extends PartialType(MerchantCategory) {
+export class FindMerchantCategoriesDto extends PartialType(MerchantCategory) {
   @IsOptional()
   merchantId?: string;
 
@@ -10,5 +10,5 @@ export class FindProviderCategoriesDto extends PartialType(MerchantCategory) {
   code?: string;
 
   @IsOptional()
-  categoryId?: string;
+  gmcCategoryId?: string;
 }

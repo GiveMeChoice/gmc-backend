@@ -23,7 +23,7 @@ export class MerchantLabelsService {
   findOne(id: string): Promise<MerchantLabel> {
     return this.merchantLabelsRepo.findOne({
       where: { id },
-      relations: { group: true },
+      relations: { gmcLabel: true },
     });
   }
 
@@ -39,10 +39,10 @@ export class MerchantLabelsService {
       .setFindOptions({
         ...pageRequest,
         relations: {
-          group: true,
+          gmcLabel: true,
         },
         select: {
-          group: {
+          gmcLabel: {
             name: true,
           },
         },

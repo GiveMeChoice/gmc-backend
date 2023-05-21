@@ -13,7 +13,7 @@ import { MerchantCategory } from './merchant-category.entity';
 import { MerchantLabel } from './merchant-label.entity';
 import { Product } from './product.entity';
 
-@Entity({ name: 'gmc_merchant' })
+@Entity({ name: 'merchant' })
 @Unique(['key'])
 export class Merchant {
   @PrimaryGeneratedColumn('uuid')
@@ -22,14 +22,14 @@ export class Merchant {
   @Column({
     type: 'enum',
     enum: MerchantKey,
-    enumName: 'gmc_merchant_key_enum',
+    enumName: 'merchant_key_enum',
   })
   key: MerchantKey;
 
   @Column({
     type: 'enum',
     enum: Region,
-    enumName: 'gmc_region_enum',
+    enumName: 'region_enum',
   })
   region: Region;
 

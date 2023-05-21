@@ -4,9 +4,9 @@ import { buildPage } from '@lib/database/utils/build-page';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Like, Repository, TreeRepository } from 'typeorm';
-import { Category } from '../model/category.entity';
+import { GmcCategory } from '../model/gmc-category.entity';
 import { MerchantCategory } from '../model/merchant-category.entity';
-import { CategoriesService } from './categories.service';
+import { GmcCategoriesService } from './gmc-categories.service';
 import { ProductsService } from './products.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class MerchantCategoriesService {
   constructor(
     @InjectRepository(MerchantCategory)
     private readonly merchantCategoriesRepo: Repository<MerchantCategory>,
-    private readonly categoryService: CategoriesService,
+    private readonly categoryService: GmcCategoriesService,
     @Inject(forwardRef(() => ProductsService))
     private readonly productsService: ProductsService,
   ) {}
@@ -25,7 +25,7 @@ export class MerchantCategoriesService {
     const [data, count] = await this.merchantCategoriesRepo.findAndCount({
       ...pageRequest,
       relations: {
-        category: true,
+        gmcCategory: true,
       },
     });
     return buildPage<MerchantCategory>(data, count, pageRequest);
@@ -34,7 +34,7 @@ export class MerchantCategoriesService {
   findOne(id: string): Promise<MerchantCategory> {
     return this.merchantCategoriesRepo.findOne({
       where: { id },
-      relations: { category: true },
+      relations: { gmcCategory: true },
     });
   }
 
@@ -43,10 +43,10 @@ export class MerchantCategoriesService {
     pageRequest?: PageRequest,
   ): Promise<Page<MerchantCategory>> {
     const categoryIds = [];
-    if (findDto.categoryId) {
+    if (findDto.gmcCategoryId) {
       const descendents = (await this.categoryService.findDescendents(
-        findDto.categoryId,
-      )) as Category[];
+        findDto.gmcCategoryId,
+      )) as GmcCategory[];
       for (const descendent of descendents) {
         categoryIds.push(descendent.id);
       }
@@ -56,15 +56,15 @@ export class MerchantCategoriesService {
       .where({
         ...findDto,
         ...(findDto.code && { code: Like(`${findDto.code}%`) }),
-        ...(findDto.categoryId && { categoryId: In(categoryIds) }),
+        ...(findDto.gmcCategoryId && { categoryId: In(categoryIds) }),
       })
       .setFindOptions({
         ...pageRequest,
         relations: {
-          category: true,
+          gmcCategory: true,
         },
         select: {
-          category: {
+          gmcCategory: {
             id: true,
             name: true,
           },

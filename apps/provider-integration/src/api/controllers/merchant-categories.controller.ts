@@ -13,31 +13,31 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { FindProviderCategoriesDto } from '../dto/find-provider-categories.dto';
+import { FindMerchantCategoriesDto } from '../dto/find-merchant-categories.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 
-@Controller('provider-categories')
-export class ProviderCategoriesController {
-  private readonly logger = new Logger(ProviderCategoriesController.name);
+@Controller('merchant-categories')
+export class MerchantCategoriesController {
+  private readonly logger = new Logger(MerchantCategoriesController.name);
 
   constructor(
-    private readonly providerCategoriesService: MerchantCategoriesService,
+    private readonly merchantCategoriesService: MerchantCategoriesService,
   ) {}
 
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
   ): Promise<Page<MerchantCategory>> {
-    return await this.providerCategoriesService.findAll(pageRequest);
+    return await this.merchantCategoriesService.findAll(pageRequest);
   }
 
   @Get(':id')
   async getOne(@Param('id') id): Promise<MerchantCategory> {
-    const providerCategory = await this.providerCategoriesService.findOne(id);
-    if (!providerCategory) {
-      throw new Error(`Provider Category not found: ${id}`);
+    const merchantCategory = await this.merchantCategoriesService.findOne(id);
+    if (!merchantCategory) {
+      throw new Error(`Merchant Category not found: ${id}`);
     } else {
-      return providerCategory;
+      return merchantCategory;
     }
   }
 
@@ -46,8 +46,8 @@ export class ProviderCategoriesController {
     @Param('id') id: string,
     @Body() updateDto: UpdateCategoryDto,
   ): Promise<MerchantCategory> {
-    this.logger.debug(`Updating provider category ${id}: ${updateDto}`);
-    return this.providerCategoriesService.update(id, updateDto);
+    this.logger.debug(`Updating merchant category ${id}: ${updateDto}`);
+    return this.merchantCategoriesService.update(id, updateDto);
   }
 
   @Post(':id/assign')
@@ -56,15 +56,15 @@ export class ProviderCategoriesController {
     @Query('categoryId') categoryId?: string,
   ): Promise<MerchantCategory> {
     this.logger.debug(`Updating provider category ${id}: ${categoryId}`);
-    return this.providerCategoriesService.assignCategory(id, categoryId);
+    return this.merchantCategoriesService.assignCategory(id, categoryId);
   }
 
   @Post('find')
   async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindProviderCategoriesDto,
+    @Body() findDto: FindMerchantCategoriesDto,
   ) {
     this.logger.debug(JSON.stringify(findDto));
-    return await this.providerCategoriesService.find(findDto, pageRequest);
+    return await this.merchantCategoriesService.find(findDto, pageRequest);
   }
 }

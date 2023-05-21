@@ -62,7 +62,7 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchSource(source: Channel): Observable<string> {
-    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.miscCode1}?limit=192`;
+    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.etlCode1}?limit=192`;
     this.logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }

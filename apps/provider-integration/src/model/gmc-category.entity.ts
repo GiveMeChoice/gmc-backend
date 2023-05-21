@@ -12,8 +12,8 @@ import { MerchantCategory } from './merchant-category.entity';
 
 @Entity({ name: 'gmc_category' })
 @Tree('nested-set')
-@Unique(['name'])
-export class Category {
+// @Unique(['name'])
+export class GmcCategory {
   constructor(name: string) {
     this.name = name;
   }
@@ -25,14 +25,14 @@ export class Category {
   name: string;
 
   @TreeChildren()
-  children: Category[];
+  children: GmcCategory[];
 
   @TreeParent()
-  parent: Category;
+  parent: GmcCategory;
 
   @OneToMany(
     () => MerchantCategory,
-    (merchantCategory) => merchantCategory.category,
+    (merchantCategory) => merchantCategory.gmcCategory,
   )
   merchantCategories: MerchantCategory[];
 }

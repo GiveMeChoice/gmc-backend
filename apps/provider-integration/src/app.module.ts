@@ -7,12 +7,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
 import { BrandsController } from './api/controllers/brands.controller';
-import { ProviderCategoriesController } from './api/controllers/provider-categories.controller';
-import { CategoryController } from './api/controllers/categories.controller';
+import { MerchantCategoriesController } from './api/controllers/merchant-categories.controller';
+import { GmcCategoriesController } from './api/controllers/gmc-categories.controller';
 import { EtlController } from './api/controllers/etl.controller';
 import { JobsController } from './api/controllers/jobs.controller';
-import { LabelGroupsController } from './api/controllers/label-groups.controller';
-import { MerchantLabelsController } from './api/controllers/labels.controller';
+import { GmcLabelsController } from './api/controllers/gmc-labels.controller';
+import { MerchantLabelsController } from './api/controllers/merchant-labels.controller';
 import { RunsController } from './api/controllers/runs.controller';
 import { ChannelsController } from './api/controllers/channels.controller';
 import { ProductsController } from './api/controllers/products.controller';
@@ -26,9 +26,9 @@ import { ProductExpiredMonitorJob } from './jobs/product-expired-monitor.job';
 import { JobContainer, JOB_CONTAINER } from './jobs/shared/job.container';
 import { SourceDueMonitorJob } from './jobs/source-due-monitor.job';
 import { MerchantBrand } from './model/merchant-brand.entity';
-import { Category } from './model/category.entity';
+import { GmcCategory } from './model/gmc-category.entity';
 import { MerchantCategory } from './model/merchant-category.entity';
-import { LabelGroup } from './model/label-group.entity';
+import { GmcLabel } from './model/gmc-label.entity';
 import { MerchantLabel } from './model/merchant-label.entity';
 import { Run } from './model/run.entity';
 import { Channel } from './model/channel.entity';
@@ -37,10 +37,10 @@ import { Provider } from './model/provider.entity';
 import { ProductReview } from './model/product-review.entity';
 import { MerchantBrandsService } from './services/merchant-brands.service';
 import { MerchantCategoriesService } from './services/merchant-categories.service';
-import { CategoriesService } from './services/categories.service';
+import { GmcCategoriesService } from './services/gmc-categories.service';
 import { EtlService } from './services/etl.service';
 import { JobsService } from './services/jobs.service';
-import { LabelGroupsService } from './services/label-groups.service';
+import { GmcLabelsService } from './services/gmc-labels.service';
 import { MerchantLabelsService } from './services/merchant-labels.service';
 import { RunsService } from './services/runs.service';
 import { ChannelsService } from './services/channels.service';
@@ -65,9 +65,9 @@ import { MerchantsService } from './services/merchants.service';
       Run,
       Product,
       MerchantLabel,
-      LabelGroup,
+      GmcLabel,
       MerchantCategory,
-      Category,
+      GmcCategory,
       MerchantBrand,
       ProductReview,
       Merchant,
@@ -84,9 +84,9 @@ import { MerchantsService } from './services/merchants.service';
     ChannelsController,
     RunsController,
     MerchantLabelsController,
-    LabelGroupsController,
-    ProviderCategoriesController,
-    CategoryController,
+    GmcLabelsController,
+    MerchantCategoriesController,
+    GmcCategoriesController,
     BrandsController,
     JobsController,
     ProductsController,
@@ -105,9 +105,9 @@ import { MerchantsService } from './services/merchants.service';
     RunsService,
     ProductsService,
     MerchantLabelsService,
-    LabelGroupsService,
+    GmcLabelsService,
     MerchantCategoriesService,
-    CategoriesService,
+    GmcCategoriesService,
     MerchantBrandsService,
     MerchantsService,
     // helper services

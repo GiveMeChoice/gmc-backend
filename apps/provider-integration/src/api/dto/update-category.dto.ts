@@ -7,5 +7,5 @@ export class UpdateCategoryDto extends PartialType(MerchantCategory) {
   groupId?: string;
 
   @IsOptional()
-  description?: string;
+  name?: string;
 }

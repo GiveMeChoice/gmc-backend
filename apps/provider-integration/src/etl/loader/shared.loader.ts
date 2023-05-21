@@ -40,7 +40,7 @@ export abstract class SharedLoader implements Loader {
     sourceItem: ProviderProductDataDto,
   ): ProviderProductDataDto;
 
-  async loadProductDetail(
+  async refreshProduct(
     id: string,
     productDetail: ProviderProductDataDto,
     source: Channel,
