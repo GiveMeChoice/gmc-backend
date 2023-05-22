@@ -1,12 +1,12 @@
-import { MessagingModule } from '@lib/messaging';
-import { SearchModule } from '@lib/search';
+import { MessagingModule } from 'libs/messaging/src';
+import { SearchModule } from 'libs/elasticsearch/src';
 import { forwardRef, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from 'libs/database/src';
 import configuration from '../config/configuration';
-import { BrandsController } from './api/controllers/brands.controller';
+import { MerchantBrandsController } from './api/controllers/merchant-brands.controller';
 import { MerchantCategoriesController } from './api/controllers/merchant-categories.controller';
 import { GmcCategoriesController } from './api/controllers/gmc-categories.controller';
 import { EtlController } from './api/controllers/etl.controller';
@@ -49,8 +49,11 @@ import { ProvidersService } from './services/providers.service';
 import { TasksService } from './services/tasks.service';
 import { PingController } from './api/controllers/ping.controller';
 import { Merchant } from './model/merchant.entity';
-import { MerchantsController } from './api/controllers/merchant.controller';
+import { MerchantsController } from './api/controllers/merchants.controller';
 import { MerchantsService } from './services/merchants.service';
+import { ProductImage } from './model/product-image.entity';
+import { IndexController } from './api/controllers/index.controller';
+import { IndexService } from './services/index.service';
 
 @Module({
   imports: [
@@ -70,6 +73,7 @@ import { MerchantsService } from './services/merchants.service';
       GmcCategory,
       MerchantBrand,
       ProductReview,
+      ProductImage,
       Merchant,
     ]),
     DatabaseModule,
@@ -87,9 +91,10 @@ import { MerchantsService } from './services/merchants.service';
     GmcLabelsController,
     MerchantCategoriesController,
     GmcCategoriesController,
-    BrandsController,
+    MerchantBrandsController,
     JobsController,
     ProductsController,
+    IndexController,
     MerchantsController,
   ],
   providers: [
@@ -104,6 +109,7 @@ import { MerchantsService } from './services/merchants.service';
     ChannelsService,
     RunsService,
     ProductsService,
+    IndexService,
     MerchantLabelsService,
     GmcLabelsService,
     MerchantCategoriesService,
@@ -125,6 +131,12 @@ import { MerchantsService } from './services/merchants.service';
       inject: [SourceDueMonitorJob, ProductExpiredMonitorJob],
     },
   ],
-  exports: [ProvidersService, ChannelsService, RunsService, ProductsService],
+  exports: [
+    ProvidersService,
+    ChannelsService,
+    RunsService,
+    ProductsService,
+    IndexService,
+  ],
 })
 export class AppModule {}

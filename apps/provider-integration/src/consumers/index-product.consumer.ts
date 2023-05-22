@@ -1,9 +1,9 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import { Consumer } from '@lib/messaging/interface/consumer.interface';
+import { Consumer } from 'libs/messaging/src/interface/consumer.interface';
 import {
   CHANNEL_HIGH,
   DEFAULT_EXCHANGE,
-} from '@lib/messaging/messaging.constants';
+} from 'libs/messaging/src/messaging.constants';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IndexProductCommand } from '../messages/index-product.command';

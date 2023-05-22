@@ -16,7 +16,7 @@ export class ProductExpiredMonitorJob extends JobBase {
   }
 
   async execute() {
-    const count = await this.productsService.updateAllExpired();
+    const count = await this.productsService.flagAllExpired();
     return `Found and updated ${count} expired Products`;
   }
 }

@@ -14,7 +14,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { FindMerchantLabelsDto } from '../dto/find-merchant-labels.dto';
-import { UpdateLabelDto } from '../dto/update-label.dto';
+import { UpdateMerchantLabelDto } from '../dto/update-merchant-label.dto';
 
 @Controller('merchant-labels')
 export class MerchantLabelsController {
@@ -37,13 +37,22 @@ export class MerchantLabelsController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateLabelDto,
+    @Body() updateDto: UpdateMerchantLabelDto,
   ): Promise<MerchantLabel> {
     return this.merchantLabelsService.update(id, updateDto);
   }
 
+  @Post(':id/assign')
+  async assign(
+    @Param('id') id: string,
+    @Query('gmcLabelId') gmcLabelId?: string,
+  ): Promise<MerchantLabel> {
+    this.logger.debug(`Assigning merchant label ${id} to ${gmcLabelId}`);
+    return this.merchantLabelsService.assignGmcLabel(id, gmcLabelId);
+  }
+
   @Post('find')
-  async search(
+  async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindMerchantLabelsDto,
   ) {

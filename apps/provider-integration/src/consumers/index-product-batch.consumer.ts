@@ -1,14 +1,13 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import { Consumer } from '@lib/messaging/interface/consumer.interface';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConsumeMessage } from 'amqplib';
+import { Consumer } from 'libs/messaging/src/interface/consumer.interface';
 import {
   CHANNEL_LOW,
   DEFAULT_EXCHANGE,
-} from '@lib/messaging/messaging.constants';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConsumeMessage } from 'amqplib';
+} from 'libs/messaging/src/messaging.constants';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { ProductsService } from '../services/products.service';
-import { formatErrorMessage } from '../utils/format-error-message';
 
 @Injectable()
 export class IndexProductBatchConsumer

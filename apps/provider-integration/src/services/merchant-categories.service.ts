@@ -1,13 +1,13 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Like, Repository, TreeRepository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { GmcCategory } from '../model/gmc-category.entity';
 import { MerchantCategory } from '../model/merchant-category.entity';
 import { GmcCategoriesService } from './gmc-categories.service';
-import { ProductsService } from './products.service';
+import { IndexService } from './index.service';
 
 @Injectable()
 export class MerchantCategoriesService {
@@ -17,8 +17,7 @@ export class MerchantCategoriesService {
     @InjectRepository(MerchantCategory)
     private readonly merchantCategoriesRepo: Repository<MerchantCategory>,
     private readonly categoryService: GmcCategoriesService,
-    @Inject(forwardRef(() => ProductsService))
-    private readonly productsService: ProductsService,
+    private readonly indexService: IndexService,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<MerchantCategory>> {
@@ -93,23 +92,19 @@ export class MerchantCategoriesService {
     return await this.findOne(id);
   }
 
-  async assignCategory(
+  async assignGmcCategory(
     id: string,
-    categoryId: string,
+    gmcCategoryId: string,
   ): Promise<MerchantCategory> {
-    const pc = await this.findOne(id);
-    if (!pc) throw new Error(`Provider Category Not Found: ${id}`);
+    const merchantCategory = await this.findOne(id);
+    if (!merchantCategory)
+      throw new Error(`Merchant Category Not Found: ${id}`);
     await this.merchantCategoriesRepo.save({
       id,
-      categoryId: categoryId ? categoryId : null,
+      categoryId: gmcCategoryId ? gmcCategoryId : null,
     });
-    const ids = await this.productsService.findIds({
-      merchantCategory: {
-        id,
-      } as MerchantCategory,
-    });
-    Logger.debug(`Reindexing ${ids.data.length} products`);
-    await this.productsService.indexProductBatchAsync({
+    Logger.debug(`Merchant Category Reassigned. Reindexing products.`);
+    await this.indexService.indexProductBatchAsync({
       merchantCategory: {
         id,
       } as MerchantCategory,

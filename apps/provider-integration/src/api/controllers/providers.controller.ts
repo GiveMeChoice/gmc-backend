@@ -22,15 +22,6 @@ export class ProvidersController {
 
   constructor(private readonly providersService: ProvidersService) {}
 
-  @Post('find')
-  async find(
-    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindProvidersDto,
-  ): Promise<Page<Provider>> {
-    this.logger.debug(JSON.stringify(findDto));
-    return await this.providersService.find(findDto, pageRequest);
-  }
-
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
@@ -49,5 +40,14 @@ export class ProvidersController {
     @Body() updateDto: UpdateProviderDto,
   ): Promise<Provider> {
     return this.providersService.update(id, updateDto);
+  }
+
+  @Post('find')
+  async find(
+    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
+    @Body() findDto: FindProvidersDto,
+  ): Promise<Page<Provider>> {
+    this.logger.debug(JSON.stringify(findDto));
+    return await this.providersService.find(findDto, pageRequest);
   }
 }

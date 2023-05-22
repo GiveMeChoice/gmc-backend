@@ -22,15 +22,6 @@ export class ChannelsController {
 
   constructor(private readonly channelsService: ChannelsService) {}
 
-  @Post('find')
-  async find(
-    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindChannelsDto,
-  ): Promise<Page<Channel>> {
-    this.logger.debug(JSON.stringify(findDto));
-    return await this.channelsService.find(findDto, pageRequest);
-  }
-
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
@@ -49,5 +40,14 @@ export class ChannelsController {
     @Body() updateDto: UpdateChannelDto,
   ): Promise<Channel> {
     return this.channelsService.update(id, updateDto);
+  }
+
+  @Post('find')
+  async find(
+    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
+    @Body() findDto: FindChannelsDto,
+  ): Promise<Page<Channel>> {
+    this.logger.debug(JSON.stringify(findDto));
+    return await this.channelsService.find(findDto, pageRequest);
   }
 }

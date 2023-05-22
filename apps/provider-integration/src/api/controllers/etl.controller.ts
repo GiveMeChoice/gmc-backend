@@ -16,15 +16,15 @@ export class EtlController {
     private readonly productsService: ProductsService,
   ) {}
 
-  @Post('integrate-source')
-  async integrateSource(@Query('id') sourceId: string): Promise<Run> {
-    this.logger.debug(`Integrate source ${sourceId}`);
-    return await this.etlService.inegrateProviderChannel(sourceId);
+  @Post('integrate-channel')
+  async integrateChannel(@Query('channelId') channelId: string): Promise<Run> {
+    this.logger.debug(`Integrate provider channel ${channelId}`);
+    return await this.etlService.inegrateProviderChannel(channelId);
   }
 
-  @Post('integrate-product')
+  @Post('refresh-product')
   async integrateProduct(
-    @Query('id') productId: string,
+    @Query('productId') productId: string,
     @Query('skipCache') skipCache: boolean,
   ): Promise<Product> {
     this.logger.debug(
@@ -32,7 +32,7 @@ export class EtlController {
         skipCache ? 'AND SKIP CACHE' : 'from cache'
       }`,
     );
-    await this.etlService.integrateProduct(
+    await this.etlService.refreshProduct(
       productId,
       'REST_API',
       ProductRefreshReason.REQUESTED,
@@ -43,7 +43,7 @@ export class EtlController {
 
   @Post('extract-product')
   async extractProduct(
-    @Query('id') productId: string,
+    @Query('productId') productId: string,
     @Query('skipCache') skipCache: boolean,
   ): Promise<any> {
     this.logger.debug(
@@ -54,7 +54,7 @@ export class EtlController {
 
   @Post('map-product')
   async mapProduct(
-    @Query('id') productId: string,
+    @Query('productId') productId: string,
     @Query('skipCache') skipCache: boolean,
   ): Promise<ProviderProductDataDto> {
     this.logger.debug(
@@ -63,10 +63,10 @@ export class EtlController {
     return await this.etlService.mapProduct(productId, skipCache);
   }
 
-  @Post('remap-provider')
-  async remapProvider(@Query('provider') key: ProviderKey): Promise<any> {
-    if (!key) throw new Error('provider (key) required');
-    this.logger.debug(`Requesting Product Remap for Provider: ${key}`);
-    return await this.etlService.remapProvider(key);
-  }
+  // @Post('remap-provider')
+  // async remapProvider(@Query('provider') key: ProviderKey): Promise<any> {
+  //   if (!key) throw new Error('provider (key) required');
+  //   this.logger.debug(`Requesting Product Remap for Provider: ${key}`);
+  //   return await this.etlService.remapProvider(key);
+  // }
 }

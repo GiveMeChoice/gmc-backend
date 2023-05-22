@@ -1,18 +1,13 @@
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
 import { Client } from '@elastic/elasticsearch';
-import {
-  MappingTypeMapping,
-  SearchResponse,
-} from '@elastic/elasticsearch/lib/api/types';
+import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { mappings } from './config/index-mappings';
 
 @Injectable()
-export class SearchService implements OnModuleInit {
-  private readonly logger = new Logger(SearchService.name);
+export class ElasticsearchService implements OnModuleInit {
+  private readonly logger = new Logger(ElasticsearchService.name);
 
   private readonly _indexName;
   private _client: Client;

@@ -67,13 +67,13 @@
         "tsConfigPath": "libs/rabbitmq/tsconfig.lib.json"
       }
     },
-    "search": {
+    "elasticsearch": {
       "type": "library",
-      "root": "libs/search",
+      "root": "libs/elasticsearch",
       "entryFile": "index",
-      "sourceRoot": "libs/search/src",
+      "sourceRoot": "libs/elasticsearch/src",
       "compilerOptions": {
-        "tsConfigPath": "libs/search/tsconfig.lib.json"
+        "tsConfigPath": "libs/elasticsearch/tsconfig.lib.json"
       }
     }
   }

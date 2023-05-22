@@ -21,6 +21,7 @@ import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.e
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 import { ProductImage } from '@app/provider-integration/model/product-image.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
+import { ProductImageType } from '@app/provider-integration/model/enum/product-image-type.enum';
 
 @Injectable()
 export class EthicalSuperstoreMapper

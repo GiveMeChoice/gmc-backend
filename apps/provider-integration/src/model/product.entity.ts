@@ -44,8 +44,8 @@ export class Product {
   @Column({ name: 'short_id' })
   shortId: string;
 
-  @Column({ name: 'owner_channel_id' })
-  readonly ownerChannelId: string;
+  @Column({ name: 'channel_id' })
+  readonly channelId: string;
 
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
@@ -187,13 +187,13 @@ export class Product {
     onUpdate: 'CASCADE',
   })
   @JoinTable({
-    name: 'gmc_product_label',
+    name: 'product_merchant_label',
     joinColumn: {
       name: 'product',
       referencedColumnName: 'id',
     },
     inverseJoinColumn: {
-      name: 'label',
+      name: 'merchant_label',
       referencedColumnName: 'id',
     },
   })

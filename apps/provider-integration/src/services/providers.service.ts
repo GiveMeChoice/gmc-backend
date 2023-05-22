@@ -14,7 +14,7 @@ export class ProvidersService {
   constructor(
     @InjectRepository(Provider) private providersRepo: Repository<Provider>,
     @InjectRepository(Channel)
-    private sourcesRepo: Repository<Channel>,
+    private channelRepo: Repository<Channel>,
   ) {}
 
   async find(
@@ -25,18 +25,19 @@ export class ProvidersService {
       .createQueryBuilder('provider')
       .where({ ...findDto })
       .setFindOptions({ ...pageRequest })
-      .loadRelationCountAndMap('provider.sourcesCount', 'provider.sources')
+      .loadRelationCountAndMap('provider.channelCount', 'provider.channels')
       .getManyAndCount();
 
+    // add provider product count by iterating and summing channel product counts
     for (const provider of data) {
       (provider as any).productCount = 0;
-      const data = await this.sourcesRepo
-        .createQueryBuilder('source')
+      const data = await this.channelRepo
+        .createQueryBuilder('channel')
         .where({ providerId: provider.id })
-        .loadRelationCountAndMap('source.productCount', 'source.products')
+        .loadRelationCountAndMap('channel.productCount', 'channel.products')
         .getMany();
-      for (const source of data) {
-        (provider as any).productCount += (source as any).productCount;
+      for (const channel of data) {
+        (provider as any).productCount += (channel as any).productCount;
       }
     }
     return buildPage<Provider>(data, count, pageRequest);

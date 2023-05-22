@@ -1,4 +1,4 @@
-import { MessageBase } from '@lib/messaging/interface/message-base.class';
+import { MessageBase } from 'libs/messaging/src/interface/message-base.class';
 import { IntegrateProductCommandDataDto } from './dto/integrate-product-command.dto';
 
 export class IntegrateProductCommand extends MessageBase<IntegrateProductCommandDataDto> {

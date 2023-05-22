@@ -1,64 +1,26 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { MessagingService } from '@lib/messaging';
-import { SearchService } from '@lib/search';
-import { SearchCategoryDto } from '@lib/search/dto/search-category.dto';
-import { SearchProductDto } from '@lib/search/dto/search-product.dto';
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import * as moment from 'moment';
-import {
-  FindOptionsRelations,
-  FindOptionsSelect,
-  In,
-  Repository,
-} from 'typeorm';
+import { Repository } from 'typeorm';
 import { FindProductsDto } from '../api/dto/find-products.dto';
-import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
-import { IndexProductCommand } from '../messages/index-product.command';
-import { MerchantBrand } from '../model/merchant-brand.entity';
-import { GmcCategory } from '../model/gmc-category.entity';
-import { ProductStatus } from '../model/enum/product-status.enum';
-import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
-import { MerchantLabel } from '../model/merchant-label.entity';
 import { Channel } from '../model/channel.entity';
-import { Product } from '../model/product.entity';
+import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
+import { ProductStatus } from '../model/enum/product-status.enum';
+import { MerchantBrand } from '../model/merchant-brand.entity';
 import { MerchantCategory } from '../model/merchant-category.entity';
-import { Provider } from '../model/provider.entity';
+import { MerchantLabel } from '../model/merchant-label.entity';
+import { Product } from '../model/product.entity';
 import { Run } from '../model/run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
+import { IndexService } from './index.service';
 import { MerchantBrandsService } from './merchant-brands.service';
-import { GmcCategoriesService } from './gmc-categories.service';
-import { MerchantLabelsService } from './merchant-labels.service';
 import { MerchantCategoriesService } from './merchant-categories.service';
-import { SearchLabelDto } from '@lib/search/dto/search-label.dto';
-import { GmcLabel } from '../model/gmc-label.entity';
-import { GmcLabelsService } from './gmc-labels.service';
+import { MerchantLabelsService } from './merchant-labels.service';
 import { MerchantsService } from './merchants.service';
-
-const searchRelevantFieldsFindOptions = {
-  relations: {
-    merchantLabels: true,
-    merchant: true,
-    merchantCategory: true,
-    merchantBrand: true,
-    reviews: true,
-  } as FindOptionsRelations<Product>,
-  select: {
-    id: true,
-    shortId: true,
-    sku: true,
-    title: true,
-    description: true,
-    price: true,
-    currency: true,
-    listImage: true,
-    rating: true,
-    ratingsTotal: true,
-  } as FindOptionsSelect<Product>,
-};
 
 @Injectable()
 export class ProductsService {
@@ -68,220 +30,12 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: MerchantLabelsService,
-    private readonly categoriesService: GmcCategoriesService,
-    private readonly labelGroupsService: GmcLabelsService,
+    private readonly indexService: IndexService,
     private readonly merchantsService: MerchantsService,
     @Inject(forwardRef(() => MerchantCategoriesService))
     private readonly merchantCategoriesService: MerchantCategoriesService,
     private readonly brandsService: MerchantBrandsService,
-    private readonly messagingService: MessagingService,
-    private readonly searchService: SearchService,
   ) {}
-
-  async indexProductAsync(productId: string) {
-    await this.messagingService.sendToQueue(
-      new IndexProductCommand({
-        productId,
-      }),
-    );
-  }
-
-  async indexProduct(id: string) {
-    const toIndex = await this.getOneIndexable(id);
-    return await this.searchService.indexDocument(toIndex.id, toIndex);
-  }
-
-  async getOneIndexable(id: string): Promise<SearchProductDto> {
-    const product = await this.productsRepo.findOne({
-      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
-      ...searchRelevantFieldsFindOptions,
-    });
-    return await this.mapToIndexable(product);
-  }
-
-  private async mapToIndexable(
-    product: Partial<Product>,
-  ): Promise<SearchProductDto> {
-    let category: GmcCategory = null;
-    if (product.merchantCategory.gmcCategoryId) {
-      category = await this.categoriesService.findOne(
-        product.merchantCategory.gmcCategoryId,
-      );
-    }
-    return {
-      id: product.shortId,
-      merchantProductId: product.merchantProductNumber,
-      region: 'UK',
-      sku: product.sku,
-      merchant: {
-        key: product.merchant.key,
-        name: product.merchant.name,
-        description: product.merchant.description,
-        logoUrl: product.merchant.logo,
-      },
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      offerLink: product.offerUrl,
-      images: {
-        list: {
-          url: product.listImage,
-        },
-        detail: {
-          url: product.mainImage,
-        },
-      },
-      brand: {
-        code: product.merchantBrand.code,
-        name: product.merchantBrand.name,
-        description: product.merchantBrand.description,
-        logoUrl: product.merchantBrand.logoUrl,
-        infoLink: product.merchantBrand.infoLink,
-      },
-      category: {
-        merchantCategory: product.merchantCategory.code,
-        gmcCategory: await this.mapSearchCategory(
-          product.merchantCategory.gmcCategoryId,
-        ),
-      },
-      labels: await this.mapSearchLabels(product.merchantLabels),
-    };
-  }
-
-  private async mapSearchCategory(
-    categoryId: string,
-  ): Promise<SearchCategoryDto> {
-    if (!categoryId) return null;
-
-    const category = (await this.categoriesService.findAncestors(
-      categoryId,
-      true,
-    )) as GmcCategory;
-    if (!category) return null;
-
-    let nodes: string[] = [];
-    nodes = this.flattenCategoryTree(category, nodes);
-    // return nodes;
-    const searchCategory: SearchCategoryDto = {
-      name: nodes[nodes.length - 1],
-      ...(nodes.length > 1 && {
-        subcategory: {
-          name: nodes[nodes.length - 2],
-          ...(nodes.length > 2 && {
-            subcategory: {
-              name: nodes[nodes.length - 3],
-            },
-          }),
-        },
-      }),
-    };
-    return searchCategory;
-  }
-
-  private async mapSearchLabels(
-    merchantLabels: MerchantLabel[],
-  ): Promise<SearchLabelDto[]> {
-    const labels = [];
-    this.logger.debug(merchantLabels.length);
-    for (const merchantLabel of merchantLabels) {
-      const label: SearchLabelDto = {
-        merchantLabel: {
-          code: merchantLabel.code,
-          name: merchantLabel.name,
-          description: merchantLabel.description,
-          logoUrl: merchantLabel.logo,
-          infoLink: merchantLabel.url,
-        },
-      };
-      this.logger.debug(`mapping label ${merchantLabel.code}`);
-      if (merchantLabel.gmcLabelId) {
-        const group = (await this.labelGroupsService.findAncestors(
-          merchantLabel.gmcLabelId,
-          true,
-        )) as GmcLabel;
-        if (group) {
-          let nodes = [];
-          nodes = this.flattenLabelGroupTree(group, nodes);
-          label.group = {
-            name: nodes[nodes.length - 1].name,
-            description: nodes[nodes.length - 1].description,
-            ...(nodes.length > 1 && {
-              sublabel: {
-                name: nodes[nodes.length - 2].name,
-                description: nodes[nodes.length - 2].description,
-                ...(nodes.length > 2 && {
-                  sublabel: {
-                    name: nodes[nodes.length - 3].name,
-                    description: nodes[nodes.length - 3].description,
-                  },
-                }),
-              },
-            }),
-          };
-        }
-      }
-      labels.push(label);
-    }
-    return labels;
-  }
-
-  private flattenCategoryTree(
-    node: GmcCategory,
-    flattened: string[],
-  ): string[] {
-    flattened.push(node.name);
-    return node.parent && node.parent.name !== 'Root'
-      ? this.flattenCategoryTree(node.parent, flattened)
-      : flattened;
-  }
-
-  private flattenLabelGroupTree(node: GmcLabel, flattened: any[]): any[] {
-    flattened.push({ name: node.name, description: node.description });
-    return node.parent && node.parent.name !== 'Root'
-      ? this.flattenLabelGroupTree(node.parent, flattened)
-      : flattened;
-  }
-
-  async indexProductBatchAsync(findDto: Partial<Product>) {
-    findDto.status = ProductStatus.LIVE;
-    const BATCH_SIZE = 30;
-    const pageRequest: PageRequest = { skip: 0, take: BATCH_SIZE };
-    let page = await this.findIds(findDto, pageRequest);
-    if (page.meta.count > 0) {
-      await this.messagingService.sendToQueue(
-        new IndexProductBatchCommand({
-          productIds: page.data.map((p) => p.id),
-        }),
-      );
-    }
-    while (pageRequest.skip + pageRequest.take < page.meta.totalCount) {
-      pageRequest.skip += BATCH_SIZE;
-      page = await this.findIds(findDto, pageRequest);
-      if (page.meta.count > 0) {
-        await this.messagingService.sendToQueue(
-          new IndexProductBatchCommand({
-            productIds: page.data.map((p) => p.id),
-          }),
-        );
-      }
-    }
-  }
-
-  async indexProductBatch(productIds: string[]) {
-    const batchToIndex = await this.productsRepo.find({
-      where: { id: In(productIds) },
-      ...searchRelevantFieldsFindOptions,
-    });
-    const documentBatch = [];
-    for (const product of batchToIndex) {
-      documentBatch.push({
-        id: product.shortId,
-        ...(await this.mapToIndexable(product)),
-      });
-    }
-    this.logger.debug(`Index product batch: ${documentBatch.length} documents`);
-    await this.searchService.bulk(documentBatch);
-  }
 
   async find(
     findDto: FindProductsDto,
@@ -327,94 +81,11 @@ export class ProductsService {
     return buildPage<Product>(toCreate, count, pageRequest);
   }
 
-  async findIds(
-    findDto: Partial<Product>,
-    pageRequest?: PageRequest,
-  ): Promise<Page<Product>> {
-    const [toCreate, count] = await this.productsRepo.findAndCount({
-      ...pageRequest,
-      where: {
-        ...findDto,
-      },
-      select: {
-        id: true,
-      },
-    });
-    return buildPage<Product>(toCreate, count, pageRequest);
-  }
-
-  async existsById(id: string): Promise<boolean> {
-    return (
-      id &&
-      (await this.productsRepo
-        .createQueryBuilder('product')
-        .select('product.id')
-        .where('product.id = :id', { id })
-        .getRawOne())
-    );
-  }
-
-  async existsByMerchant(
-    merchantId: string,
-    merchantProductId: string,
-  ): Promise<boolean> {
-    return (
-      merchantId &&
-      merchantProductId &&
-      (await this.productsRepo
-        .createQueryBuilder('product')
-        .select('product.id')
-        .where('product.merchantId = :merchantId', { merchantId })
-        .andWhere('product.merchantProductId = :merchantProductId', {
-          merchantProductId,
-        })
-        .getRawOne())
-    );
-  }
-
   async findAll(pageRequest?: PageRequest): Promise<Page<Product>> {
     const [toCreate, count] = await this.productsRepo.findAndCount({
       ...pageRequest,
     });
     return buildPage<Product>(toCreate, count, pageRequest);
-  }
-
-  async updateAllExpired(): Promise<number> {
-    const raw = await this.productsRepo
-      .createQueryBuilder()
-      .update(Product)
-      .set({
-        status: ProductStatus.EXPIRED,
-        expiresAt: null,
-      })
-      .where('expiresAt < :now', { now: new Date() })
-      .execute();
-    return raw.affected;
-  }
-
-  async setToRemapByProvider(id: string): Promise<number> {
-    const raw = await this.productsRepo
-      .createQueryBuilder()
-      .update(Product)
-      .set({
-        status: ProductStatus.REMAP,
-      })
-      .where('providerId = :id', { id })
-      .andWhere('integrationStatus != :expired', {
-        expired: ProductStatus.EXPIRED,
-      })
-      .execute();
-    return raw.affected;
-  }
-
-  findByMerchant(
-    merchantId: string,
-    merchantProductId?: string,
-  ): Promise<Product> {
-    return this.productsRepo.findOneBy({
-      merchantId,
-      merchantProductNumber: merchantProductId,
-    });
   }
 
   findOne(id: string): Promise<Product> {
@@ -452,7 +123,30 @@ export class ProductsService {
     });
   }
 
-  async getStatus(id: string): Promise<ProductStatus> {
+  findByMerchant(
+    merchantId: string,
+    merchantProductId?: string,
+  ): Promise<Product> {
+    return this.productsRepo.findOneBy({
+      merchantId,
+      merchantProductNumber: merchantProductId,
+    });
+  }
+
+  async flagAllExpired(): Promise<number> {
+    const raw = await this.productsRepo
+      .createQueryBuilder()
+      .update(Product)
+      .set({
+        status: ProductStatus.EXPIRED,
+        expiresAt: null,
+      })
+      .where('expiresAt < :now', { now: new Date() })
+      .execute();
+    return raw.affected;
+  }
+
+  async getCurrentStatus(id: string): Promise<ProductStatus> {
     const { status: status } = await this.productsRepo.findOne({
       select: {
         status: true,
@@ -465,55 +159,12 @@ export class ProductsService {
   }
 
   async create(product: Partial<Product>, run: Run): Promise<Product> {
-    // check Merchant mapped from provider
-    if (!product.merchant || !product.merchant.key) {
-      throw new Error(`Merchant not mapped by provider! (Run ID: ${run.id}`);
-    }
-    product.merchant = await this.merchantsService.findOneByKey(
-      product.merchant.key,
-    );
-    if (!product.merchant.id) {
-      throw new Error(
-        `Merchant not found! (Key: ${product.merchant.key}) (Run ID: ${run.id})`,
-      );
-    }
-    // check product is new
-    if (
-      !this.existsByMerchant(
-        run.channel.providerId,
-        product.merchantProductNumber,
-      )
-    ) {
-      throw new Error(
-        `Provider ${run.channel.providerId} product ${product.merchantProductNumber} already exists!`,
-      );
-    }
-    // ok lets go!
+    await this.validateIsCreateable(product, run);
     product.channel = run.channel;
     product.createdByRunId = run.id;
     product.keepAliveCount = 0;
-    product.expiresAt = await this.renewExpirationDate(
-      run.channel.provider,
-      run.channel,
-    );
-    if (product.merchantCategory) {
-      product.merchantCategory = await this.normalizeCategory(
-        product.merchant.id,
-        product.merchantCategory,
-      );
-    }
-    if (product.merchantBrand) {
-      product.merchantBrand = await this.normalizeBrand(
-        product.merchant.id,
-        product.merchantBrand,
-      );
-    }
-    if (product.merchantLabels) {
-      product.merchantLabels = await this.normalizeLabels(
-        product.merchant.id,
-        product.merchantLabels,
-      );
-    }
+    product.expiresAt = await this.renewExpirationDate(run.channel);
+    product = await this.normalizeProduct(product.merchant.id, product);
     return await this.productsRepo.save(Product.factory(product));
   }
 
@@ -522,73 +173,32 @@ export class ProductsService {
     updates: Partial<Product>,
     renewExpiration?: boolean,
   ): Promise<Product> {
-    let expirationDate;
-    if (renewExpiration) {
-      const { channel } = await this.productsRepo.findOne({
-        where: {
-          id,
-        },
-        select: {
-          channel: {
+    const { channel } = await this.productsRepo.findOne({
+      where: { id },
+      select: {
+        channel: {
+          merchantId: true,
+          expirationHours: true,
+          provider: {
             expirationHours: true,
-            provider: {
-              expirationHours: true,
-            },
           },
         },
-      });
-      expirationDate = this.renewExpirationDate(channel.provider, channel);
-    }
-
-    if (
-      updates.merchantCategory ||
-      updates.merchantBrand ||
-      updates.merchantLabels
-    ) {
-      const { merchantId } = await this.productsRepo.findOne({
-        where: { id },
-        select: { merchantId: true },
-      });
-      if (updates.merchantCategory) {
-        updates.merchantCategory = await this.normalizeCategory(
-          merchantId,
-          updates.merchantCategory,
-        );
-      }
-      if (updates.merchantBrand) {
-        updates.merchantBrand = await this.normalizeBrand(
-          merchantId,
-          updates.merchantBrand,
-        );
-      }
-      if (updates.merchantLabels) {
-        updates.merchantLabels = await this.normalizeLabels(
-          merchantId,
-          updates.merchantLabels,
-        );
-      }
-    }
+      },
+    });
     await this.productsRepo.save({
       id,
-      ...updates,
-      ...(renewExpiration && { expirationDate }),
+      ...(await this.normalizeProduct(channel.merchantId, updates)),
+      ...(renewExpiration && {
+        expirationDate: this.renewExpirationDate(channel),
+      }),
     });
     return await this.findOne(id);
-  }
-
-  async search(q: string): Promise<Product[]> {
-    const response = await this.searchService.search<Product>(q);
-    return response.hits.hits.map((hit) => hit._source);
-  }
-
-  async remove(id: string): Promise<void> {
-    await this.productsRepo.delete(id);
   }
 
   async refresh(
     id: string,
     updates: Partial<Product>,
-    source: Channel,
+    channel: Channel,
     runId: string,
     reason: ProductRefreshReason,
   ) {
@@ -597,12 +207,12 @@ export class ProductsService {
       updates.errorMessage = null;
       updates.refreshedAt = new Date();
       updates.refreshReason = reason;
-      updates.expiresAt = this.renewExpirationDate(source.provider, source);
+      updates.expiresAt = this.renewExpirationDate(channel);
       updates.keepAliveCount = 0;
       updates.refreshedByRunId = runId;
       updates.status = ProductStatus.LIVE;
       const product = await this.update(id, updates);
-      await this.indexProductAsync(product.id);
+      await this.indexService.indexProductAsync(product.id);
       return product;
     } catch (err) {
       const errorMessage = formatErrorMessage(err);
@@ -613,21 +223,99 @@ export class ProductsService {
 
   async keepAlive(product: Product, run: Run) {
     product.keepAliveCount++;
-    product.expiresAt = this.renewExpirationDate(
-      run.channel.provider,
-      run.channel,
-    );
+    product.expiresAt = this.renewExpirationDate(run.channel);
     await this.productsRepo.save(product);
   }
 
-  private renewExpirationDate(provider: Provider, source: Channel): Date {
-    if (source && source.expirationHours) {
-      return moment().add(source.runIntervalHours, 'hours').toDate();
-    } else if (provider && provider.expirationHours) {
-      return moment().add(provider.expirationHours, 'hours').toDate();
+  private async existsById(id: string): Promise<boolean> {
+    return (
+      id &&
+      (await this.productsRepo
+        .createQueryBuilder('product')
+        .select('product.id')
+        .where('product.id = :id', { id })
+        .getRawOne())
+    );
+  }
+
+  private async existsByMerchant(
+    merchantId: string,
+    merchantProductId: string,
+  ): Promise<boolean> {
+    return (
+      merchantId &&
+      merchantProductId &&
+      (await this.productsRepo
+        .createQueryBuilder('product')
+        .select('product.id')
+        .where('product.merchantId = :merchantId', { merchantId })
+        .andWhere('product.merchantProductId = :merchantProductId', {
+          merchantProductId,
+        })
+        .getRawOne())
+    );
+  }
+
+  private async validateIsCreateable(product: Partial<Product>, run: Run) {
+    if (!product.merchant || !product.merchant.key) {
+      throw new Error(
+        `Merchant not mapped by provider pipeline! (Run ID: ${run.id}`,
+      );
+    }
+    product.merchant = await this.merchantsService.findOneByKey(
+      product.merchant.key,
+    );
+    if (!product.merchant.id) {
+      throw new Error(
+        `Merchant not found! (Key: ${product.merchant.key}) (Run ID: ${run.id})`,
+      );
+    }
+    if (
+      !this.existsByMerchant(
+        run.channel.providerId,
+        product.merchantProductNumber,
+      )
+    ) {
+      throw new Error(
+        `Provider ${run.channel.providerId} product ${product.merchantProductNumber} already exists!`,
+      );
+    }
+  }
+
+  private renewExpirationDate(channel: Channel): Date {
+    if (channel && channel.expirationHours) {
+      return moment().add(channel.runIntervalHours, 'hours').toDate();
+    } else if (channel.provider && channel.provider.expirationHours) {
+      return moment().add(channel.provider.expirationHours, 'hours').toDate();
     } else {
+      // default if no config found is 24 hours
       return moment().add(24, 'hours').toDate();
     }
+  }
+
+  private async normalizeProduct(
+    merchantId: string,
+    product: Partial<Product>,
+  ): Promise<Partial<Product>> {
+    if (product.merchantCategory) {
+      product.merchantCategory = await this.normalizeCategory(
+        merchantId,
+        product.merchantCategory,
+      );
+    }
+    if (product.merchantBrand) {
+      product.merchantBrand = await this.normalizeBrand(
+        merchantId,
+        product.merchantBrand,
+      );
+    }
+    if (product.merchantLabels) {
+      product.merchantLabels = await this.normalizeLabels(
+        merchantId,
+        product.merchantLabels,
+      );
+    }
+    return product;
   }
 
   private async normalizeCategory(

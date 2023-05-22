@@ -7,11 +7,11 @@ import * as path from 'path';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 
-export class SeedProductSourcesEthicalSuperstore1000000000004
+export class SeedChannelsEthicalSuperstore1000000000004
   implements MigrationInterface
 {
   private readonly logger = new Logger(
-    SeedProductSourcesEthicalSuperstore1000000000004.name,
+    SeedChannelsEthicalSuperstore1000000000004.name,
   );
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -52,6 +52,6 @@ export class SeedProductSourcesEthicalSuperstore1000000000004
   public async down(queryRunner: QueryRunner): Promise<void> {
     const repo = queryRunner.connection.getRepository(Channel);
     this.logger.log('Reverting migration');
-    await repo.query('DELETE FROM pi_product_source');
+    await repo.query('DELETE FROM pi_channel');
   }
 }

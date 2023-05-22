@@ -1,4 +1,4 @@
-import { MessagingService } from '@lib/messaging';
+import { MessagingService } from 'libs/messaging/src';
 import { Injectable, Logger } from '@nestjs/common';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
 import { ChannelsService } from '../services/channels.service';

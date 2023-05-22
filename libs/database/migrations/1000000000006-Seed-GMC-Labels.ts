@@ -21,7 +21,7 @@ export class SeedGmcLabels1000000000006 implements MigrationInterface {
       await this.buildLabelGroupsTree(labelGroupsSeed, null, repo);
     } catch (e) {
       this.logger.error(e);
-      repo.query('DELETE FROM gmc_label_group');
+      repo.query('DELETE FROM gmc_label');
       throw Error('Stopping Failed Migration');
     }
   }
@@ -29,7 +29,7 @@ export class SeedGmcLabels1000000000006 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Reverting Migration');
     const repo = queryRunner.connection.getRepository(GmcLabel);
-    await repo.query('DELETE FROM gmc_label_group');
+    await repo.query('DELETE FROM gmc_label');
   }
 
   private async buildLabelGroupsTree(

@@ -3,7 +3,7 @@ import { ProductsService } from '@app/provider-integration/services/products.ser
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
-import { SearchService } from '@lib/search';
+import { ElasticsearchService } from 'libs/elasticsearch/src';
 import {
   Body,
   Controller,
@@ -19,10 +19,7 @@ import { FindProductsDto } from '../dto/find-products.dto';
 export class ProductsController {
   private readonly logger = new Logger(ProductsController.name);
 
-  constructor(
-    private readonly productsService: ProductsService,
-    private readonly searchService: SearchService,
-  ) {}
+  constructor(private readonly productsService: ProductsService) {}
 
   @Get()
   async getAll(
@@ -36,24 +33,6 @@ export class ProductsController {
     return await this.productsService.findOneExternal(id);
   }
 
-  @Post(':id/index')
-  async index(@Param('id') id): Promise<any> {
-    this.logger.debug(`Indexing Product: ${id}`);
-    return await this.productsService.indexProduct(id);
-  }
-
-  @Post(':id/index/map')
-  async getIndexable(@Param('id') id): Promise<any> {
-    return await this.productsService.getOneIndexable(id);
-  }
-
-  @Get(':id/index/current')
-  async getCurrentlyIndexed(@Param('id') id): Promise<any> {
-    if (await this.searchService.existsDocument(id)) {
-      return await this.searchService.getDocument(id);
-    }
-  }
-
   @Post('find')
   async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
@@ -63,8 +42,21 @@ export class ProductsController {
     return await this.productsService.find(findDto, pageRequest);
   }
 
-  @Post('search')
-  search(@Query('q') q: string) {
-    return this.productsService.search(q);
-  }
+  // @Post(':id/index')
+  // async index(@Param('id') id): Promise<any> {
+  //   this.logger.debug(`Indexing Product: ${id}`);
+  //   return await this.productsService.indexProduct(id);
+  // }
+
+  // @Post(':id/index/map')
+  // async getIndexable(@Param('id') id): Promise<any> {
+  //   return await this.productsService.getOneIndexable(id);
+  // }
+
+  // @Get(':id/index/current')
+  // async getCurrentlyIndexed(@Param('id') id): Promise<any> {
+  //   if (await this.searchService.existsDocument(id)) {
+  //     return await this.searchService.getDocument(id);
+  //   }
+  // }
 }

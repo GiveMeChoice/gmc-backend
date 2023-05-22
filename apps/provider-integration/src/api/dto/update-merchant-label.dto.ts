@@ -2,7 +2,7 @@ import { MerchantLabel } from '@app/provider-integration/model/merchant-label.en
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class UpdateLabelDto extends PartialType(MerchantLabel) {
+export class UpdateMerchantLabelDto extends PartialType(MerchantLabel) {
   @IsOptional()
   gmcLabelId?: string;
 

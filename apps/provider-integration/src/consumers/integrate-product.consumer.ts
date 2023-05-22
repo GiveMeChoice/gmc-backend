@@ -1,9 +1,9 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
-import { Consumer } from '@lib/messaging/interface/consumer.interface';
+import { Consumer } from 'libs/messaging/src/interface/consumer.interface';
 import {
   CHANNEL_HIGH,
   DEFAULT_EXCHANGE,
-} from '@lib/messaging/messaging.constants';
+} from 'libs/messaging/src/messaging.constants';
 import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
@@ -36,9 +36,11 @@ export class RefreshProductConsumer
         } Received: ${JSON.stringify(msg.data.productId)}`,
       );
       const { data } = msg;
-      const status = await this.productsService.getStatus(data.productId);
+      const status = await this.productsService.getCurrentStatus(
+        data.productId,
+      );
       if (status === ProductStatus.PENDING || status === ProductStatus.REMAP) {
-        await this.etlService.integrateProduct(
+        await this.etlService.refreshProduct(
           data.productId,
           data.runId,
           data.reason,

@@ -2,7 +2,13 @@ import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.en
 import { PartialType } from '@nestjs/mapped-types';
 import { IsOptional } from 'class-validator';
 
-export class FindBrandsDto extends PartialType(MerchantBrand) {
+export class UpdateMerchantBrandDto extends PartialType(MerchantBrand) {
   @IsOptional()
-  providerId?: string;
+  infoLink?: string;
+
+  @IsOptional()
+  logo?: string;
+
+  @IsOptional()
+  description?: string;
 }

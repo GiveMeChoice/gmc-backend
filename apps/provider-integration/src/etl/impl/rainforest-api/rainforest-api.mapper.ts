@@ -21,6 +21,7 @@ import {
   RainforestApiTopReviewDto,
 } from './dto/rainforest-api-product.dto';
 import { RainforestApiSourceItemDto } from './dto/rainforest-api-source-item.dto';
+import { ProductImageType } from '@app/provider-integration/model/enum/product-image-type.enum';
 
 @Injectable()
 export class RainforestApiMapper

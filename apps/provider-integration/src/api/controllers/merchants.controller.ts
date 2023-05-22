@@ -13,7 +13,6 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { Provider } from '../../model/provider.entity';
 import { FindMerchantsDto } from '../dto/find-merchants.dto';
 import { UpdateMerchantDto } from '../dto/update-merchant.dto';
 

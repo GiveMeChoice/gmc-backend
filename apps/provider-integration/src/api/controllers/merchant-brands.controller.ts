@@ -13,12 +13,12 @@ import {
   Post,
   Logger,
 } from '@nestjs/common';
-import { FindBrandsDto } from '../dto/find-brands.dto';
-import { UpdateBrandDto } from '../dto/update-brand.dto';
+import { FindMerchantBrandsDto } from '../dto/find-merchant-brands.dto';
+import { UpdateMerchantBrandDto } from '../dto/update-merchant-brand.dto';
 
-@Controller('brands')
-export class BrandsController {
-  private readonly logger = new Logger(BrandsController.name);
+@Controller('merchant-brands')
+export class MerchantBrandsController {
+  private readonly logger = new Logger(MerchantBrandsController.name);
 
   constructor(private readonly brandsService: MerchantBrandsService) {}
 
@@ -37,7 +37,7 @@ export class BrandsController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateBrandDto,
+    @Body() updateDto: UpdateMerchantBrandDto,
   ): Promise<MerchantBrand> {
     return this.brandsService.update(id, updateDto);
   }
@@ -45,7 +45,7 @@ export class BrandsController {
   @Post('find')
   async find(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindBrandsDto,
+    @Body() findDto: FindMerchantBrandsDto,
   ) {
     this.logger.debug(JSON.stringify(findDto));
     return await this.brandsService.find(findDto, pageRequest);

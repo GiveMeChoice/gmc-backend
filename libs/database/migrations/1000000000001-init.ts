@@ -17,7 +17,7 @@ export class init1000000000001 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "product_image" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "url" character varying NOT NULL, "primary" boolean NOT NULL, "type" "public"."product_image_type_enum" NOT NULL, "productId" uuid, CONSTRAINT "PK_99d98a80f57857d51b5f63c8240" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."product_status_enum" AS ENUM('PENDING', 'LIVE', 'REMAP', 'EXPIRED')`);
         await queryRunner.query(`CREATE TYPE "public"."product_refresh_reason_enum" AS ENUM('CREATED', 'OFFER_UPDATED', 'PENDING_RESEND', 'ADOPTED', 'EXPIRED', 'REQUESTED')`);
-        await queryRunner.query(`CREATE TABLE "product" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "short_id" character varying NOT NULL, "owner_channel_id" character varying NOT NULL, "merchant_id" uuid NOT NULL, "merchant_product_number" character varying NOT NULL, "product_status" "public"."product_status_enum" NOT NULL, "created_by_run_id" character varying NOT NULL, "refreshed_by_run_id" character varying, "refreshed_at" TIMESTAMP WITH TIME ZONE, "product_refresh_reason" "public"."product_refresh_reason_enum", "source_date" TIMESTAMP WITH TIME ZONE, "expires_at" TIMESTAMP WITH TIME ZONE, "keep_alive_count" integer NOT NULL DEFAULT '0', "error_message" character varying, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "sku" character varying, "title" character varying, "description" character varying, "rating" numeric(3,2), "ratings_total" integer, "price" numeric(10,2), "shipping_price" numeric(10,2), "currency" character varying, "list_image" character varying, "main_image" character varying, "secondary_image" character varying, "offer_url" character varying, "source_id" uuid, "merchantBrandId" uuid, "merchantCategoryId" uuid, CONSTRAINT "UQ_3c1788393d3c93fb6c0461b8846" UNIQUE ("short_id"), CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "product" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "short_id" character varying NOT NULL, "channel_id" character varying NOT NULL, "merchant_id" uuid NOT NULL, "merchant_product_number" character varying NOT NULL, "product_status" "public"."product_status_enum" NOT NULL, "created_by_run_id" character varying NOT NULL, "refreshed_by_run_id" character varying, "refreshed_at" TIMESTAMP WITH TIME ZONE, "product_refresh_reason" "public"."product_refresh_reason_enum", "source_date" TIMESTAMP WITH TIME ZONE, "expires_at" TIMESTAMP WITH TIME ZONE, "keep_alive_count" integer NOT NULL DEFAULT '0', "error_message" character varying, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "sku" character varying, "title" character varying, "description" character varying, "rating" numeric(3,2), "ratings_total" integer, "price" numeric(10,2), "shipping_price" numeric(10,2), "currency" character varying, "list_image" character varying, "main_image" character varying, "secondary_image" character varying, "offer_url" character varying, "source_id" uuid, "merchantBrandId" uuid, "merchantCategoryId" uuid, CONSTRAINT "UQ_3c1788393d3c93fb6c0461b8846" UNIQUE ("short_id"), CONSTRAINT "PK_bebc9158e480b949565b4dc7a82" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_9e5f0e09c22a21d435102bd6c3" ON "product" ("merchant_id", "merchant_product_number") `);
         await queryRunner.query(`CREATE TYPE "public"."pi_channel_status_enum" AS ENUM('READY', 'BUSY', 'DOWN')`);
         await queryRunner.query(`CREATE TABLE "pi_channel" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "description" character varying, "provider_id" uuid NOT NULL, "merchant_id" uuid NOT NULL, "status" "public"."pi_channel_status_enum" NOT NULL DEFAULT 'READY', "active" boolean NOT NULL DEFAULT false, "run_interval_hours" integer, "expiration_hours" integer, "retry_limit" integer NOT NULL DEFAULT '4', "retry_count" integer NOT NULL DEFAULT '0', "last_run_at" TIMESTAMP WITH TIME ZONE, "ETL_CODE_1" character varying, "ETL_CODE_2" character varying, "ETL_CODE_3" character varying, "ETL_CODE_4" character varying, "ETL_CODE_5" character varying, CONSTRAINT "PK_88cbcdff12b371d63af212d4ff3" PRIMARY KEY ("id"))`);
@@ -27,9 +27,9 @@ export class init1000000000001 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "merchant_category" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "merchant_id" uuid NOT NULL, "code" character varying NOT NULL, "name" character varying NOT NULL, "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "gmc_category_id" uuid, CONSTRAINT "PK_193eb59c92e574470923f86c469" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE UNIQUE INDEX "IDX_0c87361b8ec667a56a2d7acaaa" ON "merchant_category" ("merchant_id", "code") `);
         await queryRunner.query(`CREATE TABLE "gmc_category" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "nsleft" integer NOT NULL DEFAULT '1', "nsright" integer NOT NULL DEFAULT '2', "parentId" uuid, CONSTRAINT "PK_692bf98e94dc833f6a6f4a18874" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "gmc_product_label" ("product" uuid NOT NULL, "label" uuid NOT NULL, CONSTRAINT "PK_81d074d222ddbc4be613ddf6e88" PRIMARY KEY ("product", "label"))`);
-        await queryRunner.query(`CREATE INDEX "IDX_c7379359c335452adfc292b944" ON "gmc_product_label" ("product") `);
-        await queryRunner.query(`CREATE INDEX "IDX_9db3b794cac4e64cb40bff761c" ON "gmc_product_label" ("label") `);
+        await queryRunner.query(`CREATE TABLE "product_merchant_label" ("product" uuid NOT NULL, "merchant_label" uuid NOT NULL, CONSTRAINT "PK_173b671cde8833b00d6839d7888" PRIMARY KEY ("product", "merchant_label"))`);
+        await queryRunner.query(`CREATE INDEX "IDX_523876b5f68f7371d6c4772706" ON "product_merchant_label" ("product") `);
+        await queryRunner.query(`CREATE INDEX "IDX_7bd8350eaf08abd1784806514a" ON "product_merchant_label" ("merchant_label") `);
         await queryRunner.query(`ALTER TABLE "pi_run" ADD CONSTRAINT "FK_7cfba8544b1558a0e1a79796491" FOREIGN KEY ("channel_id") REFERENCES "pi_channel"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "merchant_brand" ADD CONSTRAINT "FK_c83440bec55cf33348e8f3d4ea5" FOREIGN KEY ("merchant_id") REFERENCES "merchant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "gmc_label" ADD CONSTRAINT "FK_6b1e94b356f0ef29a8f97e80f34" FOREIGN KEY ("parentId") REFERENCES "gmc_label"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -46,13 +46,13 @@ export class init1000000000001 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "merchant_category" ADD CONSTRAINT "FK_5bc500480db15a7ecf133d1dd97" FOREIGN KEY ("merchant_id") REFERENCES "merchant"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "merchant_category" ADD CONSTRAINT "FK_975a84ea93932b30d63f74fc259" FOREIGN KEY ("gmc_category_id") REFERENCES "gmc_category"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "gmc_category" ADD CONSTRAINT "FK_e0e212c79589c59aad742fec239" FOREIGN KEY ("parentId") REFERENCES "gmc_category"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE "gmc_product_label" ADD CONSTRAINT "FK_c7379359c335452adfc292b9446" FOREIGN KEY ("product") REFERENCES "product"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
-        await queryRunner.query(`ALTER TABLE "gmc_product_label" ADD CONSTRAINT "FK_9db3b794cac4e64cb40bff761cb" FOREIGN KEY ("label") REFERENCES "merchant_label"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "product_merchant_label" ADD CONSTRAINT "FK_523876b5f68f7371d6c4772706d" FOREIGN KEY ("product") REFERENCES "product"("id") ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE "product_merchant_label" ADD CONSTRAINT "FK_7bd8350eaf08abd1784806514ad" FOREIGN KEY ("merchant_label") REFERENCES "merchant_label"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "gmc_product_label" DROP CONSTRAINT "FK_9db3b794cac4e64cb40bff761cb"`);
-        await queryRunner.query(`ALTER TABLE "gmc_product_label" DROP CONSTRAINT "FK_c7379359c335452adfc292b9446"`);
+        await queryRunner.query(`ALTER TABLE "product_merchant_label" DROP CONSTRAINT "FK_7bd8350eaf08abd1784806514ad"`);
+        await queryRunner.query(`ALTER TABLE "product_merchant_label" DROP CONSTRAINT "FK_523876b5f68f7371d6c4772706d"`);
         await queryRunner.query(`ALTER TABLE "gmc_category" DROP CONSTRAINT "FK_e0e212c79589c59aad742fec239"`);
         await queryRunner.query(`ALTER TABLE "merchant_category" DROP CONSTRAINT "FK_975a84ea93932b30d63f74fc259"`);
         await queryRunner.query(`ALTER TABLE "merchant_category" DROP CONSTRAINT "FK_5bc500480db15a7ecf133d1dd97"`);
@@ -69,9 +69,9 @@ export class init1000000000001 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "gmc_label" DROP CONSTRAINT "FK_6b1e94b356f0ef29a8f97e80f34"`);
         await queryRunner.query(`ALTER TABLE "merchant_brand" DROP CONSTRAINT "FK_c83440bec55cf33348e8f3d4ea5"`);
         await queryRunner.query(`ALTER TABLE "pi_run" DROP CONSTRAINT "FK_7cfba8544b1558a0e1a79796491"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_9db3b794cac4e64cb40bff761c"`);
-        await queryRunner.query(`DROP INDEX "public"."IDX_c7379359c335452adfc292b944"`);
-        await queryRunner.query(`DROP TABLE "gmc_product_label"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_7bd8350eaf08abd1784806514a"`);
+        await queryRunner.query(`DROP INDEX "public"."IDX_523876b5f68f7371d6c4772706"`);
+        await queryRunner.query(`DROP TABLE "product_merchant_label"`);
         await queryRunner.query(`DROP TABLE "gmc_category"`);
         await queryRunner.query(`DROP INDEX "public"."IDX_0c87361b8ec667a56a2d7acaaa"`);
         await queryRunner.query(`DROP TABLE "merchant_category"`);

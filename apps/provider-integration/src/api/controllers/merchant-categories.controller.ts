@@ -14,7 +14,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { FindMerchantCategoriesDto } from '../dto/find-merchant-categories.dto';
-import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { UpdateMerchantCategoryDto } from '../dto/update-merchant-category.dto';
 
 @Controller('merchant-categories')
 export class MerchantCategoriesController {
@@ -44,7 +44,7 @@ export class MerchantCategoriesController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() updateDto: UpdateCategoryDto,
+    @Body() updateDto: UpdateMerchantCategoryDto,
   ): Promise<MerchantCategory> {
     this.logger.debug(`Updating merchant category ${id}: ${updateDto}`);
     return this.merchantCategoriesService.update(id, updateDto);
@@ -53,10 +53,10 @@ export class MerchantCategoriesController {
   @Post(':id/assign')
   async assign(
     @Param('id') id: string,
-    @Query('categoryId') categoryId?: string,
+    @Query('gmcCategoryId') gmcCategoryId?: string,
   ): Promise<MerchantCategory> {
-    this.logger.debug(`Updating provider category ${id}: ${categoryId}`);
-    return this.merchantCategoriesService.assignCategory(id, categoryId);
+    this.logger.debug(`Assigning merchant category ${id} to ${gmcCategoryId}`);
+    return this.merchantCategoriesService.assignGmcCategory(id, gmcCategoryId);
   }
 
   @Post('find')

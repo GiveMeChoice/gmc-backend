@@ -8,7 +8,7 @@ import { Product } from '@app/provider-integration/model/product.entity';
 import { Run } from '@app/provider-integration/model/run.entity';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { formatErrorMessage } from '@app/provider-integration/utils/format-error-message';
-import { MessagingService } from '@lib/messaging';
+import { MessagingService } from 'libs/messaging/src';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import * as moment from 'moment';
 import { Loader } from './loader.interface';

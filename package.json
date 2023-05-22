@@ -107,7 +107,7 @@
       "^@lib/aws(|/.*)$": "<rootDir>/libs/aws/src/$1",
       "^@lib/database(|/.*)$": "<rootDir>/libs/database/src/$1",
       "^@lib/messaging(|/.*)$": "<rootDir>/libs/messaging/src/$1",
-      "^@lib/search(|/.*)$": "<rootDir>/libs/search/src/$1"
+      "^@lib/elasticsearch(|/.*)$": "<rootDir>/libs/elasticsearch/src/$1"
     }
   }
 }

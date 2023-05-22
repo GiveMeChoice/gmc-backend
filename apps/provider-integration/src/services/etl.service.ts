@@ -45,7 +45,7 @@ export class EtlService {
     return await pipeline.execute(channel);
   }
 
-  async integrateProduct(
+  async refreshProduct(
     productId: string,
     runId: string,
     reason: ProductRefreshReason,
@@ -92,13 +92,13 @@ export class EtlService {
     );
   }
 
-  async remapProvider(key: ProviderKey): Promise<number> {
-    const provider = await this.providersService.findOneByKey(key);
-    this.logger.debug(JSON.stringify(provider));
-    if (!provider || !provider.id) {
-      throw new Error(`Provider ${key} does not exist!`);
-    } else {
-      return await this.productsService.setToRemapByProvider(provider.id);
-    }
-  }
+  // async remapProvider(key: ProviderKey): Promise<number> {
+  //   const provider = await this.providersService.findOneByKey(key);
+  //   this.logger.debug(JSON.stringify(provider));
+  //   if (!provider || !provider.id) {
+  //     throw new Error(`Provider ${key} does not exist!`);
+  //   } else {
+  //     return await this.productsService.setToRemapByProvider(provider.id);
+  //   }
+  // }
 }

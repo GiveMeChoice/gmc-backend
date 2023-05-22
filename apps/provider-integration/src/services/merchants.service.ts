@@ -21,11 +21,12 @@ export class MerchantsService {
     const [data, count] = await this.merchantsRepo
       .createQueryBuilder('merchant')
       .where({ ...findDto })
-      .setFindOptions({ ...pageRequest, relations: { providers: true } })
-      .loadRelationCountAndMap('merchant.labelCount', 'merchant.labels')
+      .setFindOptions({ ...pageRequest })
+      .loadRelationCountAndMap('merchant.channelCount', 'merchant.channels')
       .loadRelationCountAndMap('merchant.productCount', 'merchant.products')
+      .loadRelationCountAndMap('merchant.labelCount', 'merchant.labels')
+      .loadRelationCountAndMap('merchant.brandCount', 'merchant.brands')
       .loadRelationCountAndMap('merchant.categoryCount', 'merchant.categories')
-      .loadRelationCountAndMap('merchant.providersCount', 'merchant.providers')
       .getManyAndCount();
     return buildPage<Merchant>(data, count, pageRequest);
   }

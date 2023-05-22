@@ -1,5 +1,5 @@
 import { AwsModule } from '@lib/aws';
-import { MessagingModule } from '@lib/messaging';
+import { MessagingModule } from 'libs/messaging/src';
 import { HttpModule } from '@nestjs/axios';
 import { forwardRef, Module } from '@nestjs/common';
 import { AppModule } from '../app.module';

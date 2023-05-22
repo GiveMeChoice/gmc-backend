@@ -26,8 +26,8 @@
       "@lib/database/*": ["libs/database/src/*"],
       "@lib/messaging": ["libs/messaging/src"],
       "@lib/messaging/*": ["libs/messaging/src/*"],
-      "@lib/search": ["libs/search/src"],
-      "@lib/search/*": ["libs/search/src/*"]
+      "@lib/elasticsearch": ["libs/elasticsearch/src"],
+      "@lib/elasticsearch/*": ["libs/elasticsearch/src/*"]
     }
   }
 }
