@@ -54,7 +54,9 @@ export class MerchantCategoriesService {
       .createQueryBuilder('category')
       .where({
         ...findDto,
-        ...(findDto.code && { code: Like(`${findDto.code}%`) }),
+        ...(findDto.merchantCategoryCode && {
+          code: Like(`${findDto.merchantCategoryCode}%`),
+        }),
         ...(findDto.gmcCategoryId && { categoryId: In(categoryIds) }),
       })
       .setFindOptions({
@@ -76,7 +78,7 @@ export class MerchantCategoriesService {
 
   findOneByMerchant(merchantId: string, title: string) {
     return this.merchantCategoriesRepo.findOne({
-      where: { merchantId, code: title },
+      where: { merchantId, merchantCategoryCode: title },
     });
   }
 

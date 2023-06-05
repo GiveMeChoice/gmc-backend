@@ -61,7 +61,7 @@ export abstract class SharedLoader implements Loader {
     try {
       const product = await this.productsService.findByMerchant(
         run.channel.merchantId,
-        sourceItem.merchantProductNumber,
+        sourceItem.merchantProductCode,
       );
       if (!product) {
         await this.createProduct(sourceItem, run);

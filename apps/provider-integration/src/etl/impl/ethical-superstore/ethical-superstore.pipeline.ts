@@ -15,11 +15,12 @@ export class EthicalSuperstorePipeline extends PipelineBase {
   providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
 
   async executeInternal(run: Run) {
+    this.logger.log(this.extractorContainer == null);
     try {
       run.contentDate = new Date();
       await lastValueFrom(
         (
-          super.extractorContainer.getExtractor(
+          this.extractorContainer.getExtractor(
             this.providerKey,
           ) as EthicalSuperstoreExtractor
         )
@@ -28,12 +29,12 @@ export class EthicalSuperstorePipeline extends PipelineBase {
             concatMap(async (sourceItem) => {
               if (sourceItem.inStock) {
                 const sourceProduct = (
-                  super.mapperContainer.getMapper(
+                  this.mapperContainer.getMapper(
                     this.providerKey,
                   ) as EthicalSuperstoreMapper
                 ).mapChannelItem(sourceItem);
                 await (
-                  super.loaderContainer.getLoader(
+                  this.loaderContainer.getLoader(
                     this.providerKey,
                   ) as EthicalSuperstoreLoader
                 ).loadChannelItem(sourceProduct, run);
@@ -50,19 +51,19 @@ export class EthicalSuperstorePipeline extends PipelineBase {
 
   async refreshProduct(product: Product, runId, reason, skipCache: boolean) {
     const extracted = await (
-      super.extractorContainer.getExtractor(
+      this.extractorContainer.getExtractor(
         this.providerKey,
       ) as EthicalSuperstoreExtractor
     ).extractProduct(product, skipCache);
 
     const mapped = (
-      super.mapperContainer.getMapper(
+      this.mapperContainer.getMapper(
         this.providerKey,
       ) as EthicalSuperstoreMapper
     ).mapProductDetail(product, extracted.data);
 
     return await (
-      super.loaderContainer.getLoader(
+      this.loaderContainer.getLoader(
         this.providerKey,
       ) as EthicalSuperstoreLoader
     ).refreshProduct(product.id, mapped, product.channel, runId, reason);

@@ -4,7 +4,7 @@ import { IsOptional } from 'class-validator';
 
 export class UpdateMerchantBrandDto extends PartialType(MerchantBrand) {
   @IsOptional()
-  infoLink?: string;
+  url?: string;
 
   @IsOptional()
   logo?: string;

@@ -7,7 +7,7 @@ export class FindMerchantCategoriesDto extends PartialType(MerchantCategory) {
   merchantId?: string;
 
   @IsOptional()
-  code?: string;
+  merchantCategoryCode?: string;
 
   @IsOptional()
   gmcCategoryId?: string;

@@ -5,7 +5,7 @@ import { Product } from '../../model/product.entity';
 class PartialProduct extends PartialType(Product) {}
 
 export class ProviderProductDataDto extends PickType(PartialProduct, [
-  'merchantProductNumber',
+  'merchantProductCode',
   'sku',
   'title',
   'description',

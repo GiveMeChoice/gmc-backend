@@ -41,7 +41,7 @@ export class MerchantBrandsService {
 
   findOneByMerchant(merchantId: string, title: string) {
     return this.brandsRepo.findOne({
-      where: { merchantId, code: title },
+      where: { merchantId, merchantBrandCode: title },
     });
   }
 

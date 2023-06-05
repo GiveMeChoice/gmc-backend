@@ -9,7 +9,7 @@ import configuration from '../config/configuration';
 import { MerchantBrandsController } from './api/controllers/merchant-brands.controller';
 import { MerchantCategoriesController } from './api/controllers/merchant-categories.controller';
 import { GmcCategoriesController } from './api/controllers/gmc-categories.controller';
-import { EtlController } from './api/controllers/etl.controller';
+import { IntegrationController } from './api/controllers/integration.controller';
 import { JobsController } from './api/controllers/jobs.controller';
 import { GmcLabelsController } from './api/controllers/gmc-labels.controller';
 import { MerchantLabelsController } from './api/controllers/merchant-labels.controller';
@@ -38,7 +38,7 @@ import { ProductReview } from './model/product-review.entity';
 import { MerchantBrandsService } from './services/merchant-brands.service';
 import { MerchantCategoriesService } from './services/merchant-categories.service';
 import { GmcCategoriesService } from './services/gmc-categories.service';
-import { EtlService } from './services/etl.service';
+import { IntegrationService } from './services/integration.service';
 import { JobsService } from './services/jobs.service';
 import { GmcLabelsService } from './services/gmc-labels.service';
 import { MerchantLabelsService } from './services/merchant-labels.service';
@@ -82,7 +82,7 @@ import { IndexService } from './services/index.service';
     forwardRef(() => EtlModule),
   ],
   controllers: [
-    EtlController,
+    IntegrationController,
     PingController,
     ProvidersController,
     ChannelsController,
@@ -104,7 +104,7 @@ import { IndexService } from './services/index.service';
     IndexProductConsumer,
     IndexProductBatchConsumer,
     // core services
-    EtlService,
+    IntegrationService,
     ProvidersService,
     ChannelsService,
     RunsService,

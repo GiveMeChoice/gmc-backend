@@ -5,7 +5,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IntegrateSourceCommand } from '../messages/integrate-source.command';
 import { ChannelStatus } from '../model/enum/channel-status';
-import { EtlService } from '../services/etl.service';
+import { IntegrationService } from '../services/integration.service';
 import { ChannelsService } from '../services/channels.service';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class IntegrateSourceConsumer
 
   constructor(
     private readonly sourcesService: ChannelsService,
-    private readonly etlService: EtlService,
+    private readonly etlService: IntegrationService,
   ) {}
 
   @RabbitSubscribe({

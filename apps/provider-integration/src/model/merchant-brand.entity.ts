@@ -12,19 +12,19 @@ import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
 
 @Entity({ name: 'merchant_brand' })
-@Index(['merchantId', 'code'], { unique: true })
+@Index(['merchantId', 'merchantBrandCode'], { unique: true })
 export class MerchantBrand {
-  constructor(merchantId: string, name: string) {
+  constructor(merchantId: string, merchantBrandCode: string) {
     this.merchantId = merchantId;
-    this.code = name;
+    this.merchantBrandCode = merchantBrandCode;
   }
 
   public static factory(
     merchantId: string,
-    name: string,
+    merchantBrandCode: string,
     data: Partial<MerchantBrand>,
   ) {
-    const brand = new MerchantBrand(merchantId, name);
+    const brand = new MerchantBrand(merchantId, merchantBrandCode);
     Object.assign(brand, data);
     return brand;
   }
@@ -35,8 +35,8 @@ export class MerchantBrand {
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
 
-  @Column()
-  readonly code: string;
+  @Column({ name: 'merchant_brand_code ' })
+  readonly merchantBrandCode: string;
 
   @Column()
   name: string;
@@ -44,11 +44,11 @@ export class MerchantBrand {
   @Column({ nullable: true })
   description?: string;
 
-  @Column({ name: 'logo_url', nullable: true })
-  logoUrl?: string;
+  @Column({ nullable: true })
+  logo?: string;
 
-  @Column({ name: 'info_link', nullable: true })
-  infoLink?: string;
+  @Column({ nullable: true })
+  url?: string;
 
   @CreateDateColumn({
     name: 'created_at',

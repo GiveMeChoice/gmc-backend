@@ -18,11 +18,18 @@ import { Pipeline } from './pipeline.interface';
 export abstract class PipelineBase implements Pipeline {
   abstract providerKey: ProviderKey;
 
-  @Inject(EXTRACTOR_CONTAINER) extractorContainer: ExtractorContainer;
-  @Inject(MAPPER_CONTAINER) mapperContainer: MapperContainer;
-  @Inject(LOADER_CONTAINER) loaderContainer: LoaderContainer;
   @Inject()
-  protected readonly runsService: RunsService;
+  readonly runsService: RunsService;
+
+  constructor(
+    @Inject(EXTRACTOR_CONTAINER)
+    protected extractorContainer: ExtractorContainer,
+    @Inject(MAPPER_CONTAINER) protected mapperContainer: MapperContainer,
+    @Inject(LOADER_CONTAINER) protected loaderContainer: LoaderContainer,
+  ) {
+    console.log('yooooooooooo');
+    console.log(this.extractorContainer);
+  }
 
   async execute(channel: Channel): Promise<Run> {
     let run = await this.runsService.start(channel);

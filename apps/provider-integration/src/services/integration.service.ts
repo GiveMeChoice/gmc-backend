@@ -1,8 +1,4 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import {
-  PIPELINE_CONTAINER,
-  PipelineContainer,
-} from '../etl/pipeline/pipeline.container';
 import { ProviderProductDataDto } from '../etl/dto/provider-product-data.dto';
 import {
   EXTRACTOR_CONTAINER,
@@ -12,18 +8,21 @@ import {
   MAPPER_CONTAINER,
   MapperContainer,
 } from '../etl/mapper/mapper.container';
+import {
+  PIPELINE_CONTAINER,
+  PipelineContainer,
+} from '../etl/pipeline/pipeline.container';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
-import { ProviderKey } from '../model/enum/provider-key.enum';
-import { Run } from '../model/run.entity';
 import { Product } from '../model/product.entity';
+import { Run } from '../model/run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
 import { ChannelsService } from './channels.service';
 import { ProductsService } from './products.service';
 import { ProvidersService } from './providers.service';
 
 @Injectable()
-export class EtlService {
-  private readonly logger = new Logger(EtlService.name);
+export class IntegrationService {
+  private readonly logger = new Logger(IntegrationService.name);
 
   @Inject(PIPELINE_CONTAINER)
   private readonly pipelineContainer: PipelineContainer;

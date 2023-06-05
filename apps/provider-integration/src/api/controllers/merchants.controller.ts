@@ -48,6 +48,7 @@ export class MerchantsController {
     @Param('id') id,
     @Body() updateDto: UpdateMerchantDto,
   ): Promise<Merchant> {
+    this.logger.debug(JSON.stringify(updateDto));
     return this.merchantsService.update(id, updateDto);
   }
 }

@@ -7,7 +7,7 @@ import { SearchMerchantDto } from './search-merchant.dto';
 export interface SearchProductDto {
   id?: string;
   region?: string;
-  merchantProductId?: string;
+  merchantProductCode?: string;
   sku?: string;
   title?: string;
   description?: string;

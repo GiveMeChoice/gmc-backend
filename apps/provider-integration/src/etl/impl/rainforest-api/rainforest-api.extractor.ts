@@ -94,7 +94,7 @@ export class RainforestApiExtractor
         ? null
         : await this.cacheManager.get<RainforestApiProductDto>(
             this.providerKey,
-            product.merchantProductNumber,
+            product.merchantProductCode,
           );
       return cachedResponse
         ? {
@@ -104,7 +104,7 @@ export class RainforestApiExtractor
           }
         : await lastValueFrom(
             this.fetchProduct(
-              product.merchantProductNumber,
+              product.merchantProductCode,
               product.channel,
             ).pipe(
               map((data) => ({
@@ -115,7 +115,7 @@ export class RainforestApiExtractor
               tap((result) =>
                 this.cacheManager.put(
                   this.providerKey,
-                  product.merchantProductNumber,
+                  product.merchantProductCode,
                   this.removeUnusedElements(result.data),
                 ),
               ),

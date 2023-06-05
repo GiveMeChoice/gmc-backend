@@ -24,15 +24,15 @@ import { ProductReview } from './product-review.entity';
 import { ProductImage } from './product-image.entity';
 
 @Entity({ name: 'product' })
-@Index(['merchantId', 'merchantProductNumber'], { unique: true })
+@Index(['merchantId', 'merchantProductCode'], { unique: true })
 @Unique(['shortId'])
 export class Product {
-  constructor(merchantId: string, merchantProductId: string) {
+  constructor(merchantId: string, merchantProductCode: string) {
     this.merchantId = merchantId;
-    this.merchantProductNumber = merchantProductId;
+    this.merchantProductCode = merchantProductCode;
   }
   public static factory(data: Partial<Product>) {
-    const product = new Product(data.merchant.id, data.merchantProductNumber);
+    const product = new Product(data.merchant.id, data.merchantProductCode);
     product.shortId = shortId();
     Object.assign(product, data);
     return product;
@@ -50,8 +50,8 @@ export class Product {
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
 
-  @Column({ name: 'merchant_product_number' })
-  readonly merchantProductNumber: string;
+  @Column({ name: 'merchant_product_code' })
+  readonly merchantProductCode: string;
 
   /* 
     INTEGRATION METADATA

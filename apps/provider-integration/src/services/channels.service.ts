@@ -19,17 +19,21 @@ export class ChannelsService {
     pageRequest?: PageRequest,
   ): Promise<Page<Channel>> {
     const [data, count] = await this.channelsRepo
-      .createQueryBuilder('source')
-      .innerJoin('source.merchant', 'merchant')
-      .innerJoin('source.provider', 'provider')
+      .createQueryBuilder('channel')
+      .innerJoin('channel.merchant', 'merchant')
+      .innerJoin('channel.provider', 'provider')
       .where({
         ...findDto,
       })
       .setFindOptions({
         ...pageRequest,
+        relations: {
+          merchant: true,
+          provider: true,
+        },
       })
-      .loadRelationCountAndMap('source.runCount', 'source.runs')
-      .loadRelationCountAndMap('source.productCount', 'source.products')
+      .loadRelationCountAndMap('channel.runCount', 'channel.runs')
+      .loadRelationCountAndMap('channel.productCount', 'channel.products')
       .getManyAndCount();
     return buildPage<Channel>(data, count, pageRequest);
   }
@@ -41,18 +45,36 @@ export class ChannelsService {
     return buildPage<Channel>(data, count, pageRequest);
   }
 
-  findOne(id: string): Promise<Channel> {
-    return this.channelsRepo.findOne({
-      where: { id },
-      relations: {
-        provider: true,
-      },
-    });
+  async findOne(id: string): Promise<Channel> {
+    const channel = await this.channelsRepo
+      .createQueryBuilder('channel')
+      .innerJoin('channel.merchant', 'merchant')
+      .innerJoin('channel.provider', 'provider')
+      .where({
+        id,
+      })
+      .setFindOptions({
+        relations: {
+          merchant: true,
+          provider: true,
+        },
+      })
+      .loadRelationCountAndMap('channel.runCount', 'channel.runs')
+      .loadRelationCountAndMap('channel.productCount', 'channel.products')
+      .getOne();
+    // return this.channelsRepo.findOne({
+    //   where: { id },
+    //   relations: {
+    //     provider: true,
+    //     merchant: true,
+    //   },
+    // });
+    return channel;
   }
 
   async update(id: string, updates: Partial<Channel>): Promise<Channel> {
     await this.channelsRepo.update(id, updates);
-    return this.channelsRepo.findOne({ where: { id } });
+    return this.findOne(id);
   }
 
   async canRetryById(id: string): Promise<boolean> {
@@ -66,8 +88,8 @@ export class ChannelsService {
     return retryLimit == 0 || retryCount < retryLimit;
   }
 
-  canRetry(source: Channel): boolean {
-    return source.retryLimit == 0 || source.retryCount < source.retryLimit;
+  canRetry(channel: Channel): boolean {
+    return channel.retryLimit == 0 || channel.retryCount < channel.retryLimit;
   }
 
   async isDueById(id: string): Promise<boolean> {
@@ -84,12 +106,12 @@ export class ChannelsService {
     );
   }
 
-  isDue(source: Channel): boolean {
+  isDue(channel: Channel): boolean {
     return (
-      source.runIntervalHours &&
-      (!source.lastRunAt ||
-        moment(source.lastRunAt)
-          .add(source.runIntervalHours, 'hours')
+      channel.runIntervalHours &&
+      (!channel.lastRunAt ||
+        moment(channel.lastRunAt)
+          .add(channel.runIntervalHours, 'hours')
           .isSameOrBefore(moment()))
     );
   }

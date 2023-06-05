@@ -9,7 +9,7 @@ import { IsOptional } from 'class-validator';
 
 export class FindProductsDto extends PartialType(Product) {
   @IsOptional()
-  merchantProductNumber?: string;
+  merchantProductCode?: string;
 
   @IsOptional()
   status?: ProductStatus;
@@ -27,7 +27,7 @@ export class FindProductsDto extends PartialType(Product) {
   errorMessage?: string;
 
   @IsOptional()
-  label?: MerchantLabel;
+  merchantLabel?: MerchantLabel;
 
   @IsOptional()
   merchantCategory?: MerchantCategory;

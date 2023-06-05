@@ -92,7 +92,7 @@ export class IndexService {
     }
     return {
       id: product.shortId,
-      merchantProductId: product.merchantProductNumber,
+      merchantProductCode: product.merchantProductCode,
       region: 'UK',
       sku: product.sku,
       merchant: {
@@ -114,14 +114,14 @@ export class IndexService {
         },
       },
       brand: {
-        code: product.merchantBrand.code,
+        code: product.merchantBrand.merchantBrandCode,
         name: product.merchantBrand.name,
         description: product.merchantBrand.description,
-        logoUrl: product.merchantBrand.logoUrl,
-        infoLink: product.merchantBrand.infoLink,
+        logoUrl: product.merchantBrand.logo,
+        infoLink: product.merchantBrand.url,
       },
       category: {
-        merchantCategory: product.merchantCategory.code,
+        merchantCategory: product.merchantCategory.merchantCategoryCode,
         gmcCategory: await this.mapSearchCategory(
           product.merchantCategory.gmcCategoryId,
         ),
@@ -168,14 +168,14 @@ export class IndexService {
     for (const merchantLabel of merchantLabels) {
       const label: SearchLabelDto = {
         merchantLabel: {
-          code: merchantLabel.code,
+          code: merchantLabel.merchantLabelCode,
           name: merchantLabel.name,
           description: merchantLabel.description,
           logoUrl: merchantLabel.logo,
           infoLink: merchantLabel.url,
         },
       };
-      this.logger.debug(`mapping label ${merchantLabel.code}`);
+      this.logger.debug(`mapping label ${merchantLabel.merchantLabelCode}`);
       if (merchantLabel.gmcLabelId) {
         const group = (await this.labelGroupsService.findAncestors(
           merchantLabel.gmcLabelId,

@@ -1,25 +1,24 @@
 import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
 import { ProductRefreshReason } from '@app/provider-integration/model/enum/product-refresh-reason.enum';
-import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { Run } from '@app/provider-integration/model/run.entity';
-import { EtlService } from '@app/provider-integration/services/etl.service';
+import { IntegrationService } from '@app/provider-integration/services/integration.service';
 import { ProductsService } from '@app/provider-integration/services/products.service';
 import { Controller, Logger, Post, Query } from '@nestjs/common';
 
-@Controller('etl')
-export class EtlController {
-  private readonly logger = new Logger(EtlController.name);
+@Controller('integration')
+export class IntegrationController {
+  private readonly logger = new Logger(IntegrationController.name);
 
   constructor(
-    private readonly etlService: EtlService,
+    private readonly integrationService: IntegrationService,
     private readonly productsService: ProductsService,
   ) {}
 
   @Post('integrate-channel')
   async integrateChannel(@Query('channelId') channelId: string): Promise<Run> {
     this.logger.debug(`Integrate provider channel ${channelId}`);
-    return await this.etlService.inegrateProviderChannel(channelId);
+    return await this.integrationService.inegrateProviderChannel(channelId);
   }
 
   @Post('refresh-product')
@@ -32,7 +31,7 @@ export class EtlController {
         skipCache ? 'AND SKIP CACHE' : 'from cache'
       }`,
     );
-    await this.etlService.refreshProduct(
+    await this.integrationService.refreshProduct(
       productId,
       'REST_API',
       ProductRefreshReason.REQUESTED,
@@ -49,7 +48,7 @@ export class EtlController {
     this.logger.debug(
       `Extract ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
     );
-    return await this.etlService.extractProduct(productId, skipCache);
+    return await this.integrationService.extractProduct(productId, skipCache);
   }
 
   @Post('map-product')
@@ -60,7 +59,7 @@ export class EtlController {
     this.logger.debug(
       `Map ${productId} ${skipCache ? 'AND SKIP CACHE' : 'from cache'}`,
     );
-    return await this.etlService.mapProduct(productId, skipCache);
+    return await this.integrationService.mapProduct(productId, skipCache);
   }
 
   // @Post('remap-provider')

@@ -59,7 +59,7 @@ export class MerchantLabelsService {
 
   findOneByMerchant(merchantId: string, title: string) {
     return this.merchantLabelsRepo.findOne({
-      where: { merchantId, code: title },
+      where: { merchantId, merchantLabelCode: title },
     });
   }
 

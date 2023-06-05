@@ -18,7 +18,7 @@ export class RainforestApiPipeline extends PipelineBase {
   async executeInternal(run: Run) {
     try {
       const contentStream = await (
-        super.extractorContainer.getExtractor(
+        this.extractorContainer.getExtractor(
           this.providerKey,
         ) as RainforestApiExtractor
       ).extractChannel(run.channel);
@@ -32,13 +32,13 @@ export class RainforestApiPipeline extends PipelineBase {
             item.result.category_results.price.value
           ) {
             const sourceProduct = (
-              super.mapperContainer.getMapper(
+              this.mapperContainer.getMapper(
                 this.providerKey,
               ) as RainforestApiMapper
             ).mapChannelItem(item);
 
             await (
-              super.loaderContainer.getLoader(
+              this.loaderContainer.getLoader(
                 this.providerKey,
               ) as RainforestApiLoader
             ).loadChannelItem(sourceProduct, run);
@@ -53,17 +53,17 @@ export class RainforestApiPipeline extends PipelineBase {
 
   async refreshProduct(product: Product, runId, reason, skipCache: boolean) {
     const extracted = await (
-      super.extractorContainer.getExtractor(
+      this.extractorContainer.getExtractor(
         this.providerKey,
       ) as RainforestApiExtractor
     ).extractProduct(product, skipCache);
 
     const mapped = (
-      super.mapperContainer.getMapper(this.providerKey) as RainforestApiMapper
+      this.mapperContainer.getMapper(this.providerKey) as RainforestApiMapper
     ).mapProductDetail(product, extracted.data);
 
     return await (
-      super.loaderContainer.getLoader(this.providerKey) as RainforestApiLoader
+      this.loaderContainer.getLoader(this.providerKey) as RainforestApiLoader
     ).refreshProduct(product.id, mapped, product.channel, runId, reason);
   }
 }

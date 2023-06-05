@@ -13,19 +13,22 @@ import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
 
 @Entity({ name: 'merchant_category' })
-@Index(['merchantId', 'code'], { unique: true })
+@Index(['merchantId', 'merchantCategoryCode'], { unique: true })
 export class MerchantCategory {
-  constructor(merchantId: string, code: string) {
+  constructor(merchantId: string, merchantCategoryCode: string) {
     this.merchantId = merchantId;
-    this.code = code;
+    this.merchantCategoryCode = merchantCategoryCode;
   }
 
   public static factory(
     merchantId: string,
-    title: string,
+    merchantCategoryCode: string,
     data: Partial<MerchantCategory>,
   ) {
-    const merchantCategory = new MerchantCategory(merchantId, title);
+    const merchantCategory = new MerchantCategory(
+      merchantId,
+      merchantCategoryCode,
+    );
     Object.assign(merchantCategory, data);
     return merchantCategory;
   }
@@ -36,8 +39,8 @@ export class MerchantCategory {
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
 
-  @Column()
-  readonly code: string;
+  @Column({ name: 'merchant_category_code' })
+  readonly merchantCategoryCode: string;
 
   @Column()
   name: string;

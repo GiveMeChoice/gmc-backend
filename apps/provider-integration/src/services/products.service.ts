@@ -42,22 +42,24 @@ export class ProductsService {
     pageRequest?: PageRequest,
   ): Promise<Page<Product>> {
     const query = this.productsRepo.createQueryBuilder('product');
-    if (findDto.label) {
+    if (findDto.merchantLabel) {
       let addJoin = false;
-      if (findDto.label.code) {
-        query.andWhere('label.code=:code', { code: findDto.label.code });
+      if (findDto.merchantLabel.merchantLabelCode) {
+        query.andWhere('merchantLabel.merchantLabelCode=:code', {
+          code: findDto.merchantLabel.merchantLabelCode,
+        });
         addJoin = true;
       }
-      if (findDto.label.gmcLabelId) {
-        query.andWhere('label.group=:groupId', {
-          groupId: findDto.label.gmcLabelId,
+      if (findDto.merchantLabel.gmcLabelId) {
+        query.andWhere('merchantLabel.gmcLabelId=:id', {
+          id: findDto.merchantLabel.gmcLabelId,
         });
         addJoin = true;
       }
       if (addJoin) {
-        query.innerJoin('product.labels', 'label');
+        query.innerJoin('product.merchantLabels', 'merchantLabel');
       }
-      delete findDto.label;
+      delete findDto.merchantLabel;
     }
     query.setFindOptions({
       ...pageRequest,
@@ -125,11 +127,11 @@ export class ProductsService {
 
   findByMerchant(
     merchantId: string,
-    merchantProductId?: string,
+    merchantProductCode?: string,
   ): Promise<Product> {
     return this.productsRepo.findOneBy({
       merchantId,
-      merchantProductNumber: merchantProductId,
+      merchantProductCode,
     });
   }
 
@@ -240,17 +242,17 @@ export class ProductsService {
 
   private async existsByMerchant(
     merchantId: string,
-    merchantProductId: string,
+    merchantProductCode: string,
   ): Promise<boolean> {
     return (
       merchantId &&
-      merchantProductId &&
+      merchantProductCode &&
       (await this.productsRepo
         .createQueryBuilder('product')
         .select('product.id')
         .where('product.merchantId = :merchantId', { merchantId })
-        .andWhere('product.merchantProductId = :merchantProductId', {
-          merchantProductId,
+        .andWhere('product.merchantProductCode = :merchantProductCode', {
+          merchantProductCode,
         })
         .getRawOne())
     );
@@ -273,11 +275,11 @@ export class ProductsService {
     if (
       !this.existsByMerchant(
         run.channel.providerId,
-        product.merchantProductNumber,
+        product.merchantProductCode,
       )
     ) {
       throw new Error(
-        `Provider ${run.channel.providerId} product ${product.merchantProductNumber} already exists!`,
+        `Provider ${run.channel.providerId} product ${product.merchantProductCode} already exists!`,
       );
     }
   }
@@ -327,11 +329,15 @@ export class ProductsService {
     } else {
       const existing = await this.merchantCategoriesService.findOneByMerchant(
         merchantId,
-        category.code,
+        category.merchantCategoryCode,
       );
       return existing
         ? existing
-        : MerchantCategory.factory(merchantId, category.code, category);
+        : MerchantCategory.factory(
+            merchantId,
+            category.merchantCategoryCode,
+            category,
+          );
     }
   }
 
@@ -344,11 +350,11 @@ export class ProductsService {
     } else {
       const existing = await this.brandsService.findOneByMerchant(
         merchantId,
-        brand.code,
+        brand.merchantBrandCode,
       );
       return existing
         ? existing
-        : MerchantBrand.factory(merchantId, brand.code, brand);
+        : MerchantBrand.factory(merchantId, brand.merchantBrandCode, brand);
     }
   }
 
@@ -358,7 +364,7 @@ export class ProductsService {
   ): Promise<MerchantLabel[]> {
     const labels: MerchantLabel[] = [];
     for (const label of rawLabels) {
-      if (labels.find((l) => l.code === label.code)) {
+      if (labels.find((l) => l.merchantLabelCode === label.merchantLabelCode)) {
         // remove duplicates
         continue;
       } else if (label.id) {
@@ -367,14 +373,16 @@ export class ProductsService {
       } else {
         const existing = await this.labelsService.findOneByMerchant(
           merchantId,
-          label.code,
+          label.merchantLabelCode,
         );
         if (existing) {
           // assign existing label
           labels.push(existing);
         } else {
           // create new label
-          labels.push(MerchantLabel.factory(merchantId, label.code, label));
+          labels.push(
+            MerchantLabel.factory(merchantId, label.merchantLabelCode, label),
+          );
         }
       }
     }

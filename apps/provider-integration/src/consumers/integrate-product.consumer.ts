@@ -8,7 +8,7 @@ import { ProductStatus } from '@app/provider-integration/model/enum/product-stat
 import { Injectable, Logger } from '@nestjs/common';
 import { ConsumeMessage } from 'amqplib';
 import { IntegrateProductCommand } from '../messages/integrate-product.command';
-import { EtlService } from '../services/etl.service';
+import { IntegrationService } from '../services/integration.service';
 import { ProductsService } from '../services/products.service';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class RefreshProductConsumer
 
   constructor(
     private readonly productsService: ProductsService,
-    private readonly etlService: EtlService,
+    private readonly etlService: IntegrationService,
   ) {}
 
   @RabbitSubscribe({

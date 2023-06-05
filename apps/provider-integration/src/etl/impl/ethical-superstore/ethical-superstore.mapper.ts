@@ -36,7 +36,7 @@ export class EthicalSuperstoreMapper
         merchant: {
           key: MerchantKey.ETHICAL_SUPERSTORE,
         } as Merchant,
-        merchantProductNumber: item.id,
+        merchantProductCode: item.id,
         price: item.price ? Number(item.price) : null,
         images: [
           {
@@ -132,16 +132,16 @@ export class EthicalSuperstoreMapper
       ? data.productInfo.brand
       : data.manufacturer.name;
     return {
-      code: normalizeIdCode(brand),
+      merchantBrandCode: normalizeIdCode(brand),
       name: brand,
       description: data.manufacturer ? data.manufacturer.description : null,
-      logoUrl: data.manufacturer ? data.manufacturer.logo : null,
+      logo: data.manufacturer ? data.manufacturer.logo : null,
     };
   }
 
   private mapCategory(channel: Channel): Partial<MerchantCategory> {
     return {
-      code: channel.etlCode1
+      merchantCategoryCode: channel.etlCode1
         .split('/')
         .map((s) =>
           (s.endsWith('.htm') ? s.slice(0, -3) : s)

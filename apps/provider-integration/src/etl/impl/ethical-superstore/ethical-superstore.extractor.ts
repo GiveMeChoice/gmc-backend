@@ -108,7 +108,7 @@ export class EthicalSuperstoreExtractor
         cachedResponse =
           await this.productCacheManager.get<EthicalSuperstoreProductDto>(
             this.providerKey,
-            product.merchantProductNumber,
+            product.merchantProductCode,
           );
       }
       if (cachedResponse) {
@@ -123,7 +123,7 @@ export class EthicalSuperstoreExtractor
         );
         this.productCacheManager.put<EthicalSuperstoreProductDto>(
           this.providerKey,
-          product.merchantProductNumber,
+          product.merchantProductCode,
           extractedData,
         );
         return {

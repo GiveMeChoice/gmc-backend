@@ -39,6 +39,7 @@ export class ChannelsController {
     @Param('id') id,
     @Body() updateDto: UpdateChannelDto,
   ): Promise<Channel> {
+    this.logger.debug(JSON.stringify(updateDto));
     return this.channelsService.update(id, updateDto);
   }
 

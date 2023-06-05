@@ -35,7 +35,7 @@ export class RainforestApiMapper
         merchant: {
           key: MerchantKey.AMAZON_UK,
         } as Merchant,
-        merchantProductNumber: item.result.category_results.asin,
+        merchantProductCode: item.result.category_results.asin,
         price: Number(item.result.category_results.price.value),
         images: [
           {
@@ -151,7 +151,7 @@ export class RainforestApiMapper
 
   private mapBrand(brandName: string): Partial<MerchantBrand> {
     return {
-      code: normalizeIdCode(brandName),
+      merchantBrandCode: normalizeIdCode(brandName),
       name: brandName,
     };
   }
@@ -164,7 +164,7 @@ export class RainforestApiMapper
       throw new PipelineError('MAP_ERROR', 'Unable to find product category');
     }
     return {
-      code: categoriesFlat
+      merchantCategoryCode: categoriesFlat
         .split(' > ')
         .slice(0, 3)
         .join('_')
@@ -207,7 +207,7 @@ export class RainforestApiMapper
   ): Partial<MerchantLabel>[] {
     return [
       {
-        code: normalizeIdCode(climatePledge.text),
+        merchantLabelCode: normalizeIdCode(climatePledge.text),
         name: climatePledge.text,
         description: climatePledge.text,
         logo: climatePledge.image,

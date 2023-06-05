@@ -1,5 +1,5 @@
 export enum Region {
-  UK = 'uk',
-  US = 'us',
-  NL = 'nl',
+  UK = 'UK',
+  US = 'US',
+  NL = 'NL',
 }

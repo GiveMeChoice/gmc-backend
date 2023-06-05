@@ -39,6 +39,7 @@ export class ProvidersController {
     @Param('id') id,
     @Body() updateDto: UpdateProviderDto,
   ): Promise<Provider> {
+    this.logger.debug(JSON.stringify(updateDto));
     return this.providersService.update(id, updateDto);
   }
 

@@ -4,7 +4,7 @@ export const mappings: MappingTypeMapping = {
   properties: {
     id: { type: 'keyword' },
     region: { type: 'keyword' },
-    merchantProductId: { type: 'text' },
+    merchantProductCode: { type: 'text' },
     sku: { type: 'keyword' },
     title: { type: 'text' },
     description: { type: 'text' },

@@ -37,10 +37,10 @@ import {
     RainforestApiPipeline,
     RainforestApiExtractor,
     RainforestApiMapper,
+    RainforestApiLoader,
     EthicalSuperstorePipeline,
     EthicalSuperstoreExtractor,
     EthicalSuperstoreMapper,
-    RainforestApiLoader,
     EthicalSuperstoreLoader,
     {
       provide: PIPELINE_CONTAINER,
