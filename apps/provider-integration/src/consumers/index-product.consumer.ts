@@ -1,20 +1,19 @@
 import { RabbitSubscribe } from '@golevelup/nestjs-rabbitmq';
+import { Injectable, Logger } from '@nestjs/common';
+import { ConsumeMessage } from 'amqplib';
 import { Consumer } from 'libs/messaging/src/interface/consumer.interface';
 import {
   CHANNEL_HIGH,
   DEFAULT_EXCHANGE,
 } from 'libs/messaging/src/messaging.constants';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConsumeMessage } from 'amqplib';
 import { IndexProductCommand } from '../messages/index-product.command';
-import { ProductsService } from '../services/products.service';
-import { formatErrorMessage } from '../utils/format-error-message';
+import { ProductDocumentsService } from '../services/product-documents.service';
 
 @Injectable()
 export class IndexProductConsumer implements Consumer<IndexProductCommand> {
   private readonly logger = new Logger(IndexProductConsumer.name);
 
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly indexService: ProductDocumentsService) {}
 
   @RabbitSubscribe({
     exchange: DEFAULT_EXCHANGE,
@@ -29,7 +28,7 @@ export class IndexProductConsumer implements Consumer<IndexProductCommand> {
           msg.data.productId,
         )}`,
       );
-      await this.productsService.indexProduct(msg.data.productId);
+      await this.indexService.index(msg.data.productId);
     } catch (e) {
       this.logger.error(e);
     }

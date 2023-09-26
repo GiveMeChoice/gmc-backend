@@ -64,13 +64,9 @@ export class RunsService {
       ...pageRequest,
       where: { ...findDto },
       relations: {
-        channel: true,
-      },
-      select: {
         channel: {
-          providerId: true,
-          id: true,
-          description: true,
+          merchant: true,
+          provider: true,
         },
       },
     });

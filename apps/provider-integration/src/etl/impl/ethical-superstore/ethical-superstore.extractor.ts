@@ -24,7 +24,7 @@ export class EthicalSuperstoreExtractor
 {
   private readonly logger = new Logger(EthicalSuperstoreExtractor.name);
 
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
   constructor(
     private readonly httpService: HttpService,
@@ -62,40 +62,40 @@ export class EthicalSuperstoreExtractor
   }
 
   private fetchSource(source: Channel): Observable<string> {
-    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/category/${source.etlCode1}?limit=192`;
+    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/products/${source.etlCode1}?limit=100`;
     this.logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
 
   private extractItemsFromHtml(html: string): EthicalSuperstoreSourceItemDto[] {
     const $ = load(html);
-    const products = [];
+    const products: EthicalSuperstoreSourceItemDto[] = [];
     $('.cat-listing-wrapper')
-      .find('.media__body')
+      .find('.cat-list--products')
       .each((i, el) => {
         const vpl = $(el).find('.view_product_link').get()[0];
-        const src = $(`#p_img_${vpl.attribs['data-product-id']}`).attr('src');
-        vpl.attribs['img-src'] = src;
+        const imageSource = $(el)
+          .find('picture')
+          .children('img')
+          .first()
+          .attr('data-src');
         const atext = $(el).find('form').children('a').first().text();
-        vpl.attribs['in-stock'] = atext.trim().toLowerCase();
-        products.push(vpl);
+        products.push({
+          href: vpl.attribs['href'],
+          id: vpl.attribs['data-product-id'],
+          sku: vpl.attribs['data-product-sku'],
+          title: vpl.attribs['data-product-name'],
+          price: vpl.attribs['data-product-price'],
+          brand: vpl.attribs['data-product-brand'],
+          category: vpl.attribs['data-product-category'],
+          categoryFull: vpl.attribs['data-product-list'],
+          inStock: !atext.trim().toLowerCase().includes('out of stock'),
+          imageSource: imageSource.startsWith('//')
+            ? imageSource.substring(2)
+            : imageSource,
+        });
       });
-    return products.map(this.mapItemToDto);
-  }
-
-  private mapItemToDto(element: Element): EthicalSuperstoreSourceItemDto {
-    return {
-      href: element.attribs['href'],
-      id: element.attribs['data-product-id'],
-      sku: element.attribs['data-product-sku'],
-      name: element.attribs['data-product-name'],
-      price: element.attribs['data-product-price'],
-      brand: element.attribs['data-product-brand'],
-      category: element.attribs['data-product-category'],
-      list: element.attribs['data-product-list'],
-      image: element.attribs['img-src'],
-      inStock: !element.attribs['in-stock'].includes('out of stock'),
-    };
+    return products;
   }
 
   async extractProduct(
@@ -119,6 +119,7 @@ export class EthicalSuperstoreExtractor
         };
       } else {
         const extractedData = this.extractProductFromHtml(
+          product.channel,
           await lastValueFrom(this.fetchProduct(product)),
         );
         this.productCacheManager.put<EthicalSuperstoreProductDto>(
@@ -143,9 +144,13 @@ export class EthicalSuperstoreExtractor
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
 
-  private extractProductFromHtml(html: string): EthicalSuperstoreProductDto {
+  private extractProductFromHtml(
+    channel: Channel,
+    html: string,
+  ): EthicalSuperstoreProductDto {
     try {
       const dto: EthicalSuperstoreProductDto = {
+        category: '',
         images: [],
         ethicsAndTags: [],
         reviews: [],
@@ -176,10 +181,29 @@ export class EthicalSuperstoreExtractor
           icon: $(tagItem)
             .find('.ethics-tag-list__item-img')
             .first()
-            .attr('src'),
+            .attr('data-src'),
         });
       });
       // extract product info
+      $('nav.breadcrumb')
+        .children()
+        .last()
+        .children('li')
+        .each((i, el) => {
+          if (
+            el.lastChild.type === 'tag' &&
+            $(el.lastChild).text() !== 'Home'
+          ) {
+            dto.category = dto.category
+              ? `${dto.category} > ${$(el.lastChild).text()}`
+              : $(el.lastChild).text();
+          }
+        });
+      // .children()
+      // .each((i, el) => {
+      //   dto.category += JSON.stringify(el.attribs);
+      // });
+
       dto.productInfo = {
         id: $('button[name=add_to_cart]').first().attr('data-product-id'),
         description: '',
@@ -236,20 +260,22 @@ export class EthicalSuperstoreExtractor
           .children('img')
           .first()
           .attr('src'),
-        description: '',
+        url: `${ETHICAL_SUPERSTORE_BASE_URL}/products/${channel.etlCode1}`,
       };
-      $('span[property=manufacturer]')
-        .first()
-        .parent()
-        .next()
-        .children('p,a')
-        .each((i, el) => {
-          dto.manufacturer.description += `${$(el)
-            .text()
-            .replace(/\s+/g, ' ')
-            .trim()}\n`;
-        });
-      dto.manufacturer.description = dto.manufacturer.description.trim();
+
+      // $('span[property=manufacturer]')
+      //   .first()
+      //   .parent()
+      //   .next()
+      //   .children('p,a')
+      //   .each((i, el) => {
+      //     dto.manufacturer.url += `${$(el)
+      //       .text()
+      //       .replace(/\s+/g, ' ')
+      //       .trim()}\n`;
+      //   });
+      // dto.manufacturer.url = dto.manufacturer.url.trim();
+
       // in stock?
       $('.product-info > span.icon-tick').each((i, el) => {
         if ($(el).text().includes('In Stock')) dto.inStock = true;

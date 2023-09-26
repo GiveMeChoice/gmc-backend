@@ -27,20 +27,28 @@ export class ProvidersService {
       .setFindOptions({ ...pageRequest })
       .loadRelationCountAndMap('provider.channelCount', 'provider.channels')
       .getManyAndCount();
-
-    // add provider product count by iterating and summing channel product counts
+    // add provider product count (sum of channel product counts)
     for (const provider of data) {
-      (provider as any).productCount = 0;
-      const data = await this.channelRepo
-        .createQueryBuilder('channel')
-        .where({ providerId: provider.id })
-        .loadRelationCountAndMap('channel.productCount', 'channel.products')
-        .getMany();
-      for (const channel of data) {
-        (provider as any).productCount += (channel as any).productCount;
-      }
+      (provider as any).productCount = await this.calculateProviderProductCount(
+        provider.id,
+      );
     }
     return buildPage<Provider>(data, count, pageRequest);
+  }
+
+  private async calculateProviderProductCount(
+    providerId: string,
+  ): Promise<number> {
+    let productCount = 0;
+    const data = await this.channelRepo
+      .createQueryBuilder('channel')
+      .where({ providerId })
+      .loadRelationCountAndMap('channel.productCount', 'channel.products')
+      .getMany();
+    for (const channel of data) {
+      productCount += (channel as any).productCount;
+    }
+    return productCount;
   }
 
   async findAll(pageRequest?: PageRequest): Promise<Page<Provider>> {
@@ -50,8 +58,16 @@ export class ProvidersService {
     return buildPage<Provider>(data, count, pageRequest);
   }
 
-  findOne(id: string): Promise<Provider> {
-    return this.providersRepo.findOneBy({ id });
+  async findOne(id: string): Promise<Provider> {
+    const provider = await this.providersRepo
+      .createQueryBuilder('provider')
+      .where({ id })
+      .loadRelationCountAndMap('provider.channelCount', 'provider.channels')
+      .getOne();
+    (provider as any).productCount = await this.calculateProviderProductCount(
+      provider.id,
+    );
+    return provider;
   }
 
   findOneByKey(key: ProviderKey): Promise<Provider> {
@@ -65,6 +81,6 @@ export class ProvidersService {
 
   async update(id: string, updates: Partial<Provider>): Promise<Provider> {
     await this.providersRepo.update(id, updates);
-    return this.providersRepo.findOne({ where: { id } });
+    return this.findOne(id);
   }
 }

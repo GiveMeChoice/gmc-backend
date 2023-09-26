@@ -37,7 +37,7 @@ export class IntegrationController {
       ProductRefreshReason.REQUESTED,
       skipCache,
     );
-    return this.productsService.findOneExternal(productId);
+    return this.productsService.findOne(productId);
   }
 
   @Post('extract-product')

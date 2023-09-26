@@ -1,18 +1,32 @@
 import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 
-export const mappings: MappingTypeMapping = {
+export const productDocumentMapping: MappingTypeMapping = {
   properties: {
     id: { type: 'keyword' },
-    region: { type: 'keyword' },
     merchantProductCode: { type: 'text' },
     sku: { type: 'keyword' },
     title: { type: 'text' },
     description: { type: 'text' },
     price: { type: 'float' },
-    offerLink: { type: 'text', index: false },
+    currency: { type: 'text' },
+    rating: { type: 'float' },
+    ratingsTotal: { type: 'integer' },
+    shippingPrice: { type: 'float' },
+    offerUrl: { type: 'text', index: false },
+    brand: {
+      type: 'object',
+      properties: {
+        code: { type: 'keyword' },
+        name: { type: 'text' },
+        description: { type: 'text' },
+        logo: { type: 'text' },
+        url: { type: 'text' },
+      },
+    },
     merchant: {
       type: 'object',
       properties: {
+        region: { type: 'keyword' },
         key: { type: 'keyword' },
         name: {
           type: 'text',
@@ -24,41 +38,25 @@ export const mappings: MappingTypeMapping = {
           },
         },
         description: { type: 'text' },
-        logoUrl: { type: 'text', index: false },
-        infoLink: { type: 'text', index: false },
+        logo: { type: 'text', index: false },
+        url: { type: 'text', index: false },
       },
     },
     images: {
       type: 'nested',
       properties: {
-        list: {
-          type: 'object',
-          properties: {
-            url: { type: 'text', index: false },
-          },
-        },
-        detail: {
-          type: 'object',
-          properties: {
-            url: { type: 'text', index: false },
-          },
-        },
-        other: {
-          type: 'nested',
-          properties: {
-            url: { type: 'text', index: false },
-          },
-        },
+        url: { type: 'text', index: false },
+        primary: { type: 'boolean', index: false },
+        type: { type: 'text', index: false },
       },
     },
-    brand: {
-      type: 'object',
+    reviews: {
+      type: 'nested',
       properties: {
-        code: { type: 'keyword' },
-        name: { type: 'text' },
-        description: { type: 'text' },
-        logoUrl: { type: 'text' },
-        infoLink: { type: 'text' },
+        author: { type: 'text', index: false },
+        text: { type: 'text', index: false },
+        rating: { type: 'float', index: false },
+        submittedOn: { type: 'date', index: false },
       },
     },
     category: {
@@ -126,11 +124,11 @@ export const mappings: MappingTypeMapping = {
             code: { type: 'keyword' },
             name: { type: 'text' },
             description: { type: 'text' },
-            logoUrl: { type: 'text', index: false },
-            infoLink: { type: 'text', index: false },
+            logo: { type: 'text', index: false },
+            url: { type: 'text', index: false },
           },
         },
-        group: {
+        gmcLabel: {
           type: 'object',
           properties: {
             name: {

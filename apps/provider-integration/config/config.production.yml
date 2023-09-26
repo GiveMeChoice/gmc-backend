@@ -1,27 +1,18 @@
-port: 5001
+app:
+  port: 5001
 
 datasource:
-  host:
   port: 5432
-  username: postgres
-  password: password
-  database: gmc_db
 
 rabbitmq:
-  uri:
   prefetch-count:
 
 aws:
-  id:
-  secret:
   region: us-east-1
 
-rainforest:
-  zip-code: SE21 8AX
-  api_key:
+providers:
+  rainforest:
+    zip-code: SE21 8AX
 
 elastic:
-  username:
-  password:
-  node:
   index: gmc_search

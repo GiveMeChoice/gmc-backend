@@ -21,5 +21,5 @@ export class EthicalSuperstoreLoader extends SharedLoader {
     };
   }
 
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 }

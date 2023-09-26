@@ -72,8 +72,6 @@ export class RainforestApiMapper
           existingProduct.images,
           rainforestProduct.product.images,
         ),
-        // mainImage: data.product.main_image.link,
-        // secondaryImage: this.mapSecondaryImage(data.product.images),
         description: this.mapDescription(rainforestProduct),
         merchantBrand: this.mapBrand(
           rainforestProduct.product.brand,
@@ -100,8 +98,15 @@ export class RainforestApiMapper
     rainforestImages: RainforestApiImageDto[],
   ) {
     const images: ProductImage[] = [];
+    // preserve list images from channel mapping
+    existingImages.forEach((img) => {
+      if (img.type == ProductImageType.DETAIL) {
+        images.push(img);
+      }
+    });
+    // (re)add all detail images
     if (rainforestImages) {
-      rainforestImages.forEach((img, i) => {
+      rainforestImages.forEach((img) => {
         images.push({
           url: img.link,
           type: ProductImageType.DETAIL,

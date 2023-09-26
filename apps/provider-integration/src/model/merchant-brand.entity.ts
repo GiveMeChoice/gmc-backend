@@ -6,10 +6,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Merchant } from './merchant.entity';
 import { Product } from './product.entity';
+import { GmcBrand } from './gmc-brand.entity';
 
 @Entity({ name: 'merchant_brand' })
 @Index(['merchantId', 'merchantBrandCode'], { unique: true })
@@ -57,10 +59,17 @@ export class MerchantBrand {
   })
   createdAt: Date;
 
-  @OneToMany(() => Product, (product) => product.merchantBrand)
-  products: Product[];
+  @Column({ name: 'gmc_brand_id', nullable: true })
+  gmcBrandId?: string;
 
   @ManyToOne(() => Merchant, (merchant) => merchant.brands)
   @JoinColumn({ name: 'merchant_id' })
   merchant: Merchant;
+
+  @OneToOne(() => GmcBrand, (brand) => brand.merchantBrand)
+  @JoinColumn({ name: 'gmc_brand_id' })
+  gmcBrand?: GmcBrand;
+
+  @OneToMany(() => Product, (product) => product.merchantBrand)
+  products: Product[];
 }

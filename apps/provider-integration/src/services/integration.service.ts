@@ -34,7 +34,6 @@ export class IntegrationService {
   constructor(
     private readonly channelsService: ChannelsService,
     private readonly productsService: ProductsService,
-    private readonly providersService: ProvidersService,
   ) {}
 
   async inegrateProviderChannel(channelId: string): Promise<Run> {
@@ -50,7 +49,9 @@ export class IntegrationService {
     reason: ProductRefreshReason,
     skipCache?: boolean,
   ): Promise<Product> {
+    this.logger.debug(productId);
     const product = await this.productsService.findOne(productId);
+    this.logger.debug('is found');
     if (!product) throw new Error(`Product not found: ${productId}`);
     try {
       const pipeline = this.pipelineContainer.getPipeline(
@@ -58,7 +59,8 @@ export class IntegrationService {
       );
       return await pipeline.refreshProduct(product, runId, reason);
     } catch (err) {
-      return await this.productsService.update(productId, {
+      this.logger.error(err);
+      return await this.productsService.update(product.id, {
         errorMessage: formatErrorMessage(err),
       });
     }
@@ -84,10 +86,10 @@ export class IntegrationService {
     );
     const mapper = this.mapperContainer.getMapper(product.channel.provider.key);
     return await mapper.mapProductDetail(
+      product,
       (
         await extractor.extractProduct(product, skipCache)
       ).data,
-      product.channel,
     );
   }
 

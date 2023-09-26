@@ -5,9 +5,12 @@ import { MerchantLabel } from '@app/provider-integration/model/merchant-label.en
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 import { Product } from '@app/provider-integration/model/product.entity';
 import { PartialType } from '@nestjs/mapped-types';
-import { IsOptional } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 
 export class FindProductsDto extends PartialType(Product) {
+  @IsOptional()
+  merchantId?: string;
+
   @IsOptional()
   merchantProductCode?: string;
 
@@ -24,7 +27,8 @@ export class FindProductsDto extends PartialType(Product) {
   shortId?: string;
 
   @IsOptional()
-  errorMessage?: string;
+  @IsBoolean()
+  error?: boolean;
 
   @IsOptional()
   merchantLabel?: MerchantLabel;

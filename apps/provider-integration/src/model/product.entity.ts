@@ -27,14 +27,25 @@ import { ProductImage } from './product-image.entity';
 @Index(['merchantId', 'merchantProductCode'], { unique: true })
 @Unique(['shortId'])
 export class Product {
-  constructor(merchantId: string, merchantProductCode: string) {
-    this.merchantId = merchantId;
+  constructor(
+    merchantProductCode: string,
+    merchantId: string,
+    channelId: string,
+  ) {
     this.merchantProductCode = merchantProductCode;
+    this.merchantId = merchantId;
+    this.channelId = channelId;
   }
-  public static factory(data: Partial<Product>) {
-    const product = new Product(data.merchant.id, data.merchantProductCode);
+  public static factory(data: Partial<Product>, channel: Channel) {
+    const product = new Product(
+      data.merchantProductCode,
+      channel.merchantId,
+      channel.id,
+    );
     product.shortId = shortId();
     Object.assign(product, data);
+    product.channel = channel;
+    product.merchant = channel.merchant;
     return product;
   }
 
@@ -44,14 +55,28 @@ export class Product {
   @Column({ name: 'short_id' })
   shortId: string;
 
-  @Column({ name: 'channel_id' })
-  readonly channelId: string;
-
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
 
   @Column({ name: 'merchant_product_code' })
   readonly merchantProductCode: string;
+
+  @Column({ name: 'channel_id' })
+  readonly channelId: string;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   /* 
     INTEGRATION METADATA
@@ -73,6 +98,9 @@ export class Product {
   @Column({ name: 'refreshed_at', type: 'timestamptz', nullable: true })
   refreshedAt: Date;
 
+  @Column({ name: 'indexed_at', type: 'timestamptz', nullable: true })
+  indexedAt: Date;
+
   @Column({
     name: 'product_refresh_reason',
     type: 'enum',
@@ -82,9 +110,6 @@ export class Product {
   })
   refreshReason: ProductRefreshReason;
 
-  @Column({ name: 'source_date', type: 'timestamptz', nullable: true })
-  sourceDate: Date;
-
   @Column({ name: 'expires_at', type: 'timestamptz', nullable: true })
   expiresAt: Date;
 
@@ -93,22 +118,6 @@ export class Product {
 
   @Column({ name: 'error_message', nullable: true })
   errorMessage: string;
-
-  /* created/updated  */
-
-  @CreateDateColumn({
-    name: 'created_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    name: 'updated_at',
-    type: 'timestamptz',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
-  updatedAt: Date;
 
   /* 
     PRODUCT DATA
@@ -148,22 +157,16 @@ export class Product {
   @Column({ nullable: true })
   currency?: string;
 
-  @Column({ name: 'list_image', nullable: true })
-  listImage?: string;
-
-  @Column({ name: 'main_image', nullable: true })
-  mainImage?: string;
-
-  @Column({ name: 'secondary_image', nullable: true })
-  secondaryImage?: string;
-
   @Column({ name: 'offer_url', nullable: true })
   offerUrl?: string;
 
-  /* relatie  */
+  /* 
+    
+  RELATIONS  
+  */
 
-  @ManyToOne(() => Channel, (source: Channel) => source.products)
-  @JoinColumn({ name: 'source_id' })
+  @ManyToOne(() => Channel, (channel: Channel) => channel.products)
+  @JoinColumn({ name: 'channel_id' })
   channel: Channel;
 
   @ManyToOne(() => Merchant, (merchant: Merchant) => merchant.products)

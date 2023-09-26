@@ -7,23 +7,23 @@ import * as path from 'path';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
 
-export class SeedChannelsEthicalSuperstore1000000000004
+export class SeedChannelsRainforestApi1000000000005
   implements MigrationInterface
 {
   private readonly logger = new Logger(
-    SeedChannelsEthicalSuperstore1000000000004.name,
+    SeedChannelsRainforestApi1000000000005.name,
   );
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    this.logger.log('Executing Migration');
+    this.logger.log('Executing Rainforest Channel Migration');
     const providerRepo = queryRunner.connection.getRepository(Provider);
     const merchantsRepo = queryRunner.connection.getRepository(Merchant);
     const channelsRepo = queryRunner.connection.getRepository(Channel);
     const csvFile = path.join(
       __dirname,
-      '../seeds/pi-channels-ethical-superstore.seed.csv',
+      '../../seeds/pi-channels-rainforest-api.seed.csv',
     );
-    this.logger.debug('Loading Provider Source Data: ' + csvFile);
+    this.logger.debug('Loading Channel Data: ' + csvFile);
     const channels = await csv().fromFile(csvFile);
     for (const channel of channels) {
       const { id: providerId } = await providerRepo.findOne({

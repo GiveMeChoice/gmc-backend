@@ -30,7 +30,7 @@ export class ProductsController {
 
   @Get(':id')
   async getOne(@Param('id') id): Promise<Product> {
-    return await this.productsService.findOneExternal(id);
+    return await this.productsService.findOne(id);
   }
 
   @Post('find')
@@ -38,25 +38,7 @@ export class ProductsController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindProductsDto,
   ) {
-    this.logger.debug(JSON.stringify(findDto));
+    this.logger.debug('find: ' + JSON.stringify(findDto));
     return await this.productsService.find(findDto, pageRequest);
   }
-
-  // @Post(':id/index')
-  // async index(@Param('id') id): Promise<any> {
-  //   this.logger.debug(`Indexing Product: ${id}`);
-  //   return await this.productsService.indexProduct(id);
-  // }
-
-  // @Post(':id/index/map')
-  // async getIndexable(@Param('id') id): Promise<any> {
-  //   return await this.productsService.getOneIndexable(id);
-  // }
-
-  // @Get(':id/index/current')
-  // async getCurrentlyIndexed(@Param('id') id): Promise<any> {
-  //   if (await this.searchService.existsDocument(id)) {
-  //     return await this.searchService.getDocument(id);
-  //   }
-  // }
 }

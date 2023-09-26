@@ -1,7 +1,7 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as moment from 'moment';
 import { Repository } from 'typeorm';
@@ -45,8 +45,8 @@ export class ChannelsService {
     return buildPage<Channel>(data, count, pageRequest);
   }
 
-  async findOne(id: string): Promise<Channel> {
-    const channel = await this.channelsRepo
+  findOne(id: string): Promise<Channel> {
+    return this.channelsRepo
       .createQueryBuilder('channel')
       .innerJoin('channel.merchant', 'merchant')
       .innerJoin('channel.provider', 'provider')
@@ -62,14 +62,6 @@ export class ChannelsService {
       .loadRelationCountAndMap('channel.runCount', 'channel.runs')
       .loadRelationCountAndMap('channel.productCount', 'channel.products')
       .getOne();
-    // return this.channelsRepo.findOne({
-    //   where: { id },
-    //   relations: {
-    //     provider: true,
-    //     merchant: true,
-    //   },
-    // });
-    return channel;
   }
 
   async update(id: string, updates: Partial<Channel>): Promise<Channel> {
@@ -107,25 +99,29 @@ export class ChannelsService {
   }
 
   isDue(channel: Channel): boolean {
+    const interval =
+      channel.runIntervalHours || channel.provider.runIntervalHours;
     return (
-      channel.runIntervalHours &&
+      interval &&
       (!channel.lastRunAt ||
         moment(channel.lastRunAt)
-          .add(channel.runIntervalHours, 'hours')
+          .add(interval, 'hours')
           .isSameOrBefore(moment()))
     );
   }
 
   async findAllDue(): Promise<Channel[]> {
-    return (
-      await this.channelsRepo.find({
-        where: {
+    const activeChannels = await this.channelsRepo.find({
+      where: {
+        active: true,
+        provider: {
           active: true,
-          provider: {
-            active: true,
-          },
         },
-      })
-    ).filter(this.isDue);
+      },
+      relations: {
+        provider: true,
+      },
+    });
+    return activeChannels.filter(this.isDue);
   }
 }

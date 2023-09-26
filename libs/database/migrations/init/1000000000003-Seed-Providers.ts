@@ -9,7 +9,7 @@ export class SeedProviders1000000000003 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Providers Migration');
-    const csvFile = path.join(__dirname, '../seeds/pi-providers.seed.csv');
+    const csvFile = path.join(__dirname, '../../seeds/pi-providers.seed.csv');
     this.logger.debug('Loading CSV Data: ' + csvFile);
     const providers = await csv().fromFile(csvFile);
     await queryRunner.connection.getRepository(Provider).save(providers);

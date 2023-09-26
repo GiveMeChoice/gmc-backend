@@ -12,7 +12,7 @@ export class SeedCategories1000000000007 implements MigrationInterface {
 
     const categoriesSeed = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, '../seeds/gmc-categories.seed.json'),
+        path.join(__dirname, '../../seeds/gmc-categories.seed.json'),
         'utf-8',
       ),
     );

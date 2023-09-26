@@ -1,17 +1,21 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FindMerchantsDto } from '../api/dto/find-merchants.dto';
 import { MerchantKey } from '../model/enum/merchant-key.enum';
 import { Merchant } from '../model/merchant.entity';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class MerchantsService {
+  private readonly logger = new Logger(MerchantsService.name);
+
   constructor(
     @InjectRepository(Merchant) private merchantsRepo: Repository<Merchant>,
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async find(
@@ -42,6 +46,11 @@ export class MerchantsService {
     return this.merchantsRepo.findOneBy({ id });
   }
 
+  async existsByKey(key: MerchantKey): Promise<boolean> {
+    const found = await this.findOneByKey(key);
+    return !!found;
+  }
+
   findOneByKey(key: MerchantKey): Promise<Merchant> {
     if (!key) return null;
     return this.merchantsRepo.findOneBy({ key });
@@ -49,6 +58,10 @@ export class MerchantsService {
 
   async update(id: string, updates: Partial<Merchant>): Promise<Merchant> {
     await this.merchantsRepo.update(id, updates);
+    this.logger.debug('Merchant updated. Updating Index.');
+    await this.productDocumentsService.indexBatchAsync({
+      merchantId: id,
+    });
     return this.merchantsRepo.findOne({ where: { id } });
   }
 }

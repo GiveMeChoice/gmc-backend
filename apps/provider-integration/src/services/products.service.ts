@@ -5,9 +5,10 @@ import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import * as moment from 'moment';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { FindProductsDto } from '../api/dto/find-products.dto';
 import { Channel } from '../model/channel.entity';
+import { MerchantKey } from '../model/enum/merchant-key.enum';
 import { ProductRefreshReason } from '../model/enum/product-refresh-reason.enum';
 import { ProductStatus } from '../model/enum/product-status.enum';
 import { MerchantBrand } from '../model/merchant-brand.entity';
@@ -16,11 +17,10 @@ import { MerchantLabel } from '../model/merchant-label.entity';
 import { Product } from '../model/product.entity';
 import { Run } from '../model/run.entity';
 import { formatErrorMessage } from '../utils/format-error-message';
-import { IndexService } from './index.service';
 import { MerchantBrandsService } from './merchant-brands.service';
 import { MerchantCategoriesService } from './merchant-categories.service';
 import { MerchantLabelsService } from './merchant-labels.service';
-import { MerchantsService } from './merchants.service';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class ProductsService {
@@ -30,8 +30,8 @@ export class ProductsService {
     @InjectRepository(Product)
     private readonly productsRepo: Repository<Product>,
     private readonly labelsService: MerchantLabelsService,
-    private readonly indexService: IndexService,
-    private readonly merchantsService: MerchantsService,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
     @Inject(forwardRef(() => MerchantCategoriesService))
     private readonly merchantCategoriesService: MerchantCategoriesService,
     private readonly brandsService: MerchantBrandsService,
@@ -61,6 +61,10 @@ export class ProductsService {
       }
       delete findDto.merchantLabel;
     }
+    if (findDto.error) {
+      query.andWhere('product.errorMessage is not null');
+      delete findDto.error;
+    }
     query.setFindOptions({
       ...pageRequest,
       where: {
@@ -68,19 +72,15 @@ export class ProductsService {
       },
       relations: {
         channel: true,
+        merchant: true,
+        merchantLabels: true,
         merchantCategory: {
           gmcCategory: true,
         },
       },
-      select: {
-        channel: {
-          id: true,
-          description: true,
-        },
-      },
     });
-    const [toCreate, count] = await query.getManyAndCount();
-    return buildPage<Product>(toCreate, count, pageRequest);
+    const [products, count] = await query.getManyAndCount();
+    return buildPage<Product>(products, count, pageRequest);
   }
 
   async findAll(pageRequest?: PageRequest): Promise<Page<Product>> {
@@ -94,35 +94,74 @@ export class ProductsService {
     return this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {
-        merchant: true,
+        images: true,
+        reviews: true,
+        merchantLabels: {
+          gmcLabel: {
+            parent: {
+              parent: true,
+            },
+          },
+        },
         channel: {
           provider: true,
         },
+        merchant: true,
+        merchantCategory: {
+          gmcCategory: {
+            parent: {
+              parent: true,
+            },
+          },
+        },
+        merchantBrand: true,
       },
     });
   }
 
-  findOneExternal(id: string): Promise<Product> {
-    return this.productsRepo.findOne({
-      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+  findMany(ids: string[]): Promise<Product[]> {
+    return this.productsRepo.find({
+      where: { id: In(ids) },
       relations: {
+        images: true,
         reviews: true,
-        merchantLabels: true,
-        channel: true,
+        merchantLabels: {
+          gmcLabel: {
+            parent: {
+              parent: true,
+            },
+          },
+        },
+        channel: {
+          provider: true,
+        },
         merchant: true,
-        merchantCategory: true,
+        merchantCategory: {
+          gmcCategory: {
+            parent: {
+              parent: true,
+            },
+          },
+        },
         merchantBrand: true,
       },
+    });
+  }
+
+  async findIds(
+    findDto: Partial<Product>,
+    pageRequest?: PageRequest,
+  ): Promise<Page<Product>> {
+    const [data, count] = await this.productsRepo.findAndCount({
+      ...pageRequest,
+      where: {
+        ...findDto,
+      },
       select: {
-        channel: {
-          id: true,
-          description: true,
-        },
-        merchant: {
-          key: true,
-        },
+        id: true,
       },
     });
+    return buildPage<Product>(data, count, pageRequest);
   }
 
   findByMerchant(
@@ -162,12 +201,13 @@ export class ProductsService {
 
   async create(product: Partial<Product>, run: Run): Promise<Product> {
     await this.validateIsCreateable(product, run);
-    product.channel = run.channel;
     product.createdByRunId = run.id;
     product.keepAliveCount = 0;
     product.expiresAt = await this.renewExpirationDate(run.channel);
-    product = await this.normalizeProduct(product.merchant.id, product);
-    return await this.productsRepo.save(Product.factory(product));
+    product = await this.normalizeProduct(run.channel.merchantId, product);
+    const toCreate = Product.factory(product, run.channel);
+    this.logger.debug(JSON.stringify(toCreate));
+    return await this.productsRepo.save(toCreate);
   }
 
   async update(
@@ -175,8 +215,14 @@ export class ProductsService {
     updates: Partial<Product>,
     renewExpiration?: boolean,
   ): Promise<Product> {
+    this.logger.debug(id);
     const { channel } = await this.productsRepo.findOne({
-      where: { id },
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
+      relations: {
+        channel: {
+          provider: true,
+        },
+      },
       select: {
         channel: {
           merchantId: true,
@@ -187,6 +233,7 @@ export class ProductsService {
         },
       },
     });
+    this.logger.debug(JSON.stringify(channel));
     await this.productsRepo.save({
       id,
       ...(await this.normalizeProduct(channel.merchantId, updates)),
@@ -195,6 +242,16 @@ export class ProductsService {
       }),
     });
     return await this.findOne(id);
+  }
+
+  async updateAll(ids: string[], updates: Partial<Product>): Promise<number> {
+    const result = await this.productsRepo
+      .createQueryBuilder()
+      .update(Product)
+      .set(updates)
+      .where({ id: In(ids) })
+      .execute();
+    return result.affected;
   }
 
   async refresh(
@@ -214,7 +271,7 @@ export class ProductsService {
       updates.refreshedByRunId = runId;
       updates.status = ProductStatus.LIVE;
       const product = await this.update(id, updates);
-      await this.indexService.indexProductAsync(product.id);
+      await this.productDocumentsService.index(product.id);
       return product;
     } catch (err) {
       const errorMessage = formatErrorMessage(err);
@@ -259,19 +316,24 @@ export class ProductsService {
   }
 
   private async validateIsCreateable(product: Partial<Product>, run: Run) {
-    if (!product.merchant || !product.merchant.key) {
+    // Validate the mapped merchant key exists
+    if (
+      !product.merchant ||
+      !Object.values(MerchantKey).includes(product.merchant.key)
+    ) {
       throw new Error(
-        `Merchant not mapped by provider pipeline! (Run ID: ${run.id}`,
+        `Merchant not found by Key: ${JSON.stringify(
+          product.merchant,
+        )} (Run ID: ${run.id})`,
       );
     }
-    product.merchant = await this.merchantsService.findOneByKey(
-      product.merchant.key,
-    );
-    if (!product.merchant.id) {
+    // Validate the mapped merchant key matches that of the current run's channel
+    if (run.channel.merchant.key !== product.merchant.key) {
       throw new Error(
-        `Merchant not found! (Key: ${product.merchant.key}) (Run ID: ${run.id})`,
+        `Mapped product merchant (${product.merchant.key}) does not match channel merchant (${run.channel.merchant.key})`,
       );
     }
+    // Validate this merchant product doesn't already exist
     if (
       !this.existsByMerchant(
         run.channel.providerId,
@@ -279,7 +341,7 @@ export class ProductsService {
       )
     ) {
       throw new Error(
-        `Provider ${run.channel.providerId} product ${product.merchantProductCode} already exists!`,
+        `Merchant product (${run.channel.merchant.key}: ${product.merchantProductCode}) already exists`,
       );
     }
   }

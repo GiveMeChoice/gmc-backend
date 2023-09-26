@@ -151,7 +151,7 @@ export abstract class SharedLoader implements Loader {
       this.isOfferUpdated(sourceItem, product)
     ) {
       // product offer updated
-      await this.productsService.refresh(
+      await this.refreshProduct(
         product.id,
         this.pickOfferUpdatedSourceFields(sourceItem),
         run.channel,

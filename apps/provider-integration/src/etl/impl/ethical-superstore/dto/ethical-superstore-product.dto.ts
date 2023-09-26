@@ -15,16 +15,19 @@ export interface EthicalSuperstoreProductDto {
   reviewCount?: number;
   reviews?: EthicalSuperstoreReviewDto[];
   inStock?: boolean;
-  images?: {
-    url: string;
-    isPrimary: boolean;
-  }[];
+  images?: EthicalSuperstoreImageDto[];
   ethicsAndTags?: EthicalSuperstoreEthicsAndTagsDto[];
   manufacturer?: {
     name: string;
     logo: string;
-    description: string;
+    url: string;
   };
+  category?: string;
+}
+
+export interface EthicalSuperstoreImageDto {
+  url: string;
+  isPrimary: boolean;
 }
 
 export interface EthicalSuperstoreReviewDto {

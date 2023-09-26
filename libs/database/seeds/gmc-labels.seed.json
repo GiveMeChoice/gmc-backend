@@ -2,30 +2,135 @@
   "name": "Root",
   "children": [
     {
-      "name": "Certifications",
-      "description": "Sustainable practices and/or impact have been certified by a third-party organization",
-      "children": []
-    },
-    {
-      "name": "Origin",
-      "description": "Product was partially or wholly produced in this country/region",
+      "name": "Certification",
+      "description": "Claim and of sustainable impact or ethical standard has been certified by a neutral third-party organization",
       "children": [
         {
-          "name": "China",
-          "description": "Made in China",
+          "name": "Climate Neutral",
+          "description": "",
           "children": []
         },
         {
-          "name": "Italy",
-          "description": "Made in Italy",
+          "name": "Forest Stewardship Council",
+          "description": "",
+          "children": []
+        },
+        {
+          "name": "Compact by Design",
+          "description": "Amazon Compact by Deisgn",
           "children": []
         }
       ]
     },
     {
-      "name": "Substance-Free",
-      "description": "Product does not contain one or more specific harmful substances",
+      "name": "Origin",
+      "description": "Product was partially or wholly produced in this region",
+      "children": [
+        {
+          "name": "Made in Asia",
+          "description": "Product was partially or wholly produced in Asia",
+          "children": [
+            {
+              "name": "Made in China",
+              "description": "Product was partially or wholly produced in China",
+              "children": []
+            },
+            {
+              "name": "Made in India",
+              "description": "Product was partially or wholly produced in India",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Made in Europe",
+          "description": "Product was partially or wholly produced in Europe",
+          "children": [
+            {
+              "name": "Made in UK",
+              "description": "Product was partially or wholly produced in UK",
+              "children": []
+            },
+            {
+              "name": "Made in Portugal",
+              "description": "Product was partially or wholly produced in Portugal",
+              "children": []
+            },
+            {
+              "name": "Made in Estonia",
+              "description": "Product was partially or wholly produced in Estonia",
+              "children": []
+            },
+            {
+              "name": "Made in Spain",
+              "description": "Product was partially or wholly produced in Spain",
+              "children": []
+            },
+            {
+              "name": "Made in Italy",
+              "description": "Product was partially or wholly produced in Italy",
+              "children": []
+            }
+          ]
+        },
+        {
+          "name": "Made in America",
+          "description": "Product was partially or wholly produced in America",
+          "children": []
+        },
+        {
+          "name": "Made in Africa",
+          "description": "Product was partially or wholly produced in Africa",
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Organic",
+      "description": "Food and drinks produced by methods complying with the standards of organic farming. Standards vary worldwise, but organic farming features practices that cylce resources, promote ecological balance, and conserve biodiversity",
       "children": []
+    },
+    {
+      "name": "Fair Trade",
+      "description": "A trading partnership based on dialogue, transparency and respect, that seeks greater equity in international trade",
+      "children": []
+    },
+    {
+      "name": "Production Method",
+      "description": "Specific practices adhered to during the manufacture and/or production of goods",
+      "children": [
+        {
+          "name": "Handmade",
+          "description": "Products made by skillful handiwork and simple, non-automated tools",
+          "children": []
+        }
+      ]
+    },
+    {
+      "name": "Ingredients and Dietary",
+      "description": "Products that meet the ingredient requirements for specific dietary restrictions or additive (non-additive) preferences",
+      "children": [
+        {
+          "name": "Gluten-Free",
+          "description": "Products without gluten",
+          "children": []
+        },
+        {
+          "name": "Sugar-Free",
+          "description": "Products without sugar",
+          "children": []
+        },
+        {
+          "name": "Dairy-Free",
+          "description": "Products without dairy",
+          "children": []
+        },
+        {
+          "name": "Palm-Oil Free",
+          "description": "Products without palm-oil",
+          "children": []
+        }
+      ]
     },
     {
       "name": "Uncategorized",

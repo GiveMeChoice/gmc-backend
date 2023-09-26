@@ -11,7 +11,7 @@ const logger = new Logger('MessagingModule');
     RabbitMQModule.forRootAsync(RabbitMQModule, {
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => {
-        logger.debug(configService.get('rabbitmq.uri'));
+        logger.debug(configService.get('RABBITMQ_URI'));
         return {
           exchanges: [
             {
@@ -21,6 +21,7 @@ const logger = new Logger('MessagingModule');
           ],
           connectionInitOptions: {
             timeout: 30000,
+            wait: false,
           },
           channels: {
             'channel-low': {
@@ -40,10 +41,10 @@ const logger = new Logger('MessagingModule');
               prefetchCount:
                 configService.get<number>(
                   'rabbitmq.prefetch-count.channel-high',
-                ) || 40,
+                ) || 8,
             },
           },
-          uri: configService.get('rabbitmq.uri'),
+          uri: configService.get('RABBITMQ_URI'),
         };
       },
       inject: [ConfigService],

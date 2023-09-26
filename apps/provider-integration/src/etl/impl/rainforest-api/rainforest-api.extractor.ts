@@ -41,8 +41,8 @@ export class RainforestApiExtractor
     private readonly cacheManager: ProductCacheManager,
     configService: ConfigService,
   ) {
-    this._apiKey = configService.get('rainforest.api_key');
-    this._zipCode = configService.get('rainforest.zip-code');
+    this._apiKey = configService.get('RAINFOREST_API_KEY');
+    this._zipCode = configService.get('providers.rainforest.zip-code');
     this.logger.debug('zip code: ' + this._zipCode);
   }
 

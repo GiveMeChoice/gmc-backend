@@ -12,7 +12,7 @@ export class SeedGmcLabels1000000000006 implements MigrationInterface {
 
     const labelGroupsSeed = JSON.parse(
       fs.readFileSync(
-        path.join(__dirname, '../seeds/gmc-labels.seed.json'),
+        path.join(__dirname, '../../seeds/gmc-labels.seed.json'),
         'utf-8',
       ),
     );

@@ -52,8 +52,9 @@ import { Merchant } from './model/merchant.entity';
 import { MerchantsController } from './api/controllers/merchants.controller';
 import { MerchantsService } from './services/merchants.service';
 import { ProductImage } from './model/product-image.entity';
-import { IndexController } from './api/controllers/index.controller';
-import { IndexService } from './services/index.service';
+import { ProductDocumentsController } from './api/controllers/product-document.controller';
+import { ProductDocumentsService } from './services/product-documents.service';
+import { GmcBrand } from './model/gmc-brand.entity';
 
 @Module({
   imports: [
@@ -67,10 +68,11 @@ import { IndexService } from './services/index.service';
       Channel,
       Run,
       Product,
-      MerchantLabel,
       GmcLabel,
-      MerchantCategory,
       GmcCategory,
+      GmcBrand,
+      MerchantLabel,
+      MerchantCategory,
       MerchantBrand,
       ProductReview,
       ProductImage,
@@ -94,7 +96,7 @@ import { IndexService } from './services/index.service';
     MerchantBrandsController,
     JobsController,
     ProductsController,
-    IndexController,
+    ProductDocumentsController,
     MerchantsController,
   ],
   providers: [
@@ -109,7 +111,7 @@ import { IndexService } from './services/index.service';
     ChannelsService,
     RunsService,
     ProductsService,
-    IndexService,
+    ProductDocumentsService,
     MerchantLabelsService,
     GmcLabelsService,
     MerchantCategoriesService,
@@ -136,7 +138,7 @@ import { IndexService } from './services/index.service';
     ChannelsService,
     RunsService,
     ProductsService,
-    IndexService,
+    ProductDocumentsService,
   ],
 })
 export class AppModule {}

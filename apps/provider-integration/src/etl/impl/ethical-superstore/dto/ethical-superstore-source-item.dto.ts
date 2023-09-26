@@ -2,11 +2,11 @@ export interface EthicalSuperstoreSourceItemDto {
   href: string;
   id: string;
   sku: string;
-  name: string;
+  title: string;
   price: string;
   brand: string;
   category: string;
-  list: string;
-  image: string;
+  categoryFull: string;
+  imageSource: string;
   inStock: boolean;
 }

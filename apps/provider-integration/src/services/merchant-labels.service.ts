@@ -3,9 +3,12 @@ import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
 import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, IsNull, Repository } from 'typeorm';
+import { FindMerchantLabelsDto } from '../api/dto/find-merchant-labels.dto';
+import { GmcLabel } from '../model/gmc-label.entity';
 import { MerchantLabel } from '../model/merchant-label.entity';
-import { ProductsService } from './products.service';
+import { GmcLabelsService } from './gmc-labels.service';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class MerchantLabelsService {
@@ -14,8 +17,9 @@ export class MerchantLabelsService {
   constructor(
     @InjectRepository(MerchantLabel)
     private readonly merchantLabelsRepo: Repository<MerchantLabel>,
-    @Inject(forwardRef(() => ProductsService))
-    private readonly productsService: ProductsService,
+    private readonly gmcLabelsService: GmcLabelsService,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<MerchantLabel>> {
@@ -26,25 +30,46 @@ export class MerchantLabelsService {
   }
 
   findOne(id: string): Promise<MerchantLabel> {
-    return this.merchantLabelsRepo.findOne({
-      where: { id },
-      relations: { gmcLabel: true },
-    });
+    return this.merchantLabelsRepo
+      .createQueryBuilder('label')
+      .where({ id })
+      .setFindOptions({ relations: { gmcLabel: true, merchant: true } })
+      .loadRelationCountAndMap('label.productCount', 'label.products')
+      .getOne();
   }
 
   async find(
-    findDto: Partial<MerchantLabel>,
+    findDto: FindMerchantLabelsDto,
     pageRequest?: PageRequest,
   ): Promise<Page<MerchantLabel>> {
+    const gmcLabelIds = [];
+    if (findDto.gmcLabelId) {
+      const descendants = (await this.gmcLabelsService.findDescendents(
+        findDto.gmcLabelId,
+      )) as GmcLabel[];
+      for (const descendant of descendants) {
+        gmcLabelIds.push(descendant.id);
+      }
+    }
+    let unassigned = false;
+    if (findDto.unassigned) {
+      unassigned = true;
+      delete findDto.unassigned;
+    }
     const [data, count] = await this.merchantLabelsRepo
       .createQueryBuilder('label')
       .where({
         ...findDto,
+        ...(findDto.gmcLabelId && {
+          gmcLabelId: In(gmcLabelIds),
+        }),
+        ...(unassigned && { gmcLabelId: IsNull() }),
       })
       .setFindOptions({
         ...pageRequest,
         relations: {
           gmcLabel: true,
+          merchant: true,
         },
         select: {
           gmcLabel: {
@@ -72,30 +97,32 @@ export class MerchantLabelsService {
     label: Partial<MerchantLabel>,
   ): Promise<MerchantLabel> {
     await this.merchantLabelsRepo.save({ id, ...label });
+    this.logger.debug(`Merchant label ${id} Updated. Indexing Products.`);
+    await this.productDocumentsService.indexBatchAsync({
+      merchantLabels: [
+        {
+          id,
+        } as MerchantLabel,
+      ],
+    });
     return await this.findOne(id);
   }
 
   async assignGmcLabel(id: string, gmcLabelId: string): Promise<MerchantLabel> {
-    throw new Error('Ruh roh! Merchant label assignment is broken!');
-    // const merchantLabel = await this.findOne(id);
-    // if (!merchantLabel) throw new Error(`Merchant Label Not Found: ${id}`);
-    // await this.merchantLabelsRepo.save({
-    //   id,
-    //   gmcLabelId: gmcLabelId ? gmcLabelId : null,
-    // });
-    // const productIds = await this.productsService.findIds({
-    //   merchantLabels: {
-    //     id,
-    //   } as MerchantLabel,
-    // });
-    // this.logger.debug(
-    //   `Label reassigned. Reindexing ${productIds.data.length} products`,
-    // );
-    // await this.productsService.indexProductBatchAsync({
-    //   merchantCategory: {
-    //     id,
-    //   } as MerchantCategory,
-    // });
-    // return await this.findOne(id);
+    const merchantLabel = await this.findOne(id);
+    if (!merchantLabel) throw new Error(`Merchant Label Not Found: ${id}`);
+    await this.merchantLabelsRepo.save({
+      id,
+      gmcLabelId: gmcLabelId ? gmcLabelId : null,
+    });
+    Logger.debug('Merchant Label Reassigned. Indexing products');
+    await this.productDocumentsService.indexBatchAsync({
+      merchantLabels: [
+        {
+          id,
+        } as MerchantLabel,
+      ],
+    });
+    return await this.findOne(id);
   }
 }

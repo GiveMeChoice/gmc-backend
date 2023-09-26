@@ -26,10 +26,7 @@ export abstract class PipelineBase implements Pipeline {
     protected extractorContainer: ExtractorContainer,
     @Inject(MAPPER_CONTAINER) protected mapperContainer: MapperContainer,
     @Inject(LOADER_CONTAINER) protected loaderContainer: LoaderContainer,
-  ) {
-    console.log('yooooooooooo');
-    console.log(this.extractorContainer);
-  }
+  ) {}
 
   async execute(channel: Channel): Promise<Run> {
     let run = await this.runsService.start(channel);

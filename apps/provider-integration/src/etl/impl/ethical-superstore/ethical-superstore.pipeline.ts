@@ -12,10 +12,9 @@ import { EthicalSuperstoreMapper } from './ethical-superstore.mapper';
 export class EthicalSuperstorePipeline extends PipelineBase {
   private readonly logger = new Logger(EthicalSuperstorePipeline.name);
 
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
   async executeInternal(run: Run) {
-    this.logger.log(this.extractorContainer == null);
     try {
       run.contentDate = new Date();
       await lastValueFrom(

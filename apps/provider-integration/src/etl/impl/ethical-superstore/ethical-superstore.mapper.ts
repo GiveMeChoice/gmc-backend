@@ -7,11 +7,12 @@ import { MerchantCategory } from '@app/provider-integration/model/merchant-categ
 import { ProductReview } from '@app/provider-integration/model/product-review.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PipelineError } from '../../exception/pipeline.error';
 import { Mapper } from '../../mapper/mapper.interface';
 import {
   EthicalSuperstoreEthicsAndTagsDto,
+  EthicalSuperstoreImageDto,
   EthicalSuperstoreProductDto,
   EthicalSuperstoreReviewDto,
 } from './dto/ethical-superstore-product.dto';
@@ -28,7 +29,9 @@ export class EthicalSuperstoreMapper
   implements
     Mapper<EthicalSuperstoreSourceItemDto, EthicalSuperstoreProductDto>
 {
-  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE_WEB;
+  private readonly logger = new Logger(EthicalSuperstoreMapper.name);
+
+  providerKey: ProviderKey = ProviderKey.ETHICAL_SUPERSTORE;
 
   mapChannelItem(item: EthicalSuperstoreSourceItemDto): ProviderProductDataDto {
     try {
@@ -37,10 +40,12 @@ export class EthicalSuperstoreMapper
           key: MerchantKey.ETHICAL_SUPERSTORE,
         } as Merchant,
         merchantProductCode: item.id,
+        sku: item.sku,
+        title: item.title,
         price: item.price ? Number(item.price) : null,
         images: [
           {
-            url: item.image,
+            url: item.imageSource,
             type: ProductImageType.LIST,
             primary: true,
           } as ProductImage,
@@ -59,7 +64,7 @@ export class EthicalSuperstoreMapper
   ): ProviderProductDataDto {
     try {
       const product: ProviderProductDataDto = {};
-      product.sku = this.mapSku(ethicalSuperstoreProduct);
+      // product.sku = this.mapSku(ethicalSuperstoreProduct);
       product.title = ethicalSuperstoreProduct.productInfo.title;
       product.description = ethicalSuperstoreProduct.productInfo.description
         .replace('�', '')
@@ -79,91 +84,87 @@ export class EthicalSuperstoreMapper
       product.price = ethicalSuperstoreProduct.productInfo.price.price;
       product.shippingPrice = product.price > 50 ? 0 : 4.95;
       product.currency = ethicalSuperstoreProduct.productInfo.price.currency;
-      product.merchantBrand = this.mapBrand(
+      product.merchantBrand = this.mapMerchantBrand(
+        existingProduct.channel,
         ethicalSuperstoreProduct,
       ) as MerchantBrand;
-      product.merchantCategory = this.mapCategory(
-        existingProduct.channel,
+      product.merchantCategory = this.mapMerchantCategory(
+        ethicalSuperstoreProduct,
       ) as MerchantCategory;
       product.reviews = this.mapReviews(
         ethicalSuperstoreProduct.reviews,
       ) as ProductReview[];
-      product.merchantLabels = this.mapLabels(
+      product.merchantLabels = this.mapMerchantLabels(
         ethicalSuperstoreProduct.ethicsAndTags,
       ) as MerchantLabel[];
-      product.images.concat(this.mapImages(ethicalSuperstoreProduct));
+      product.images = this.mapImages(
+        existingProduct.images,
+        ethicalSuperstoreProduct.images,
+      );
       return product;
     } catch (err) {
       throw new PipelineError('MAP_ERROR', err);
     }
   }
 
-  private mapImages(data: EthicalSuperstoreProductDto): ProductImage[] {
-    const detailImages = [];
-    const primary = data.images.find((img) => img.isPrimary);
-    if (primary) {
-      detailImages.push({
-        url: primary.url,
-        type: ProductImageType.DETAIL,
-        primary: true,
-      } as ProductImage);
-    }
-    data.images
-      .filter((img) => !img.isPrimary)
-      .forEach((secondaryImage) => {
-        detailImages.push({
-          url: secondaryImage.url,
-          type: ProductImageType.LIST,
-          primary: false,
+  private mapImages(
+    existingImages: ProductImage[],
+    rainforestImages: EthicalSuperstoreImageDto[],
+  ): ProductImage[] {
+    const images: ProductImage[] = [];
+    // preserve list images from channel mapping
+    this.logger.debug(JSON.stringify(existingImages));
+    existingImages &&
+      existingImages.forEach((img) => {
+        if (img.type === ProductImageType.LIST) {
+          images.push(img);
+        }
+      });
+    // (re)add all detail images
+    rainforestImages &&
+      rainforestImages.forEach((img) => {
+        images.push({
+          url: img.url,
+          type: ProductImageType.DETAIL,
+          primary: img.isPrimary,
         } as ProductImage);
       });
-    return detailImages;
+    return images;
   }
 
-  private mapSku(data: EthicalSuperstoreProductDto): string {
-    const splits = data.productInfo.productCodeText.split(':');
-    return splits.length > 1 && !isNaN(splits[1].trim() as unknown as number)
-      ? splits[1].trim()
-      : null;
-  }
+  // private mapSku(data: EthicalSuperstoreProductDto): string {
+  //   const splits = data.productInfo.productCodeText.split(':');
+  //   return splits.length > 1 && !isNaN(splits[1].trim() as unknown as number)
+  //     ? splits[1].trim()
+  //     : null;
+  // }
 
-  private mapBrand(data: EthicalSuperstoreProductDto): Partial<MerchantBrand> {
-    const brand = data.productInfo.brand
-      ? data.productInfo.brand
-      : data.manufacturer.name;
+  private mapMerchantBrand(
+    channel: Channel,
+    data: EthicalSuperstoreProductDto,
+  ): Partial<MerchantBrand> {
     return {
-      merchantBrandCode: normalizeIdCode(brand),
-      name: brand,
-      description: data.manufacturer ? data.manufacturer.description : null,
-      logo: data.manufacturer ? data.manufacturer.logo : null,
+      merchantBrandCode: normalizeIdCode(channel.etlCode1),
+      name: channel.etlCode1,
+      url: data.manufacturer.url,
+      logo: data.manufacturer.logo,
     };
   }
 
-  private mapCategory(channel: Channel): Partial<MerchantCategory> {
+  private mapMerchantCategory(
+    data: EthicalSuperstoreProductDto,
+  ): Partial<MerchantCategory> {
     return {
-      merchantCategoryCode: channel.etlCode1
-        .split('/')
-        .map((s) =>
-          (s.endsWith('.htm') ? s.slice(0, -3) : s)
-            .split('-')
-            .map(capitalizeWord)
-            .join(' '),
-        )
+      merchantCategoryCode: data.category
+        .split('>')
+        .map((s) => s.trim().split('-').map(capitalizeWord).join(' '))
         .join('_')
         .toLowerCase() // lowercase only
         .replace(/\&/g, 'and') // spaces -> dashes
         .replace(/\s+/g, '-') // spaces -> dashes
         .replace(/[^a-zA-Z0-9-_]/g, '') // remove non-alphanumeric
         .trim(), // remove whitespace;,
-      name: channel.etlCode1
-        .split('/')
-        .map((s) =>
-          (s.endsWith('.htm') ? s.slice(0, -3) : s)
-            .split('-')
-            .map(capitalizeWord)
-            .join(' '),
-        )
-        .join(' > '),
+      name: data.category,
     };
   }
 
@@ -173,15 +174,15 @@ export class EthicalSuperstoreMapper
     return reviews;
   }
 
-  private mapLabels(
+  private mapMerchantLabels(
     ethicsAndTags: EthicalSuperstoreEthicsAndTagsDto[],
   ): Partial<MerchantLabel>[] {
     return ethicsAndTags.map((tag) => ({
-      code: normalizeIdCode(tag.title),
+      merchantLabelCode: normalizeIdCode(tag.title),
       name: tag.title,
       description: tag.title,
-      infoLink: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.href}`,
-      icon: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.icon}`,
+      url: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.href}`,
+      logo: `${ETHICAL_SUPERSTORE_BASE_URL}${tag.icon}`,
     }));
   }
 }

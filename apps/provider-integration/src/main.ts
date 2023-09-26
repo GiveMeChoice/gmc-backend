@@ -13,7 +13,12 @@ const logger = new Logger('Main=>bootstrap()');
 
 async function bootstrap() {
   logger.log('Starting Give Me Choice - Provider Integration Service (BETA)');
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger:
+      process.env.NODE_ENV === 'development'
+        ? ['log', 'debug', 'error', 'verbose', 'warn']
+        : ['log', 'error', 'warn'],
+  });
   app.enableCors({
     origin: '*',
   });
@@ -36,8 +41,8 @@ async function bootstrap() {
   );
   const configService = app.get(ConfigService);
   logger.log('starting api');
-  const port = configService.get('PORT', 5002);
+  const port = configService.get('app.port', 5002);
   await app.listen(port);
-  logger.log(`api started, listening on port: ${port}`);
+  logger.log(`app api started, listening on port: ${port}`);
 }
 bootstrap();

@@ -24,6 +24,15 @@ export class MerchantCategoriesController {
     private readonly merchantCategoriesService: MerchantCategoriesService,
   ) {}
 
+  @Post('find')
+  async find(
+    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
+    @Body() findDto: FindMerchantCategoriesDto,
+  ) {
+    this.logger.debug(JSON.stringify(findDto));
+    return await this.merchantCategoriesService.find(findDto, pageRequest);
+  }
+
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
@@ -55,16 +64,9 @@ export class MerchantCategoriesController {
     @Param('id') id: string,
     @Query('gmcCategoryId') gmcCategoryId?: string,
   ): Promise<MerchantCategory> {
-    this.logger.debug(`Assigning merchant category ${id} to ${gmcCategoryId}`);
+    this.logger.debug(
+      `Assigning merchant category ${id} to GMC category ${gmcCategoryId}`,
+    );
     return this.merchantCategoriesService.assignGmcCategory(id, gmcCategoryId);
-  }
-
-  @Post('find')
-  async find(
-    @Query(TransformPageRequestPipe) pageRequest: PageRequest,
-    @Body() findDto: FindMerchantCategoriesDto,
-  ) {
-    this.logger.debug(JSON.stringify(findDto));
-    return await this.merchantCategoriesService.find(findDto, pageRequest);
   }
 }

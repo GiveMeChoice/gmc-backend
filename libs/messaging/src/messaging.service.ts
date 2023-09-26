@@ -10,9 +10,7 @@ export class MessagingService {
   constructor(private readonly amqpConnection: AmqpConnection) {}
 
   async sendToQueue(message: Message<any>): Promise<void> {
-    this.logger.debug(
-      `Sending to ${message.getQueue()}: ${JSON.stringify(message.data)}`,
-    );
+    this.logger.debug(`Sending message to ${message.getQueue()}`);
     await this.amqpConnection.publish(
       DEFAULT_EXCHANGE,
       message.getRoutingKey(),

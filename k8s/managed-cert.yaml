@@ -1,0 +1,7 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: gmc-torino-cert-1
+spec:
+  domains:
+    - torino-1.givemechoice.com

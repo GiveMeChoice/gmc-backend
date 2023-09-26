@@ -18,8 +18,8 @@ export class S3Service {
   private _client: S3Client;
 
   constructor(configService: ConfigService) {
-    const id = configService.get('aws.id');
-    const secret = configService.get('aws.secret');
+    const id = configService.get('AWS_ID');
+    const secret = configService.get('AWS_SECRET');
     const region = configService.get('aws.region');
     if (!id || !secret || !region) {
       throw new Error('AWS configuration missing');

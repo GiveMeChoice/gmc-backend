@@ -1,0 +1,18 @@
+app:
+  port: 5002
+
+datasource:
+  port: 5432
+
+rabbitmq:
+  prefetch-count:
+
+aws:
+  region: us-east-1
+
+providers:
+  rainforest:
+    zip-code: SE21 8AX
+
+elastic:
+  index: gmc_search

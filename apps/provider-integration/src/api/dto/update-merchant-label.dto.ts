@@ -10,5 +10,11 @@ export class UpdateMerchantLabelDto extends PartialType(MerchantLabel) {
   logo?: string;
 
   @IsOptional()
+  url?: string;
+
+  @IsOptional()
+  name?: string;
+
+  @IsOptional()
   description?: string;
 }

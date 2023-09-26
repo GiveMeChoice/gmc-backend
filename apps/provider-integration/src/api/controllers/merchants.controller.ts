@@ -15,6 +15,7 @@ import {
 } from '@nestjs/common';
 import { FindMerchantsDto } from '../dto/find-merchants.dto';
 import { UpdateMerchantDto } from '../dto/update-merchant.dto';
+import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
 
 @Controller('merchants')
 export class MerchantsController {
@@ -27,6 +28,8 @@ export class MerchantsController {
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
     @Body() findDto: FindMerchantsDto,
   ): Promise<Page<Merchant>> {
+    this.logger.debug('hel' + JSON.stringify(Object.values(MerchantKey)));
+    this.logger.debug('oo' + JSON.stringify(Object.keys(MerchantKey)));
     this.logger.debug(JSON.stringify(findDto));
     return await this.merchantsService.find(findDto, pageRequest);
   }

@@ -9,7 +9,7 @@ export class SeedMerchants1000000000002 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Merchants Migration');
-    const csvFile = path.join(__dirname, '../seeds/merchants.seed.csv');
+    const csvFile = path.join(__dirname, '../../seeds/merchants.seed.csv');
     this.logger.debug('Loading CSV Data: ' + csvFile);
     const merchants = await csv().fromFile(csvFile);
     await queryRunner.connection.getRepository(Merchant).save(merchants);
