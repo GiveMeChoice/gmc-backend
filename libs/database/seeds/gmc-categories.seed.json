@@ -1,99 +1,273 @@
 {
   "name": "Root",
+  "slug": "root",
   "categories": [
     {
-      "name": "Baby & Kids",
+      "name": "Clothing",
+      "slug": "clothing",
       "categories": [
         {
-          "name": "Baby Care & Accessories",
-          "categories": []
-        },
-        {
-          "name": "Baby Furniture",
-          "categories": []
-        },
-        {
-          "name": "Baby Health & Care",
-          "categories": []
-        },
-        {
-          "name": "Baby Safety",
-          "categories": []
-        },
-        {
-          "name": "Baby Travel",
+          "name": "Mens",
+          "slug": "mens",
           "categories": [
-            {
-              "name": "Baby Car Seats & Accessories",
-              "categories": []
-            },
-            {
-              "name": "Baby Carriers, Bouncers & Walkers",
-              "categories": []
-            },
-            {
-              "name": "Baby Pushchairs & Accessories",
-              "categories": []
-            }
+            { "name": "T-shirts", "slug": "t-shirts" },
+            { "name": "Shirts", "slug": "shirts" },
+            { "name": "Jumpers & Cardigans", "slug": "jumpers-and-cardigans" },
+            { "name": "Jeans & Trousers", "slug": "jeans-and-trousers" },
+            { "name": "Coats & Jackets", "slug": "coats-and-jackets" },
+            { "name": "Underwear & Socks", "slug": "underwear-and-socks" },
+            { "name": "Nightwear", "slug": "nightwear" },
+            { "name": "Sportswear", "slug": "sportswear" },
+            { "name": "Swimwear", "slug": "swimwear" },
+            { "name": "Shoes", "slug": "shoes" },
+            { "name": "Jewellery", "slug": "jewellery" },
+            { "name": "Bags", "slug": "bags" },
+            { "name": "Hats & Caps", "slug": "hats-and-caps" }
+          ]
+        },
+        {
+          "name": "Womens",
+          "slug": "womens",
+          "categories": [
+            { "name": "Tops", "slug": "tops" },
+            { "name": "Blouses & Shirts", "slug": "blouses-and-shirts" },
+            { "name": "Jumpers & Cardigans", "slug": "jumpers-and-cardigans" },
+            { "name": "Skirts", "slug": "skirts" },
+            { "name": "Jeans & Trousers", "slug": "jeans-and-trousers" },
+            { "name": "Dresses", "slug": "dresses" },
+            { "name": "Jumpsuits", "slug": "jumpsuits" },
+            { "name": "Coats & Jackets", "slug": "coats-and-jackets" },
+            { "name": "Underwear & Socks", "slug": "underwear-and-socks" },
+            { "name": "Nightwear", "slug": "nightwear" },
+            { "name": "Sportswear", "slug": "sportswear" },
+            { "name": "Swimwear", "slug": "swimwear" },
+            { "name": "Maternity Clothes", "slug": "maternity-clothes" },
+            { "name": "Shoes", "slug": "shoes" },
+            { "name": "Jewellery", "slug": "jewellery" },
+            { "name": "Rain wear", "slug": "rain-wear" },
+            { "name": "Bags & Purses", "slug": "bags-and-purses" },
+            { "name": "Hats", "slug": "hats" }
+          ]
+        },
+        {
+          "name": "Kids",
+          "slug": "kids",
+          "categories": [
+            { "name": "Tops", "slug": "tops" },
+            { "name": "Jumpers & Cardigans", "slug": "jumpers-and-cardigans" },
+            { "name": "Dresses & Onesies", "slug": "dresses-and-onesies" },
+            { "name": "Skirts & Shorts", "slug": "skirts-and-shorts" },
+            { "name": "Jeans & Trousers", "slug": "jeans-and-trousers" },
+            { "name": "Coats & Jackets", "slug": "coats-and-jackets" },
+            { "name": "Pyjamas (PJs)", "slug": "pyjamas" },
+            { "name": "Underwear & Socks", "slug": "underwear-and-socks" },
+            { "name": "Swimwear", "slug": "swimwear" },
+            { "name": "Shoes", "slug": "shoes" },
+            { "name": "Accessories", "slug": "accessories" },
+            { "name": "Baby clothing", "slug": "baby-clothing" }
           ]
         }
       ]
     },
     {
-      "name": "Personal Care & Health",
-      "categories": []
-    },
-    {
       "name": "Beauty",
-      "categories": []
-    },
-    {
-      "name": "Hobby, Toys, & Games",
-      "categories": []
-    },
-    {
-      "name": "Apparel",
+      "slug": "beauty",
       "categories": [
         {
-          "name": "Men",
-          "description": "Men's Clothing",
-          "categories": []
+          "name": "Skincare",
+          "slug": "skincare",
+          "categoreis": [
+            { "name": "Cleansers", "slug": "cleansers" },
+            { "name": "Moisturizers", "slug": "moisturizers" },
+            { "name": "Sunscreen", "slug": "sunscreen" }
+          ]
         },
         {
-          "name": "Women",
-          "description": "Women's Clothing",
-          "categories": []
+          "name": "Haircare",
+          "slug": "haircare",
+          "categoreis": [
+            {
+              "name": "Shampoo and Conditioner",
+              "slug": "shampoo-and-conditioner"
+            },
+            { "name": "Styling Products", "slug": "styling-products" }
+          ]
         },
         {
-          "name": "Children",
-          "description": "Children's Clothing",
-          "categories": []
+          "name": "Cosmetics",
+          "slug": "cosmetics",
+          "categoreis": [{ "name": "Makeup", "slug": "makeup" }]
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "slug": "health",
+      "categories": [
+        {
+          "name": "Vitamins and Supplements",
+          "slug": "vitamins-and-supplements",
+          "categories": [
+            { "name": "Multivitamins", "slug": "multivitamins" },
+            { "name": "Herbal Supplements", "slug": "herbal-supplements" }
+          ]
         },
         {
-          "name": "Accessories",
-          "description": "Jewelry & Accessories",
-          "categories": []
+          "name": "Fitness Equipment",
+          "slug": "fitness-equipment",
+          "categories": [
+            {
+              "name": "Yoga Mats and Accessories",
+              "slug": "yoga-mats-and-accessories"
+            }
+          ]
+        },
+        {
+          "name": "Wellness Products",
+          "slug": "welness-products",
+          "categories": [{ "name": "Aromatherapy", "slug": "aromatherapy" }]
+        }
+      ]
+    },
+    {
+      "name": "Indoor",
+      "slug": "indoor",
+      "categories": [
+        {
+          "name": "Furniture",
+          "slug": "furniture",
+          "categories": [
+            { "name": "Living Room", "slug": "living-room" },
+            { "name": "Bedroom", "slug": "bedroom" },
+            { "name": "Dining Room", "slug": "dining-room" },
+            { "name": "Kitchen", "slug": "kitchen" },
+            { "name": "Bathroom", "slug": "bathroom" },
+            { "name": "Chairs and Seating", "slug": "chairs-and-seating" }
+          ]
+        },
+        {
+          "name": "Décor",
+          "slug": "decor",
+          "categories": [
+            { "name": "Lighting", "slug": "lighting" },
+            { "name": "Home Textiles", "slug": "home-textiles" }
+          ]
+        },
+        {
+          "name": "Dining",
+          "slug": "dining",
+          "categories": [
+            { "name": "Cookware", "slug": "cooking" },
+            { "name": "Dining Sets", "slug": "dining-sets" }
+          ]
+        },
+        {
+          "name": "Office",
+          "slug": "office",
+          "categories": [
+            { "name": "Stationary", "slug": "stationary" },
+            { "name": "Books", "slug": "books" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Outdoor",
+      "slug": "outdoor",
+      "categories": [
+        {
+          "name": "Camping and Hiking",
+          "slug": "camping-and-hiking",
+          "categories": [
+            { "name": "Tents and Shelters", "slug": "tents-and-shelters" },
+            { "name": "Sleeping Bags", "slug": "sleeping-bags" },
+            { "name": "Camping Cookware", "slug": "camping-cookware" }
+          ]
+        },
+        {
+          "name": "Sports and Fitness",
+          "slug": "sports-and-fitness",
+          "categories": [{ "name": "Bicycles", "slug": "bicycles" }]
+        },
+        {
+          "name": "Travel Gear",
+          "slug": "travel-gear",
+          "categories": [
+            { "name": "Luggage and Bags", "slug": "luggage-and-bags" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Toys",
+      "slug": "toys",
+      "categories": [
+        {
+          "name": "Educational Toys",
+          "slug": "educational-toys",
+          "categories": [
+            { "name": "STEM Toys", "slug": "stems-toys" },
+            { "name": "Board Games", "slug": "board-games" },
+            { "name": "Puzzles", "slug": "puzzles" }
+          ]
+        },
+        {
+          "name": "Outdoor Play",
+          "slug": "outdoor-play",
+          "categories": [
+            { "name": "Playhouses", "slug": "playhouses" },
+            { "name": "Outdoor Games", "slug": "outdoor-games" }
+          ]
+        },
+        {
+          "name": "Arts and Crafts",
+          "slug": "arts-and-crafts",
+          "categories": [
+            { "name": "Craft Supplies", "slug": "craft-supplies" },
+            { "name": "Art Kits", "slug": "arts-kits" },
+            { "name": "Coloring Books", "slug": "coloring-books" }
+          ]
         }
       ]
     },
     {
       "name": "Pets",
-      "categories": []
+      "slug": "pets",
+      "categories": [
+        {
+          "name": "Pet Food",
+          "slug": "pet-food",
+          "categories": [
+            { "name": "Dog Food", "slug": "dog-food" },
+            { "name": "Cat Food", "slug": "cat-food" },
+            { "name": "Small Animal Food", "slug": "small-animal-food" }
+          ]
+        },
+        {
+          "name": "Pet Accessories",
+          "slug": "pet-accessories",
+          "categories": [
+            { "name": "Collars and Leashes", "slug": "collars-and-leashes" },
+            { "name": "Pet Beds", "slug": "pet-beds" },
+            { "name": "Toys and Treats", "slug": "toys-and-treats" }
+          ]
+        },
+        {
+          "name": "Grooming & Health",
+          "slug": "grooming-and-health",
+          "categories": [
+            {
+              "name": "Shampoos and Conditioners",
+              "slug": "shampoos-and-conditioners"
+            },
+            { "name": "Supplements", "slug": "supplements" }
+          ]
+        }
+      ]
     },
     {
-      "name": "House & Home",
-      "categories": []
-    },
-    {
-      "name": "Grocery",
-      "categories": []
-    },
-    {
-      "name": "Travel",
-      "categories": []
-    },
-    {
-      "name": "Miscellaneous",
+      "name": "Gifts",
+      "slug": "gifts",
       "categories": []
     }
   ]

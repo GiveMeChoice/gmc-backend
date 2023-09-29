@@ -1,10 +1,14 @@
-import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
 import { ProviderProductDataDto } from '@app/provider-integration/etl/dto/provider-product-data.dto';
+import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
+import { ProductImageType } from '@app/provider-integration/model/enum/product-image-type.enum';
 import { ProviderKey } from '@app/provider-integration/model/enum/provider-key.enum';
-import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
-import { Channel } from '@app/provider-integration/model/channel.entity';
+import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
 import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
+import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
+import { Merchant } from '@app/provider-integration/model/merchant.entity';
+import { ProductImage } from '@app/provider-integration/model/product-image.entity';
 import { ProductReview } from '@app/provider-integration/model/product-review.entity';
+import { Product } from '@app/provider-integration/model/product.entity';
 import { capitalizeWord } from '@app/provider-integration/utils/capitalize-word';
 import { normalizeIdCode } from '@app/provider-integration/utils/normalize-id-code';
 import { Injectable, Logger } from '@nestjs/common';
@@ -18,11 +22,6 @@ import {
 } from './dto/ethical-superstore-product.dto';
 import { EthicalSuperstoreSourceItemDto } from './dto/ethical-superstore-source-item.dto';
 import { ETHICAL_SUPERSTORE_BASE_URL } from './ethical-superstore.constants';
-import { MerchantKey } from '@app/provider-integration/model/enum/merchant-key.enum';
-import { Merchant } from '@app/provider-integration/model/merchant.entity';
-import { ProductImage } from '@app/provider-integration/model/product-image.entity';
-import { Product } from '@app/provider-integration/model/product.entity';
-import { ProductImageType } from '@app/provider-integration/model/enum/product-image-type.enum';
 
 @Injectable()
 export class EthicalSuperstoreMapper
@@ -85,7 +84,7 @@ export class EthicalSuperstoreMapper
       product.shippingPrice = product.price > 50 ? 0 : 4.95;
       product.currency = ethicalSuperstoreProduct.productInfo.price.currency;
       product.merchantBrand = this.mapMerchantBrand(
-        existingProduct.channel,
+        existingProduct,
         ethicalSuperstoreProduct,
       ) as MerchantBrand;
       product.merchantCategory = this.mapMerchantCategory(
@@ -140,15 +139,16 @@ export class EthicalSuperstoreMapper
   // }
 
   private mapMerchantBrand(
-    channel: Channel,
+    product: Product,
     data: EthicalSuperstoreProductDto,
   ): Partial<MerchantBrand> {
-    return {
-      merchantBrandCode: normalizeIdCode(channel.etlCode1),
-      name: channel.etlCode1,
+    const brand = {
+      merchantBrandCode: product.channel.etlCode1.toLowerCase(),
+      name: data.manufacturer.name,
       url: data.manufacturer.url,
       logo: data.manufacturer.logo,
     };
+    return brand;
   }
 
   private mapMerchantCategory(

@@ -1,25 +1,31 @@
 import {
-  Entity,
-  Tree,
-  PrimaryGeneratedColumn,
   Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Tree,
   TreeChildren,
   TreeParent,
-  OneToMany,
-  Unique,
 } from 'typeorm';
 import { MerchantCategory } from './merchant-category.entity';
 
 @Entity({ name: 'gmc_category' })
 @Tree('nested-set')
-// @Unique(['name'])
 export class GmcCategory {
-  constructor(name: string) {
+  constructor(name: string, slug: string) {
     this.name = name;
+    this.slug = slug;
+    // this.shortId = shortId();
   }
 
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
+
+  // @Column({ name: 'short_id' })
+  // shortId: string;
+
+  @Column()
+  slug: string;
 
   @Column()
   name: string;

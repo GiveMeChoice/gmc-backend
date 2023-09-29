@@ -20,18 +20,18 @@ import { UpdateMerchantBrandDto } from '../dto/update-merchant-brand.dto';
 export class MerchantBrandsController {
   private readonly logger = new Logger(MerchantBrandsController.name);
 
-  constructor(private readonly brandsService: MerchantBrandsService) {}
+  constructor(private readonly merchantBrandsService: MerchantBrandsService) {}
 
   @Get()
   async getAll(
     @Query(TransformPageRequestPipe) pageRequest: PageRequest,
   ): Promise<Page<MerchantBrand>> {
-    return await this.brandsService.findAll(pageRequest);
+    return await this.merchantBrandsService.findAll(pageRequest);
   }
 
   @Get(':id')
   async getOne(@Param('id') id): Promise<MerchantBrand> {
-    return await this.brandsService.findOne(id);
+    return await this.merchantBrandsService.findOne(id);
   }
 
   @Put(':id')
@@ -39,7 +39,7 @@ export class MerchantBrandsController {
     @Param('id') id: string,
     @Body() updateDto: UpdateMerchantBrandDto,
   ): Promise<MerchantBrand> {
-    return this.brandsService.update(id, updateDto);
+    return this.merchantBrandsService.update(id, updateDto);
   }
 
   @Post('find')
@@ -48,6 +48,17 @@ export class MerchantBrandsController {
     @Body() findDto: FindMerchantBrandsDto,
   ) {
     this.logger.debug(JSON.stringify(findDto));
-    return await this.brandsService.find(findDto, pageRequest);
+    return await this.merchantBrandsService.find(findDto, pageRequest);
+  }
+
+  @Post(':id/assign')
+  async assign(
+    @Param('id') id: string,
+    @Query('gmcBrandId') gmcBrandId?: string,
+  ): Promise<MerchantBrand> {
+    this.logger.debug(
+      `Assigning merchant brand ${id} to GMC Brand ${gmcBrandId}`,
+    );
+    return this.merchantBrandsService.assignGmcBrand(id, gmcBrandId);
   }
 }

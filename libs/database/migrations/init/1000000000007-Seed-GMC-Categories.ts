@@ -38,12 +38,14 @@ export class SeedCategories1000000000007 implements MigrationInterface {
     repo: TreeRepository<GmcCategory>,
   ) {
     this.logger.debug(current.name);
-    let category = new GmcCategory(current.name);
+    let category = new GmcCategory(current.name, current.slug);
     category.parent = parent;
     category.merchantCategories = [];
     category = await repo.save(category);
-    for (const s of current.categories) {
-      await this.buildCategoryTree(s, category, repo);
+    if (current.categories) {
+      for (const s of current.categories) {
+        await this.buildCategoryTree(s, category, repo);
+      }
     }
   }
 }

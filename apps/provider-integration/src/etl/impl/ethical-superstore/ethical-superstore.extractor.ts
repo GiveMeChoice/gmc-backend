@@ -38,31 +38,13 @@ export class EthicalSuperstoreExtractor
         map((html) => this.extractItemsFromHtml(html)),
         mergeMap((items) => items),
       );
-      // return from(
-      //   this.sourceCacheManager.get<EthicalSuperstoreSourceItemDto[]>(source),
-      // ).pipe(
-      //   switchMap((cachedResponse) => {
-      //     return cachedResponse
-      //       ? of(cachedResponse.data)
-      //       : this.fetchSource(source).pipe(
-      //           map((html) => this.extractItemsFromHtml(html)),
-      //           tap((items) =>
-      //             this.sourceCacheManager.put<EthicalSuperstoreSourceItemDto[]>(
-      //               source,
-      //               items,
-      //             ),
-      //           ),
-      //         );
-      //   }),
-      //   mergeMap((items) => items),
-      // );
     } catch (err) {
       throw new PipelineError('EXTRACT_ERROR', err);
     }
   }
 
   private fetchSource(source: Channel): Observable<string> {
-    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/products/${source.etlCode1}?limit=100`;
+    const url = `${ETHICAL_SUPERSTORE_BASE_URL}/products/${source.etlCode1}?limit=500`;
     this.logger.debug(`Fetching source: ${url}`);
     return this.httpService.get<string>(url).pipe(map((res) => res.data));
   }
@@ -90,9 +72,7 @@ export class EthicalSuperstoreExtractor
           category: vpl.attribs['data-product-category'],
           categoryFull: vpl.attribs['data-product-list'],
           inStock: !atext.trim().toLowerCase().includes('out of stock'),
-          imageSource: imageSource.startsWith('//')
-            ? imageSource.substring(2)
-            : imageSource,
+          imageSource,
         });
       });
     return products;
@@ -199,10 +179,6 @@ export class EthicalSuperstoreExtractor
               : $(el.lastChild).text();
           }
         });
-      // .children()
-      // .each((i, el) => {
-      //   dto.category += JSON.stringify(el.attribs);
-      // });
 
       dto.productInfo = {
         id: $('button[name=add_to_cart]').first().attr('data-product-id'),
@@ -259,23 +235,9 @@ export class EthicalSuperstoreExtractor
           .next()
           .children('img')
           .first()
-          .attr('src'),
+          .attr('data-src'),
         url: `${ETHICAL_SUPERSTORE_BASE_URL}/products/${channel.etlCode1}`,
       };
-
-      // $('span[property=manufacturer]')
-      //   .first()
-      //   .parent()
-      //   .next()
-      //   .children('p,a')
-      //   .each((i, el) => {
-      //     dto.manufacturer.url += `${$(el)
-      //       .text()
-      //       .replace(/\s+/g, ' ')
-      //       .trim()}\n`;
-      //   });
-      // dto.manufacturer.url = dto.manufacturer.url.trim();
-
       // in stock?
       $('.product-info > span.icon-tick').each((i, el) => {
         if ($(el).text().includes('In Stock')) dto.inStock = true;
@@ -290,20 +252,6 @@ export class EthicalSuperstoreExtractor
             .replace(/\s+/g, ' ')
             .trim()}\n\n`;
         });
-      // .first()
-      // .text()
-      // .replace(/\s+/g, ' ')
-      // .trim();
-
-      // $('.accordion__content[itemprop=description]')
-      //   .first()
-      //   .add('.accordion__content[itemprop=description] > p')
-      //   .each((i, el) => {
-      //     dto.productInfo.description += `${$(el)
-      //       .text()
-      //       .replace(/\s+/g, ' ')
-      //       .trim()}\n`;
-      //   });
       dto.productInfo.description = dto.productInfo.description.trim();
       return dto;
     } catch (err) {

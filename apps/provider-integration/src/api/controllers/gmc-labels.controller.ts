@@ -1,6 +1,18 @@
 import { GmcLabel } from '@app/provider-integration/model/gmc-label.entity';
 import { GmcLabelsService } from '@app/provider-integration/services/gmc-labels.service';
-import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Logger,
+  Param,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
+import { CreateGmcLabelDto } from '../dto/create-gmc-label.dto';
+import { UpdateGmcLabelDto } from '../dto/update-gmc-label.dto';
 
 @Controller('gmc-labels')
 export class GmcLabelsController {
@@ -9,35 +21,35 @@ export class GmcLabelsController {
   constructor(private readonly gmcLabelsService: GmcLabelsService) {}
 
   @Get()
-  async getAll(@Query('tree') tree: boolean): Promise<any> {
-    return this.gmcLabelsService.findAll(tree);
+  async getAll(@Query('deep') deep: boolean): Promise<any> {
+    return this.gmcLabelsService.findAll(deep);
   }
 
   @Get(':id')
-  async getOne(@Param('id') id: string): Promise<GmcLabel> {
-    return await this.gmcLabelsService.findOne(id);
-  }
-
-  @Get(':id/ancestors')
-  async getAncestors(
+  async getOne(
     @Param('id') id: string,
-    @Query('tree') tree: boolean,
-  ): Promise<any> {
-    return await this.gmcLabelsService.findAncestors(id, tree);
-  }
-
-  private invertTree(gmcLabel: GmcLabel, nodes: string[]): string[] {
-    nodes.push(gmcLabel.name);
-    return gmcLabel.parent && gmcLabel.parent.name !== 'Root'
-      ? this.invertTree(gmcLabel.parent, nodes)
-      : nodes;
+    @Query('deep') deep: boolean,
+  ): Promise<GmcLabel> {
+    return await this.gmcLabelsService.findOne(id, deep);
   }
 
   @Get(':id/descendents')
-  async getDescendents(
-    @Param('id') id: string,
-    @Query('tree') tree: boolean,
-  ): Promise<any> {
-    return this.gmcLabelsService.findDescendents(id, tree);
+  async getDescendents(@Param('id') id: string): Promise<any> {
+    return this.gmcLabelsService.findDescendents(id);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    await this.gmcLabelsService.delete(id);
+  }
+
+  @Post()
+  async create(@Body() createDto: CreateGmcLabelDto) {
+    return await this.gmcLabelsService.create(createDto);
+  }
+
+  @Put(':id')
+  async update(@Param('id') id: string, @Body() updateDto: UpdateGmcLabelDto) {
+    return this.gmcLabelsService.udpate(id, updateDto);
   }
 }

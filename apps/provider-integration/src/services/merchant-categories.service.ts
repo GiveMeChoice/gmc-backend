@@ -47,9 +47,9 @@ export class MerchantCategoriesService {
   ): Promise<Page<MerchantCategory>> {
     const gmcCategoryIds = [];
     if (findDto.gmcCategoryId) {
-      const descendants = (await this.gmcCategoryService.findDescendents(
+      const descendants = await this.gmcCategoryService.findDescendents(
         findDto.gmcCategoryId,
-      )) as GmcCategory[];
+      );
       for (const descendant of descendants) {
         gmcCategoryIds.push(descendant.id);
       }

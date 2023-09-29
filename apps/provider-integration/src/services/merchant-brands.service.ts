@@ -1,59 +1,97 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Like, Repository } from 'typeorm';
 import { MerchantBrand } from '../model/merchant-brand.entity';
+import { GmcBrand } from '../model/gmc-brand.entity';
+import { FindMerchantBrandsDto } from '../api/dto/find-merchant-brands.dto';
 
 @Injectable()
 export class MerchantBrandsService {
   constructor(
     @InjectRepository(MerchantBrand)
-    private readonly brandsRepo: Repository<MerchantBrand>,
+    private readonly merchantBrandsRepo: Repository<MerchantBrand>,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<MerchantBrand>> {
-    const [data, count] = await this.brandsRepo.findAndCount({
+    const [data, count] = await this.merchantBrandsRepo.findAndCount({
       ...pageRequest,
+      relations: { gmcBrand: true, merchant: true },
     });
     return buildPage<MerchantBrand>(data, count, pageRequest);
   }
 
   findOne(id: string): Promise<MerchantBrand> {
-    return this.brandsRepo.findOne({
-      where: { id },
-    });
+    return this.merchantBrandsRepo
+      .createQueryBuilder('brand')
+      .where({ id })
+      .setFindOptions({ relations: { gmcBrand: true, merchant: true } })
+      .loadRelationCountAndMap('brand.productCount', 'brand.products')
+      .getOne();
   }
 
   async find(
-    findDto: Partial<MerchantBrand>,
+    findDto: FindMerchantBrandsDto,
     pageRequest?: PageRequest,
   ): Promise<Page<MerchantBrand>> {
-    const [data, count] = await this.brandsRepo.findAndCount({
-      ...pageRequest,
-      where: {
+    let unassigned = false;
+    if (findDto.unassigned) {
+      unassigned = true;
+      delete findDto.unassigned;
+    }
+    const [data, count] = await this.merchantBrandsRepo
+      .createQueryBuilder('brand')
+      .where({
         ...findDto,
-      },
-    });
+        ...(findDto.merchantBrandCode && {
+          merchantBrandCode: Like(`${findDto.merchantBrandCode}%`),
+        }),
+        ...(unassigned && { gmcBrandId: IsNull() }),
+      })
+      .setFindOptions({
+        ...pageRequest,
+        relations: {
+          gmcBrand: true,
+          merchant: true,
+        },
+      })
+      .loadRelationCountAndMap('brand.productCount', 'brand.products')
+      .getManyAndCount();
     return buildPage<MerchantBrand>(data, count, pageRequest);
   }
 
   findOneByMerchant(merchantId: string, title: string) {
-    return this.brandsRepo.findOne({
+    return this.merchantBrandsRepo.findOne({
       where: { merchantId, merchantBrandCode: title },
+      relations: { gmcBrand: true },
     });
   }
 
-  create(brand: Partial<MerchantBrand>): Promise<MerchantBrand> {
-    return this.brandsRepo.save(brand);
+  async create(brand: Partial<MerchantBrand>): Promise<MerchantBrand> {
+    const created = await this.merchantBrandsRepo.save(brand);
+    return await this.findOne(created.id);
   }
 
   async update(
     id: string,
     brand: Partial<MerchantBrand>,
   ): Promise<MerchantBrand> {
-    await this.brandsRepo.save({ id, ...brand });
+    await this.merchantBrandsRepo.save({ id, ...brand });
+    return await this.findOne(id);
+  }
+
+  async assignGmcBrand(id: string, gmcBrandId: string): Promise<MerchantBrand> {
+    const merchantBrand = await this.findOne(id);
+    if (!merchantBrand) {
+      throw new NotFoundException();
+    }
+    await this.merchantBrandsRepo.save({
+      id,
+      gmcBrandId: gmcBrandId ? gmcBrandId : null,
+    });
+    /// UPDATE INDEX??
     return await this.findOne(id);
   }
 }

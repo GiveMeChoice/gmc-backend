@@ -1,22 +1,27 @@
 {
   "name": "Root",
+  "slug": "root",
   "children": [
     {
       "name": "Certification",
+      "slug": "certification",
       "description": "Claim and of sustainable impact or ethical standard has been certified by a neutral third-party organization",
       "children": [
         {
           "name": "Climate Neutral",
+          "slug": "climate-neutral",
           "description": "",
           "children": []
         },
         {
           "name": "Forest Stewardship Council",
+          "slug": "forest-stewardship-council",
           "description": "",
           "children": []
         },
         {
           "name": "Compact by Design",
+          "slug": "compact-by-design",
           "description": "Amazon Compact by Deisgn",
           "children": []
         }
@@ -24,19 +29,23 @@
     },
     {
       "name": "Origin",
+      "slug": "origin",
       "description": "Product was partially or wholly produced in this region",
       "children": [
         {
           "name": "Made in Asia",
+          "slug": "made-in-asia",
           "description": "Product was partially or wholly produced in Asia",
           "children": [
             {
               "name": "Made in China",
+              "slug": "made-in-china",
               "description": "Product was partially or wholly produced in China",
               "children": []
             },
             {
               "name": "Made in India",
+              "slug": "made-in-india",
               "description": "Product was partially or wholly produced in India",
               "children": []
             }
@@ -44,30 +53,36 @@
         },
         {
           "name": "Made in Europe",
+          "slug": "made-in-europe",
           "description": "Product was partially or wholly produced in Europe",
           "children": [
             {
               "name": "Made in UK",
+              "slug": "made-in-uk",
               "description": "Product was partially or wholly produced in UK",
               "children": []
             },
             {
               "name": "Made in Portugal",
+              "slug": "made-in-portugal",
               "description": "Product was partially or wholly produced in Portugal",
               "children": []
             },
             {
               "name": "Made in Estonia",
+              "slug": "made-in-estonia",
               "description": "Product was partially or wholly produced in Estonia",
               "children": []
             },
             {
               "name": "Made in Spain",
+              "slug": "made-in-spain",
               "description": "Product was partially or wholly produced in Spain",
               "children": []
             },
             {
               "name": "Made in Italy",
+              "slug": "made-in-italy",
               "description": "Product was partially or wholly produced in Italy",
               "children": []
             }
@@ -75,11 +90,13 @@
         },
         {
           "name": "Made in America",
+          "slug": "made-in-america",
           "description": "Product was partially or wholly produced in America",
           "children": []
         },
         {
           "name": "Made in Africa",
+          "slug": "made-in-africa",
           "description": "Product was partially or wholly produced in Africa",
           "children": []
         }
@@ -87,20 +104,24 @@
     },
     {
       "name": "Organic",
+      "slug": "organic",
       "description": "Food and drinks produced by methods complying with the standards of organic farming. Standards vary worldwise, but organic farming features practices that cylce resources, promote ecological balance, and conserve biodiversity",
       "children": []
     },
     {
       "name": "Fair Trade",
+      "slug": "fair-trade",
       "description": "A trading partnership based on dialogue, transparency and respect, that seeks greater equity in international trade",
       "children": []
     },
     {
       "name": "Production Method",
+      "slug": "production-method",
       "description": "Specific practices adhered to during the manufacture and/or production of goods",
       "children": [
         {
           "name": "Handmade",
+          "slug": "handmade",
           "description": "Products made by skillful handiwork and simple, non-automated tools",
           "children": []
         }
@@ -108,25 +129,30 @@
     },
     {
       "name": "Ingredients and Dietary",
+      "slug": "ingredients-and-dietary",
       "description": "Products that meet the ingredient requirements for specific dietary restrictions or additive (non-additive) preferences",
       "children": [
         {
           "name": "Gluten-Free",
+          "slug": "gluten-free",
           "description": "Products without gluten",
           "children": []
         },
         {
           "name": "Sugar-Free",
+          "slug": "sugar-free",
           "description": "Products without sugar",
           "children": []
         },
         {
           "name": "Dairy-Free",
+          "slug": "dairy-free",
           "description": "Products without dairy",
           "children": []
         },
         {
           "name": "Palm-Oil Free",
+          "slug": "palm-oil-free",
           "description": "Products without palm-oil",
           "children": []
         }
@@ -134,6 +160,7 @@
     },
     {
       "name": "Uncategorized",
+      "slug": "uncategorized",
       "description": "Label has yet to be categorized",
       "children": []
     }

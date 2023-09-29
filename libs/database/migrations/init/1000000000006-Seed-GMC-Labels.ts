@@ -38,7 +38,7 @@ export class SeedGmcLabels1000000000006 implements MigrationInterface {
     repo: TreeRepository<GmcLabel>,
   ) {
     this.logger.debug(current.name);
-    let labelGroup = new GmcLabel(current.name);
+    let labelGroup = new GmcLabel(current.name, current.slug);
     labelGroup.description = current.description;
     labelGroup.parent = parent;
     labelGroup.merchantLabels = [];

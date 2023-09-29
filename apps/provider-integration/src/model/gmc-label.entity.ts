@@ -6,23 +6,25 @@ import {
   Tree,
   TreeChildren,
   TreeParent,
-  Unique,
 } from 'typeorm';
 import { MerchantLabel } from './merchant-label.entity';
 
 @Entity({ name: 'gmc_label' })
 @Tree('nested-set')
-// @Unique(['name'])
 export class GmcLabel {
-  constructor(name: string) {
+  constructor(name: string, slug: string) {
     this.name = name;
+    this.slug = slug;
   }
 
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
 
   @Column()
-  readonly name: string;
+  slug: string;
+
+  @Column()
+  name: string;
 
   @Column({ nullable: true })
   description?: string;

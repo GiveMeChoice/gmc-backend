@@ -55,6 +55,8 @@ import { ProductImage } from './model/product-image.entity';
 import { ProductDocumentsController } from './api/controllers/product-document.controller';
 import { ProductDocumentsService } from './services/product-documents.service';
 import { GmcBrand } from './model/gmc-brand.entity';
+import { GmcBrandsController } from './api/controllers/gmc-brands.controller';
+import { GmcBrandsService } from './services/gmc-brands.service';
 
 @Module({
   imports: [
@@ -89,10 +91,11 @@ import { GmcBrand } from './model/gmc-brand.entity';
     ProvidersController,
     ChannelsController,
     RunsController,
-    MerchantLabelsController,
-    GmcLabelsController,
-    MerchantCategoriesController,
     GmcCategoriesController,
+    GmcLabelsController,
+    GmcBrandsController,
+    MerchantCategoriesController,
+    MerchantLabelsController,
     MerchantBrandsController,
     JobsController,
     ProductsController,
@@ -113,9 +116,10 @@ import { GmcBrand } from './model/gmc-brand.entity';
     ProductsService,
     ProductDocumentsService,
     MerchantLabelsService,
-    GmcLabelsService,
-    MerchantCategoriesService,
     GmcCategoriesService,
+    GmcLabelsService,
+    GmcBrandsService,
+    MerchantCategoriesService,
     MerchantBrandsService,
     MerchantsService,
     // helper services

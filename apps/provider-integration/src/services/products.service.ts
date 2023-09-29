@@ -77,6 +77,7 @@ export class ProductsService {
         merchantCategory: {
           gmcCategory: true,
         },
+        images: true,
       },
     });
     const [products, count] = await query.getManyAndCount();
@@ -215,7 +216,6 @@ export class ProductsService {
     updates: Partial<Product>,
     renewExpiration?: boolean,
   ): Promise<Product> {
-    this.logger.debug(id);
     const { channel } = await this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {

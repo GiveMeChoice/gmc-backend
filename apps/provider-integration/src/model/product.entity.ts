@@ -64,6 +64,12 @@ export class Product {
   @Column({ name: 'channel_id' })
   readonly channelId: string;
 
+  @Column({ name: 'merchant_brand_id', nullable: true })
+  merchantBrandId?: string;
+
+  @Column({ name: 'merchant_category_id', nullable: true })
+  merchantCategoryId?: string;
+
   @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
@@ -177,12 +183,14 @@ export class Product {
     cascade: true,
     onUpdate: 'CASCADE',
   })
+  @JoinColumn({ name: 'merchant_brand_id' })
   merchantBrand?: MerchantBrand;
 
   @ManyToOne(() => MerchantCategory, (category) => category.products, {
     cascade: true,
     onUpdate: 'CASCADE',
   })
+  @JoinColumn({ name: 'merchant_category_id' })
   merchantCategory?: MerchantCategory;
 
   @ManyToMany(() => MerchantLabel, (label) => label.products, {

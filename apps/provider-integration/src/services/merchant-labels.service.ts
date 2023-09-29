@@ -44,9 +44,9 @@ export class MerchantLabelsService {
   ): Promise<Page<MerchantLabel>> {
     const gmcLabelIds = [];
     if (findDto.gmcLabelId) {
-      const descendants = (await this.gmcLabelsService.findDescendents(
+      const descendants = await this.gmcLabelsService.findDescendents(
         findDto.gmcLabelId,
-      )) as GmcLabel[];
+      );
       for (const descendant of descendants) {
         gmcLabelIds.push(descendant.id);
       }
