@@ -4,8 +4,8 @@ import { MigrationInterface, QueryRunner, TreeRepository } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export class SeedCategories1000000000007 implements MigrationInterface {
-  private readonly logger = new Logger(SeedCategories1000000000007.name);
+export class SeedCategories1000000000006 implements MigrationInterface {
+  private readonly logger = new Logger(SeedCategories1000000000006.name);
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Migration');
@@ -40,6 +40,9 @@ export class SeedCategories1000000000007 implements MigrationInterface {
     this.logger.debug(current.name);
     let category = new GmcCategory(current.name, current.slug);
     category.parent = parent;
+    if (current.color) {
+      category.color = current.color;
+    }
     category.merchantCategories = [];
     category = await repo.save(category);
     if (current.categories) {

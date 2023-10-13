@@ -1,18 +1,29 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { GmcBrand } from '../model/gmc-brand.entity';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { UpdateGmcBrandDto } from '../api/dto/update-gmc-brand.dto';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateGmcBrandDto } from '../api/dto/create-gmc-brand.dto';
+import { UpdateGmcBrandDto } from '../api/dto/update-gmc-brand.dto';
+import { GmcBrand } from '../model/gmc-brand.entity';
+import { MerchantBrand } from '../model/merchant-brand.entity';
+import { ProductDocumentsService } from './product-documents.service';
+import { ReadEntityBySlugDto } from '../api/dto/read-gmc-label-by-slug.dto';
 
 @Injectable()
 export class GmcBrandsService {
   constructor(
     @InjectRepository(GmcBrand)
     private readonly gmcBrandsRepo: Repository<GmcBrand>,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<GmcBrand>> {
@@ -28,6 +39,15 @@ export class GmcBrandsService {
   findOne(id: string): Promise<GmcBrand> {
     return this.gmcBrandsRepo.findOne({
       where: { id },
+      relations: {
+        merchantBrand: true,
+      },
+    });
+  }
+
+  findOneBySlug(dto: ReadEntityBySlugDto): Promise<GmcBrand> {
+    return this.gmcBrandsRepo.findOne({
+      where: { ...dto },
       relations: {
         merchantBrand: true,
       },
@@ -63,6 +83,12 @@ export class GmcBrandsService {
       throw new NotFoundException();
     }
     await this.gmcBrandsRepo.save({ id, ...updates });
+    Logger.debug('GMC Brand Updated, Indexing Changes');
+    await this.productDocumentsService.indexBatchAsync({
+      merchantBrand: {
+        gmcBrandId: id,
+      } as MerchantBrand,
+    });
     return await this.findOne(id);
   }
 
@@ -76,7 +102,7 @@ export class GmcBrandsService {
     }
     if (brand.merchantBrand) {
       throw new Error(
-        'Cannot delete brand because currently assigned to a merchant brand',
+        'Cannot delete brand that is currently assigned to a merchant brand',
       );
     }
     this.gmcBrandsRepo.delete({ id });

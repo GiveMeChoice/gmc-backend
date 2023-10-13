@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreateGmcLabelDto } from '../dto/create-gmc-label.dto';
+import { GmcNestedEntityPageDataDto } from '../dto/lookup-gmc-label-response.dto';
 import { UpdateGmcLabelDto } from '../dto/update-gmc-label.dto';
 
 @Controller('gmc-labels')
@@ -31,6 +32,35 @@ export class GmcLabelsController {
     @Query('deep') deep: boolean,
   ): Promise<GmcLabel> {
     return await this.gmcLabelsService.findOne(id, deep);
+  }
+
+  @Get('page-data/:slug/:subslug1?/:subslug2?')
+  async getPageData(
+    @Param('slug') slug: string,
+    @Param('subslug1') subslug1?: string,
+    @Param('subslug2') subslug2?: string,
+  ): Promise<GmcNestedEntityPageDataDto> {
+    this.logger.debug(`
+      slug: ${slug}
+      subslug1: ${subslug1}
+      subslug2: ${subslug2}
+    `);
+    const roots = await this.gmcLabelsService.findAll(false);
+    const entity = await this.gmcLabelsService.findOneBySlug(
+      slug,
+      subslug1,
+      subslug2,
+    );
+    const activeRoot = roots.find((r) => r.slug === slug);
+    const pageTree = await this.gmcLabelsService.findOne(activeRoot.id, true);
+    return {
+      roots,
+      pageTree,
+      entity,
+      slug,
+      subslug1,
+      subslug2,
+    };
   }
 
   @Get(':id/descendents')

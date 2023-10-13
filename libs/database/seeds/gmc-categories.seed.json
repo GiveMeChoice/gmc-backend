@@ -5,6 +5,7 @@
     {
       "name": "Clothing",
       "slug": "clothing",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Mens",
@@ -72,6 +73,7 @@
     {
       "name": "Beauty",
       "slug": "beauty",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Skincare",
@@ -103,6 +105,7 @@
     {
       "name": "Health",
       "slug": "health",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Vitamins and Supplements",
@@ -132,6 +135,7 @@
     {
       "name": "Indoor",
       "slug": "indoor",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Furniture",
@@ -174,6 +178,7 @@
     {
       "name": "Outdoor",
       "slug": "outdoor",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Camping and Hiking",
@@ -201,6 +206,7 @@
     {
       "name": "Toys",
       "slug": "toys",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Educational Toys",
@@ -233,6 +239,7 @@
     {
       "name": "Pets",
       "slug": "pets",
+      "color": "#a7f700",
       "categories": [
         {
           "name": "Pet Food",
@@ -268,6 +275,7 @@
     {
       "name": "Gifts",
       "slug": "gifts",
+      "color": "#a7f700",
       "categories": []
     }
   ]

@@ -16,8 +16,17 @@ export const productDocumentMapping: MappingTypeMapping = {
     brand: {
       type: 'object',
       properties: {
-        code: { type: 'keyword' },
+        merchantCode: { type: 'keyword' },
         name: { type: 'text' },
+        slug: {
+          type: 'text',
+          fields: {
+            keyword: {
+              type: 'keyword',
+              ignore_above: 256,
+            },
+          },
+        },
         description: { type: 'text' },
         logo: { type: 'text' },
         url: { type: 'text' },
@@ -74,7 +83,17 @@ export const productDocumentMapping: MappingTypeMapping = {
         gmcCategory: {
           type: 'object',
           properties: {
+            description: { type: 'text' },
             name: {
+              type: 'text',
+              fields: {
+                keyword: {
+                  type: 'keyword',
+                  ignore_above: 256,
+                },
+              },
+            },
+            slug: {
               type: 'text',
               fields: {
                 keyword: {
@@ -86,7 +105,17 @@ export const productDocumentMapping: MappingTypeMapping = {
             subcategory: {
               type: 'object',
               properties: {
+                description: { type: 'text' },
                 name: {
+                  type: 'text',
+                  fields: {
+                    keyword: {
+                      type: 'keyword',
+                      ignore_above: 256,
+                    },
+                  },
+                },
+                slug: {
                   type: 'text',
                   fields: {
                     keyword: {
@@ -98,7 +127,17 @@ export const productDocumentMapping: MappingTypeMapping = {
                 subcategory: {
                   type: 'object',
                   properties: {
+                    description: { type: 'text' },
                     name: {
+                      type: 'text',
+                      fields: {
+                        keyword: {
+                          type: 'keyword',
+                          ignore_above: 256,
+                        },
+                      },
+                    },
+                    slug: {
                       type: 'text',
                       fields: {
                         keyword: {
@@ -140,11 +179,29 @@ export const productDocumentMapping: MappingTypeMapping = {
                 },
               },
             },
+            slug: {
+              type: 'text',
+              fields: {
+                keyword: {
+                  type: 'keyword',
+                  ignore_above: 256,
+                },
+              },
+            },
             description: { type: 'text' },
             sublabel: {
               type: 'object',
               properties: {
                 name: {
+                  type: 'text',
+                  fields: {
+                    keyword: {
+                      type: 'keyword',
+                      ignore_above: 256,
+                    },
+                  },
+                },
+                slug: {
                   type: 'text',
                   fields: {
                     keyword: {
@@ -159,6 +216,15 @@ export const productDocumentMapping: MappingTypeMapping = {
                   properties: {
                     description: { type: 'text' },
                     name: {
+                      type: 'text',
+                      fields: {
+                        keyword: {
+                          type: 'keyword',
+                          ignore_above: 256,
+                        },
+                      },
+                    },
+                    slug: {
                       type: 'text',
                       fields: {
                         keyword: {

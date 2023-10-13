@@ -3,7 +3,6 @@ import { ProductsService } from '@app/provider-integration/services/products.ser
 import { TransformPageRequestPipe } from '@app/provider-integration/utils/transform-page.pipe';
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
-import { ElasticsearchService } from 'libs/elasticsearch/src';
 import {
   Body,
   Controller,

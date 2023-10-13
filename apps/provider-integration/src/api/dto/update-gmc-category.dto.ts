@@ -9,4 +9,10 @@ export class UpdateGmcCategoryDto extends PartialType(GmcCategory) {
 
   @IsOptional()
   name?: string;
+
+  @IsOptional()
+  description?: string;
+
+  @IsOptional()
+  color?: string;
 }

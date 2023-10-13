@@ -5,7 +5,6 @@ import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Repository } from 'typeorm';
 import { FindMerchantLabelsDto } from '../api/dto/find-merchant-labels.dto';
-import { GmcLabel } from '../model/gmc-label.entity';
 import { MerchantLabel } from '../model/merchant-label.entity';
 import { GmcLabelsService } from './gmc-labels.service';
 import { ProductDocumentsService } from './product-documents.service';

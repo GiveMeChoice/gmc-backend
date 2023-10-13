@@ -13,4 +13,7 @@ export class UpdateGmcLabelDto extends PartialType(GmcLabel) {
 
   @IsOptional()
   description?: string;
+
+  @IsOptional()
+  color?: string;
 }

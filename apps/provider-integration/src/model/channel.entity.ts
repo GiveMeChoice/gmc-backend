@@ -1,6 +1,7 @@
 import { Provider } from '@app/provider-integration/model/provider.entity';
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -14,17 +15,29 @@ import { Product } from './product.entity';
 
 @Entity({ name: 'pi_channel' })
 export class Channel {
+  constructor(merchantId: string, providerId: string, name: string) {
+    this.merchantId = merchantId;
+    this.providerId = providerId;
+    this.name = name;
+  }
+
+  public static factory(data: Partial<Channel>) {
+    const channel = new Channel(data.merchantId, data.providerId, data.name);
+    Object.assign(channel, data);
+    return channel;
+  }
+
   @PrimaryGeneratedColumn('uuid')
   readonly id: string;
-
-  @Column({ nullable: true })
-  description?: string;
 
   @Column({ name: 'provider_id' })
   readonly providerId: string;
 
   @Column({ name: 'merchant_id' })
   readonly merchantId: string;
+
+  @Column()
+  name: string;
 
   @Column({
     type: 'enum',
@@ -40,10 +53,10 @@ export class Channel {
   @Column({ default: false })
   active: boolean;
 
-  @Column({ name: 'run_interval_hours', type: 'integer', nullable: true })
+  @Column({ name: 'run_interval_hours', type: 'integer', default: 0 })
   runIntervalHours: number;
 
-  @Column({ name: 'expiration_hours', type: 'integer', nullable: true })
+  @Column({ name: 'expiration_hours', type: 'integer', default: 0 })
   expirationHours: number;
 
   @Column({ name: 'retry_limit', type: 'integer', default: 4 })
@@ -51,6 +64,13 @@ export class Channel {
 
   @Column({ name: 'retry_count', type: 'integer', default: 0 })
   retryCount: number;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 
   @Column({ name: 'last_run_at', type: 'timestamptz', nullable: true })
   lastRunAt?: Date;

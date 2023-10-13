@@ -1,9 +1,17 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TreeRepository } from 'typeorm';
 import { CreateGmcCategoryDto } from '../api/dto/create-gmc-category.dto';
-import { GmcCategory } from '../model/gmc-category.entity';
 import { UpdateGmcCategoryDto } from '../api/dto/update-gmc-category.dto';
+import { GmcCategory } from '../model/gmc-category.entity';
+import { MerchantCategory } from '../model/merchant-category.entity';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class GmcCategoriesService {
@@ -12,6 +20,8 @@ export class GmcCategoriesService {
   constructor(
     @InjectRepository(GmcCategory)
     private readonly categoryRepo: TreeRepository<GmcCategory>,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async findAll(deep: boolean): Promise<GmcCategory[]> {
@@ -35,6 +45,33 @@ export class GmcCategoriesService {
       depth: deep ? 10 : 1,
       relations: ['merchantCategories'],
     });
+  }
+
+  async findOneBySlug(slug, subslug1?, subslug2?): Promise<GmcCategory> {
+    const category = await this.categoryRepo.findOne({
+      where: {
+        slug: subslug2 ? subslug2 : subslug1 ? subslug1 : slug,
+        parent: {
+          slug: subslug2 ? subslug1 : subslug1 ? slug : 'root',
+          ...((subslug2 || subslug1) && {
+            parent: { slug: subslug2 ? slug : 'root' },
+          }),
+        },
+      },
+      relations: {
+        parent: {
+          parent: {
+            children: true,
+          },
+          children: true,
+        },
+        children: true,
+      },
+    });
+    if (!category) {
+      throw new NotFoundException();
+    }
+    return category;
   }
 
   async findDescendents(id: string): Promise<GmcCategory[]> {
@@ -67,6 +104,12 @@ export class GmcCategoriesService {
       throw new NotFoundException();
     }
     await this.categoryRepo.save({ id, ...updateDto });
+    Logger.debug('GMC Category Updated, Indexing Changes');
+    await this.productDocumentsService.indexBatchAsync({
+      merchantCategory: {
+        gmcCategoryId: id,
+      } as MerchantCategory,
+    });
     return await this.categoryRepo.findOne({
       where: { id },
       relations: { merchantCategories: true, children: true },

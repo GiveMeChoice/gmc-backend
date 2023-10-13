@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -32,6 +33,13 @@ export class GmcBrand {
 
   @Column({ nullable: true })
   url?: string;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
 
   @OneToOne(() => MerchantBrand, (merchantBrand) => merchantBrand.gmcBrand)
   merchantBrand: MerchantBrand;

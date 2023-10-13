@@ -1,18 +1,26 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Like, Repository } from 'typeorm';
-import { MerchantBrand } from '../model/merchant-brand.entity';
-import { GmcBrand } from '../model/gmc-brand.entity';
 import { FindMerchantBrandsDto } from '../api/dto/find-merchant-brands.dto';
+import { MerchantBrand } from '../model/merchant-brand.entity';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class MerchantBrandsService {
   constructor(
     @InjectRepository(MerchantBrand)
     private readonly merchantBrandsRepo: Repository<MerchantBrand>,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async findAll(pageRequest?: PageRequest): Promise<Page<MerchantBrand>> {
@@ -91,7 +99,12 @@ export class MerchantBrandsService {
       id,
       gmcBrandId: gmcBrandId ? gmcBrandId : null,
     });
-    /// UPDATE INDEX??
+    Logger.debug(`GMC Brand Assigned. Updating Index.`);
+    await this.productDocumentsService.indexBatchAsync({
+      merchantBrand: {
+        id,
+      } as MerchantBrand,
+    });
     return await this.findOne(id);
   }
 }

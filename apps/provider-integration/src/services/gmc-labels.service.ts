@@ -1,9 +1,17 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TreeRepository } from 'typeorm';
-import { GmcLabel } from '../model/gmc-label.entity';
 import { CreateGmcLabelDto } from '../api/dto/create-gmc-label.dto';
 import { UpdateGmcLabelDto } from '../api/dto/update-gmc-label.dto';
+import { GmcLabel } from '../model/gmc-label.entity';
+import { MerchantLabel } from '../model/merchant-label.entity';
+import { ProductDocumentsService } from './product-documents.service';
 
 @Injectable()
 export class GmcLabelsService {
@@ -12,6 +20,8 @@ export class GmcLabelsService {
   constructor(
     @InjectRepository(GmcLabel)
     private readonly gmcLabelsRepo: TreeRepository<GmcLabel>,
+    @Inject(forwardRef(() => ProductDocumentsService))
+    private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
   async findAll(deep: boolean): Promise<GmcLabel[]> {
@@ -37,6 +47,33 @@ export class GmcLabelsService {
     });
   }
 
+  async findOneBySlug(slug, subslug1?, subslug2?): Promise<GmcLabel> {
+    const label = await this.gmcLabelsRepo.findOne({
+      where: {
+        slug: subslug2 ? subslug2 : subslug1 ? subslug1 : slug,
+        parent: {
+          slug: subslug2 ? subslug1 : subslug1 ? slug : 'root',
+          ...((subslug2 || subslug1) && {
+            parent: { slug: subslug2 ? slug : 'root' },
+          }),
+        },
+      },
+      relations: {
+        parent: {
+          parent: {
+            children: true,
+          },
+          children: true,
+        },
+        children: true,
+      },
+    });
+    if (!label) {
+      throw new NotFoundException();
+    }
+    return label;
+  }
+
   async findDescendents(id: string): Promise<GmcLabel[]> {
     const parentLabel = await this.gmcLabelsRepo.findOne({ where: { id } });
     return await this.gmcLabelsRepo.findDescendants(parentLabel, {
@@ -45,9 +82,14 @@ export class GmcLabelsService {
   }
 
   async create(createDto: CreateGmcLabelDto): Promise<GmcLabel> {
-    const parent = await this.gmcLabelsRepo.findOne({
-      where: { id: createDto.parentId },
-    });
+    let parent = null;
+    if (createDto.parentId) {
+      parent = await this.gmcLabelsRepo.findOne({
+        where: { id: createDto.parentId },
+      });
+    } else {
+      parent = await this.gmcLabelsRepo.findOne({ where: { slug: 'root' } });
+    }
     if (!parent) throw new Error('Unable to find parent label');
     const slug = createDto.slug.toLowerCase();
 
@@ -67,6 +109,12 @@ export class GmcLabelsService {
       throw new NotFoundException();
     }
     await this.gmcLabelsRepo.save({ id, ...updateDto });
+    Logger.debug('GMC Label Updated, Indexing Changes');
+    await this.productDocumentsService.indexBatchAsync({
+      merchantLabel: {
+        gmcLabelId: id,
+      } as MerchantLabel,
+    });
     return await this.gmcLabelsRepo.findOne({
       where: { id },
       relations: { merchantLabels: true, children: true },

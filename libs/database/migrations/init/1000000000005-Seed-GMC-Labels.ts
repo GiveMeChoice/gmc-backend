@@ -4,8 +4,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { MigrationInterface, QueryRunner, TreeRepository } from 'typeorm';
 
-export class SeedGmcLabels1000000000006 implements MigrationInterface {
-  private readonly logger = new Logger(SeedGmcLabels1000000000006.name);
+export class SeedGmcLabels1000000000005 implements MigrationInterface {
+  private readonly logger = new Logger(SeedGmcLabels1000000000005.name);
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     this.logger.log('Executing Migration');
@@ -38,13 +38,16 @@ export class SeedGmcLabels1000000000006 implements MigrationInterface {
     repo: TreeRepository<GmcLabel>,
   ) {
     this.logger.debug(current.name);
-    let labelGroup = new GmcLabel(current.name, current.slug);
-    labelGroup.description = current.description;
-    labelGroup.parent = parent;
-    labelGroup.merchantLabels = [];
-    labelGroup = await repo.save(labelGroup);
+    let label = new GmcLabel(current.name, current.slug);
+    label.description = current.description;
+    if (current.color) {
+      label.color = current.color;
+    }
+    label.parent = parent;
+    label.merchantLabels = [];
+    label = await repo.save(label);
     for (const s of current.children) {
-      await this.buildLabelGroupsTree(s, labelGroup, repo);
+      await this.buildLabelGroupsTree(s, label, repo);
     }
   }
 }

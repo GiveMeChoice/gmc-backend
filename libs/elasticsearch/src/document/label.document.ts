@@ -12,6 +12,7 @@ export interface MerchantLabelDocument {
 }
 
 export interface GmcLabelDocument {
+  slug: string;
   name: string;
   description?: string;
   sublabel?: GmcLabelDocument;

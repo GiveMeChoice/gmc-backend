@@ -6,6 +6,7 @@
       "name": "Certification",
       "slug": "certification",
       "description": "Claim and of sustainable impact or ethical standard has been certified by a neutral third-party organization",
+      "color": "#a7f700",
       "children": [
         {
           "name": "Climate Neutral",
@@ -31,6 +32,7 @@
       "name": "Origin",
       "slug": "origin",
       "description": "Product was partially or wholly produced in this region",
+      "color": "#a7f700",
       "children": [
         {
           "name": "Made in Asia",
@@ -106,18 +108,21 @@
       "name": "Organic",
       "slug": "organic",
       "description": "Food and drinks produced by methods complying with the standards of organic farming. Standards vary worldwise, but organic farming features practices that cylce resources, promote ecological balance, and conserve biodiversity",
+      "color": "#a7f700",
       "children": []
     },
     {
       "name": "Fair Trade",
       "slug": "fair-trade",
       "description": "A trading partnership based on dialogue, transparency and respect, that seeks greater equity in international trade",
+      "color": "#a7f700",
       "children": []
     },
     {
       "name": "Production Method",
       "slug": "production-method",
       "description": "Specific practices adhered to during the manufacture and/or production of goods",
+      "color": "#a7f700",
       "children": [
         {
           "name": "Handmade",
@@ -131,6 +136,7 @@
       "name": "Ingredients and Dietary",
       "slug": "ingredients-and-dietary",
       "description": "Products that meet the ingredient requirements for specific dietary restrictions or additive (non-additive) preferences",
+      "color": "#a7f700",
       "children": [
         {
           "name": "Gluten-Free",
@@ -162,6 +168,7 @@
       "name": "Uncategorized",
       "slug": "uncategorized",
       "description": "Label has yet to be categorized",
+      "color": "#a7f700",
       "children": []
     }
   ]

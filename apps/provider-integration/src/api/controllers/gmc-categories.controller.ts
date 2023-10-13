@@ -12,6 +12,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CreateGmcCategoryDto } from '../dto/create-gmc-category.dto';
+import { GmcNestedEntityPageDataDto } from '../dto/lookup-gmc-label-response.dto';
 import { UpdateGmcCategoryDto } from '../dto/update-gmc-category.dto';
 
 @Controller('gmc-categories')
@@ -31,6 +32,38 @@ export class GmcCategoriesController {
     @Query('deep') deep: boolean,
   ): Promise<GmcCategory> {
     return await this.gmcCategoriesService.findOne(id, deep);
+  }
+
+  @Get('page-data/:slug/:subslug1?/:subslug2?')
+  async getPageData(
+    @Param('slug') slug: string,
+    @Param('subslug1') subslug1?: string,
+    @Param('subslug2') subslug2?: string,
+  ): Promise<GmcNestedEntityPageDataDto> {
+    this.logger.debug(`
+      slug: ${slug}
+      subslug1: ${subslug1}
+      subslug2: ${subslug2}
+    `);
+    const roots = await this.gmcCategoriesService.findAll(false);
+    const entity = await this.gmcCategoriesService.findOneBySlug(
+      slug,
+      subslug1,
+      subslug2,
+    );
+    const activeRoot = roots.find((r) => r.slug === slug);
+    const pageTree = await this.gmcCategoriesService.findOne(
+      activeRoot.id,
+      true,
+    );
+    return {
+      roots,
+      pageTree,
+      entity,
+      slug,
+      subslug1,
+      subslug2,
+    };
   }
 
   @Get(':id/descendents')

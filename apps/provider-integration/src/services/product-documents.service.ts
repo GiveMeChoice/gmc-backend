@@ -27,6 +27,7 @@ import { ProductReview } from '../model/product-review.entity';
 import { Product } from '../model/product.entity';
 import { ProductsService } from './products.service';
 import { ConfigService } from '@nestjs/config';
+import { FindProductsDto } from '../api/dto/find-products.dto';
 
 @Injectable()
 export class ProductDocumentsService {
@@ -52,7 +53,6 @@ export class ProductDocumentsService {
 
   async map(id: string, checkAssignments?: boolean): Promise<ProductDocument> {
     const product = await this.productsService.findOne(id);
-    this.logger.debug('product ' + product);
     return await this.mapDocument(product, checkAssignments);
   }
 
@@ -69,6 +69,7 @@ export class ProductDocumentsService {
       const status = await this.productsService.getCurrentStatus(id);
       if (status === ProductStatus.LIVE) {
         const document = await this.map(id, true);
+        this.logger.debug('document : ' + document);
         await this.elasticsearchService.indexDocument(document.id, document);
         await this.productsService.update(id, {
           indexedAt: new Date(),
@@ -86,11 +87,12 @@ export class ProductDocumentsService {
     Sends product IDs to queue in batches to be reindexed.
     Returns total number of products sent to queue.
   */
-  async indexBatchAsync(findDto: Partial<Product>): Promise<number> {
+  async indexBatchAsync(findDto: FindProductsDto): Promise<number> {
     findDto.status = ProductStatus.LIVE; // ensure only LIVE products are reindexed
     let total = 0;
     const pageRequest: PageRequest = { skip: 0, take: this._indexBatchSize };
-    let page = await this.productsService.findIds(findDto, pageRequest);
+    this.logger.debug('Attempting Index with DTO ' + JSON.stringify(findDto));
+    let page = await this.productsService.find(findDto, pageRequest, true);
     if (page.meta.count > 0) {
       total += page.meta.count;
       await this.messagingService.sendToQueue(
@@ -98,11 +100,13 @@ export class ProductDocumentsService {
           productIds: page.data.map((p) => p.id),
         }),
       );
+    } else {
+      this.logger.debug('No Products Found For Index :(');
     }
     while (pageRequest.skip + pageRequest.take < page.meta.totalCount) {
       pageRequest.skip += this._indexBatchSize;
       console.log('checking: ' + JSON.stringify(pageRequest));
-      page = await this.productsService.findIds(findDto, pageRequest);
+      page = await this.productsService.find(findDto, pageRequest, true);
       if (page.meta.count > 0) {
         total += page.meta.count;
         await this.messagingService.sendToQueue(
@@ -133,10 +137,10 @@ export class ProductDocumentsService {
         });
       }
     }
+    this.logger.debug(
+      `Indexing product batch: ${documentBatch.length} documents from ${productIds.length} Ids`,
+    );
     if (documentBatch.length > 0) {
-      this.logger.debug(
-        `Indexing product batch: ${documentBatch.length} documents`,
-      );
       await this.elasticsearchService.bulk(documentBatch);
       // once successful, set indexed date on all updated products
       await this.productsService.updateAll(ids, {
@@ -150,6 +154,7 @@ export class ProductDocumentsService {
     product: Partial<Product>,
     checkAssignments?: boolean,
   ): Promise<ProductDocument> {
+    this.logger.debug('mapping');
     return {
       id: product.shortId,
       merchantProductCode: product.merchantProductCode,
@@ -171,7 +176,7 @@ export class ProductDocumentsService {
       ),
       images: this.mapImageDocuments(product.images),
       reviews: this.mapReviewDocuments(product.reviews),
-      labels: this.mapLabelDocuments(product.merchantLabels, checkAssignments),
+      labels: this.mapLabelDocuments(product.merchantLabels, false),
     };
   }
 
@@ -193,23 +198,30 @@ export class ProductDocumentsService {
   }
 
   private mapBrandDocument(brand: MerchantBrand): BrandDocument {
+    this.logger.debug('brand' + JSON.stringify(brand));
+    if (!brand.gmcBrand) {
+      throw new Error('GMC Brand Unassigned');
+    }
     return {
-      code: brand.merchantBrandCode,
-      name: brand.name,
-      description: brand.description,
-      logo: brand.logo,
-      url: brand.url,
+      merchantCode: brand.merchantBrandCode,
+      name: brand.gmcBrand.name,
+      description: brand.gmcBrand.description,
+      // logo: brand.gmcBrand.logo,
+      // url: brand.gmcBrand.url,
+      slug: brand.gmcBrand.slug,
     };
   }
 
   private mapMerchantDocument(merchant: Merchant): MerchantDocument {
+    this.logger.debug('merchant');
+
     return {
       region: merchant.region,
       key: merchant.key,
       name: merchant.name,
-      description: merchant.description,
-      logo: merchant.logo,
-      url: merchant.url,
+      // description: merchant.description,
+      // logo: merchant.logo,
+      // url: merchant.url,
     };
   }
 
@@ -217,11 +229,14 @@ export class ProductDocumentsService {
     category: MerchantCategory,
     checkAssignments: boolean,
   ): CategoryDocument {
+    this.logger.debug('category');
     let gmcCategory: GmcCategoryDocument = null;
 
     if (category.gmcCategory) {
       gmcCategory = {
         name: category.gmcCategory.name,
+        slug: category.gmcCategory.slug,
+        description: category.gmcCategory.description,
       };
 
       if (
@@ -230,6 +245,8 @@ export class ProductDocumentsService {
       ) {
         gmcCategory = {
           name: category.gmcCategory.parent.name,
+          slug: category.gmcCategory.parent.slug,
+          description: category.gmcCategory.parent.description,
           subcategory: gmcCategory,
         };
         if (
@@ -238,12 +255,14 @@ export class ProductDocumentsService {
         ) {
           gmcCategory = {
             name: category.gmcCategory.parent.parent.name,
+            slug: category.gmcCategory.parent.parent.slug,
+            description: category.gmcCategory.parent.parent.description,
             subcategory: gmcCategory,
           };
         }
       }
     } else if (checkAssignments) {
-      throw new Error('GMC Category Unassigned');
+      throw new Error('Category Not Assigned');
     }
 
     return {
@@ -256,16 +275,20 @@ export class ProductDocumentsService {
     merchantLabels: MerchantLabel[],
     checkAssignments,
   ): LabelDocument[] {
-    const documents: LabelDocument[] = [];
+    this.logger.debug('labels');
+
+    const labelDocuments: LabelDocument[] = [];
     for (const label of merchantLabels) {
       let gmcLabel: GmcLabelDocument = null;
       if (label.gmcLabel) {
         gmcLabel = {
+          slug: label.gmcLabel.slug,
           name: label.gmcLabel.name,
           description: label.gmcLabel.description,
         };
         if (label.gmcLabel.parent && label.gmcLabel.parent.name !== 'Root') {
           gmcLabel = {
+            slug: label.gmcLabel.parent.slug,
             name: label.gmcLabel.parent.name,
             description: label.gmcLabel.parent.description,
             sublabel: gmcLabel,
@@ -275,26 +298,29 @@ export class ProductDocumentsService {
             label.gmcLabel.parent.parent.name !== 'Root'
           ) {
             gmcLabel = {
+              slug: label.gmcLabel.parent.parent.slug,
               name: label.gmcLabel.parent.parent.name,
               description: label.gmcLabel.parent.parent.description,
               sublabel: gmcLabel,
             };
           }
         }
+        labelDocuments.push({
+          merchantLabel: {
+            code: label.merchantLabelCode,
+            name: label.name,
+            // description: label.description,
+            // logo: label.logo,
+            // url: label.url,
+          },
+          gmcLabel,
+        });
       } else if (checkAssignments) {
         throw new Error('GMC Label Unassigned');
       }
-      documents.push({
-        merchantLabel: {
-          code: label.merchantLabelCode,
-          name: label.name,
-          description: label.description,
-          logo: label.logo,
-          url: label.url,
-        },
-        gmcLabel,
-      });
     }
-    return documents;
+    if (labelDocuments.length === 0)
+      throw new Error("At Least 1 Label Must Be Mapped... C'mon man!");
+    return labelDocuments;
   }
 }

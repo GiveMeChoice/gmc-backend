@@ -4,6 +4,7 @@ import { Page } from '@lib/database/interface/page.interface';
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Logger,
   Param,
@@ -15,6 +16,7 @@ import { Channel } from '../../model/channel.entity';
 import { ChannelsService } from '../../services/channels.service';
 import { FindChannelsDto } from '../dto/find-channels.dto';
 import { UpdateChannelDto } from '../dto/update-channel.dto';
+import { CreateChannelDto } from '../dto/create-channel.dto';
 
 @Controller('channels')
 export class ChannelsController {
@@ -41,6 +43,17 @@ export class ChannelsController {
   ): Promise<Channel> {
     this.logger.debug(JSON.stringify(updateDto));
     return this.channelsService.update(id, updateDto);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id) {
+    return this.channelsService.delete(id);
+  }
+
+  @Post()
+  async create(@Body() createDto: CreateChannelDto): Promise<Channel> {
+    this.logger.debug(JSON.stringify(createDto));
+    return this.channelsService.create(createDto);
   }
 
   @Post('find')

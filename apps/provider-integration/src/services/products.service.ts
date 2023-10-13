@@ -34,12 +34,14 @@ export class ProductsService {
     private readonly productDocumentsService: ProductDocumentsService,
     @Inject(forwardRef(() => MerchantCategoriesService))
     private readonly merchantCategoriesService: MerchantCategoriesService,
+    @Inject(forwardRef(() => MerchantBrandsService))
     private readonly brandsService: MerchantBrandsService,
   ) {}
 
   async find(
     findDto: FindProductsDto,
     pageRequest?: PageRequest,
+    idsOnly = false,
   ): Promise<Page<Product>> {
     const query = this.productsRepo.createQueryBuilder('product');
     if (findDto.merchantLabel) {
@@ -70,15 +72,19 @@ export class ProductsService {
       where: {
         ...findDto,
       },
-      relations: {
-        channel: true,
-        merchant: true,
-        merchantLabels: true,
-        merchantCategory: {
-          gmcCategory: true,
+      ...(idsOnly && { select: { id: true } }),
+      ...(!idsOnly && {
+        relations: {
+          channel: true,
+          merchant: true,
+          merchantLabels: true,
+          merchantBrand: true,
+          merchantCategory: {
+            gmcCategory: true,
+          },
+          images: true,
         },
-        images: true,
-      },
+      }),
     });
     const [products, count] = await query.getManyAndCount();
     return buildPage<Product>(products, count, pageRequest);
@@ -115,7 +121,9 @@ export class ProductsService {
             },
           },
         },
-        merchantBrand: true,
+        merchantBrand: {
+          gmcBrand: true,
+        },
       },
     });
   }
@@ -144,25 +152,11 @@ export class ProductsService {
             },
           },
         },
-        merchantBrand: true,
+        merchantBrand: {
+          gmcBrand: true,
+        },
       },
     });
-  }
-
-  async findIds(
-    findDto: Partial<Product>,
-    pageRequest?: PageRequest,
-  ): Promise<Page<Product>> {
-    const [data, count] = await this.productsRepo.findAndCount({
-      ...pageRequest,
-      where: {
-        ...findDto,
-      },
-      select: {
-        id: true,
-      },
-    });
-    return buildPage<Product>(data, count, pageRequest);
   }
 
   findByMerchant(
@@ -189,13 +183,12 @@ export class ProductsService {
   }
 
   async getCurrentStatus(id: string): Promise<ProductStatus> {
+    Logger.debug('getting it: ' + id);
     const { status: status } = await this.productsRepo.findOne({
       select: {
         status: true,
       },
-      where: {
-        id,
-      },
+      where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
     });
     return status;
   }
@@ -216,7 +209,8 @@ export class ProductsService {
     updates: Partial<Product>,
     renewExpiration?: boolean,
   ): Promise<Product> {
-    const { channel } = await this.productsRepo.findOne({
+    this.logger.debug('updating product');
+    const { id: actualId, channel } = await this.productsRepo.findOne({
       where: [{ ...((isUUID(id) && { id }) || { shortId: id }) }],
       relations: {
         channel: {
@@ -233,9 +227,8 @@ export class ProductsService {
         },
       },
     });
-    this.logger.debug(JSON.stringify(channel));
     await this.productsRepo.save({
-      id,
+      id: actualId,
       ...(await this.normalizeProduct(channel.merchantId, updates)),
       ...(renewExpiration && {
         expirationDate: this.renewExpirationDate(channel),

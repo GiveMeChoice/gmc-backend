@@ -3,12 +3,12 @@ import { PartialType } from '@nestjs/mapped-types';
 import { IsNotEmpty, IsOptional, IsString, NotContains } from 'class-validator';
 
 export class UpdateGmcBrandDto extends PartialType(GmcBrand) {
-  @IsNotEmpty()
   @IsString()
   @NotContains(' ')
+  @IsOptional()
   slug?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   name?: string;
 

@@ -1,5 +1,6 @@
 import { Channel } from '@app/provider-integration/model/channel.entity';
 import { ProductStatus } from '@app/provider-integration/model/enum/product-status.enum';
+import { MerchantBrand } from '@app/provider-integration/model/merchant-brand.entity';
 import { MerchantCategory } from '@app/provider-integration/model/merchant-category.entity';
 import { MerchantLabel } from '@app/provider-integration/model/merchant-label.entity';
 import { Merchant } from '@app/provider-integration/model/merchant.entity';
@@ -35,4 +36,7 @@ export class FindProductsDto extends PartialType(Product) {
 
   @IsOptional()
   merchantCategory?: MerchantCategory;
+
+  @IsOptional()
+  merchantBrand?: MerchantBrand;
 }

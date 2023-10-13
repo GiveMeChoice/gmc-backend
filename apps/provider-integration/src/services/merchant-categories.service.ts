@@ -1,14 +1,13 @@
 import { PageRequest } from '@lib/database/interface/page-request.interface';
 import { Page } from '@lib/database/interface/page.interface';
 import { buildPage } from '@lib/database/utils/build-page';
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Like, Repository } from 'typeorm';
-import { GmcCategory } from '../model/gmc-category.entity';
+import { FindMerchantCategoriesDto } from '../api/dto/find-merchant-categories.dto';
 import { MerchantCategory } from '../model/merchant-category.entity';
 import { GmcCategoriesService } from './gmc-categories.service';
 import { ProductDocumentsService } from './product-documents.service';
-import { FindMerchantCategoriesDto } from '../api/dto/find-merchant-categories.dto';
 
 @Injectable()
 export class MerchantCategoriesService {
@@ -18,6 +17,7 @@ export class MerchantCategoriesService {
     @InjectRepository(MerchantCategory)
     private readonly merchantCategoriesRepo: Repository<MerchantCategory>,
     private readonly gmcCategoryService: GmcCategoriesService,
+    @Inject(forwardRef(() => ProductDocumentsService))
     private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
@@ -116,7 +116,7 @@ export class MerchantCategoriesService {
       id,
       gmcCategoryId: gmcCategoryId ? gmcCategoryId : null,
     });
-    Logger.debug(`Merchant Category Reassigned. Updating Index.`);
+    Logger.debug(`GMC Category Assigned. Updating Index.`);
     await this.productDocumentsService.indexBatchAsync({
       merchantCategory: {
         id,
