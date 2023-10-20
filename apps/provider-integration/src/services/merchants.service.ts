@@ -58,10 +58,6 @@ export class MerchantsService {
 
   async update(id: string, updates: Partial<Merchant>): Promise<Merchant> {
     await this.merchantsRepo.update(id, updates);
-    this.logger.debug('Merchant updated. Updating Index.');
-    await this.productDocumentsService.indexBatchAsync({
-      merchantId: id,
-    });
     return this.merchantsRepo.findOne({ where: { id } });
   }
 }

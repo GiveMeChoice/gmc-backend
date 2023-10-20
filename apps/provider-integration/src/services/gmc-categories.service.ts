@@ -24,13 +24,29 @@ export class GmcCategoriesService {
     private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
-  async findAll(deep: boolean): Promise<GmcCategory[]> {
+  async findAll(deep: boolean, slim?: boolean): Promise<GmcCategory[]> {
     return (
       await this.categoryRepo.findTrees({
         depth: deep ? 10 : 1,
-        relations: ['merchantCategories'],
+        relations: slim ? [] : ['merchantCategories'],
       })
-    )[0].children;
+    )[0].children.map((baseCategory) =>
+      slim
+        ? ({
+            slug: baseCategory.slug,
+            name: baseCategory.name,
+            color: baseCategory.color,
+            children: baseCategory.children.map((subcategory1) => ({
+              slug: subcategory1.slug,
+              name: subcategory1.name,
+              children: subcategory1.children.map((subcategory2) => ({
+                name: subcategory2.name,
+                slug: subcategory2.slug,
+              })),
+            })),
+          } as GmcCategory)
+        : baseCategory,
+    );
   }
 
   async findOne(id: string, deep: boolean): Promise<GmcCategory> {
@@ -104,12 +120,14 @@ export class GmcCategoriesService {
       throw new NotFoundException();
     }
     await this.categoryRepo.save({ id, ...updateDto });
-    Logger.debug('GMC Category Updated, Indexing Changes');
-    await this.productDocumentsService.indexBatchAsync({
-      merchantCategory: {
-        gmcCategoryId: id,
-      } as MerchantCategory,
-    });
+    if (updateDto.name || updateDto.slug) {
+      Logger.debug('GMC Category Updated, Indexing Changes');
+      await this.productDocumentsService.indexBatchAsync({
+        merchantCategory: {
+          gmcCategoryId: id,
+        } as MerchantCategory,
+      });
+    }
     return await this.categoryRepo.findOne({
       where: { id },
       relations: { merchantCategories: true, children: true },

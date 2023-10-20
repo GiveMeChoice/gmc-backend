@@ -96,14 +96,14 @@ export class MerchantLabelsService {
     label: Partial<MerchantLabel>,
   ): Promise<MerchantLabel> {
     await this.merchantLabelsRepo.save({ id, ...label });
-    this.logger.debug(`Merchant label ${id} Updated. Indexing Products.`);
-    await this.productDocumentsService.indexBatchAsync({
-      merchantLabels: [
-        {
-          id,
-        } as MerchantLabel,
-      ],
-    });
+    // this.logger.debug(`Merchant label ${id} Updated. Indexing Products.`);
+    // await this.productDocumentsService.indexBatchAsync({
+    //   merchantLabels: [
+    //     {
+    //       id,
+    //     } as MerchantLabel,
+    //   ],
+    // });
     return await this.findOne(id);
   }
 

@@ -22,14 +22,17 @@ export class GmcLabelsController {
   constructor(private readonly gmcLabelsService: GmcLabelsService) {}
 
   @Get()
-  async getAll(@Query('deep') deep: boolean): Promise<any> {
-    return this.gmcLabelsService.findAll(deep);
+  async getAll(
+    @Query('deep') deep: boolean,
+    @Query('slim') slim: boolean,
+  ): Promise<any> {
+    return this.gmcLabelsService.findAll(deep, slim);
   }
 
   @Get(':id')
   async getOne(
     @Param('id') id: string,
-    @Query('deep') deep: boolean,
+    @Query('deep') deep?: boolean,
   ): Promise<GmcLabel> {
     return await this.gmcLabelsService.findOne(id, deep);
   }
@@ -45,7 +48,7 @@ export class GmcLabelsController {
       subslug1: ${subslug1}
       subslug2: ${subslug2}
     `);
-    const roots = await this.gmcLabelsService.findAll(false);
+    const roots = await this.gmcLabelsService.findAll(false, false);
     const entity = await this.gmcLabelsService.findOneBySlug(
       slug,
       subslug1,

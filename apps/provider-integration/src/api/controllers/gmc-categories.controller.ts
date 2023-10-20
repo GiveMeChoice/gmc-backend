@@ -22,8 +22,11 @@ export class GmcCategoriesController {
   constructor(private readonly gmcCategoriesService: GmcCategoriesService) {}
 
   @Get()
-  async getAll(@Query('deep') deep: boolean): Promise<any> {
-    return this.gmcCategoriesService.findAll(deep);
+  async getAll(
+    @Query('deep') deep: boolean,
+    @Query('slim') slim: boolean,
+  ): Promise<any> {
+    return this.gmcCategoriesService.findAll(deep, slim);
   }
 
   @Get(':id')

@@ -83,12 +83,14 @@ export class GmcBrandsService {
       throw new NotFoundException();
     }
     await this.gmcBrandsRepo.save({ id, ...updates });
-    Logger.debug('GMC Brand Updated, Indexing Changes');
-    await this.productDocumentsService.indexBatchAsync({
-      merchantBrand: {
-        gmcBrandId: id,
-      } as MerchantBrand,
-    });
+    if (updates.name || updates.slug) {
+      Logger.debug('GMC Brand Updated, Indexing Changes');
+      await this.productDocumentsService.indexBatchAsync({
+        merchantBrand: {
+          gmcBrandId: id,
+        } as MerchantBrand,
+      });
+    }
     return await this.findOne(id);
   }
 

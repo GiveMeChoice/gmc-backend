@@ -78,7 +78,9 @@ export class ProductsService {
           channel: true,
           merchant: true,
           merchantLabels: true,
-          merchantBrand: true,
+          merchantBrand: {
+            gmcBrand: true,
+          },
           merchantCategory: {
             gmcCategory: true,
           },

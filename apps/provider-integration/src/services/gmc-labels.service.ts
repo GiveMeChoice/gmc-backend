@@ -24,13 +24,29 @@ export class GmcLabelsService {
     private readonly productDocumentsService: ProductDocumentsService,
   ) {}
 
-  async findAll(deep: boolean): Promise<GmcLabel[]> {
+  async findAll(deep: boolean, slim: boolean): Promise<GmcLabel[]> {
     return (
       await this.gmcLabelsRepo.findTrees({
         depth: deep ? 10 : 1,
-        relations: ['merchantLabels'],
+        relations: slim ? [] : ['merchantLabels'],
       })
-    )[0].children;
+    )[0].children.map((baseLabel) =>
+      slim
+        ? ({
+            slug: baseLabel.slug,
+            color: baseLabel.color,
+            name: baseLabel.name,
+            children: baseLabel.children.map((sublabel1) => ({
+              slug: sublabel1.slug,
+              name: sublabel1.name,
+              children: sublabel1.children.map((sublabel2) => ({
+                slug: sublabel2.slug,
+                name: sublabel2.name,
+              })),
+            })),
+          } as GmcLabel)
+        : baseLabel,
+    );
   }
 
   async findOne(id: string, deep: boolean): Promise<GmcLabel> {
@@ -109,12 +125,14 @@ export class GmcLabelsService {
       throw new NotFoundException();
     }
     await this.gmcLabelsRepo.save({ id, ...updateDto });
-    Logger.debug('GMC Label Updated, Indexing Changes');
-    await this.productDocumentsService.indexBatchAsync({
-      merchantLabel: {
-        gmcLabelId: id,
-      } as MerchantLabel,
-    });
+    if (updateDto.name || updateDto.slug) {
+      Logger.debug('GMC Label Updated, Indexing Changes');
+      await this.productDocumentsService.indexBatchAsync({
+        merchantLabel: {
+          gmcLabelId: id,
+        } as MerchantLabel,
+      });
+    }
     return await this.gmcLabelsRepo.findOne({
       where: { id },
       relations: { merchantLabels: true, children: true },

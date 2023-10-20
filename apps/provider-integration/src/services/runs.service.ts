@@ -24,7 +24,7 @@ export class RunsService {
       throw new HttpException('Invalid Product Source', HttpStatus.BAD_REQUEST);
     } else if (!channel.active || !channel.provider.active) {
       throw new Error(
-        'Provider and/or Source is not active! Skipping integration...',
+        'Provider and/or Channel is not active! Skipping integration...',
       );
     }
     // else if (source.status === ProductSourceStatus.BUSY) {

@@ -15,6 +15,8 @@ import { ReviewDocument } from '@lib/elasticsearch/document/review.document';
 import { ElasticsearchService } from '@lib/elasticsearch/elasticsearch.service';
 import { MessagingService } from '@lib/messaging';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { FindProductsDto } from '../api/dto/find-products.dto';
 import { IndexProductBatchCommand } from '../messages/index-product-batch.command';
 import { IndexProductCommand } from '../messages/index-product.command';
 import { ProductStatus } from '../model/enum/product-status.enum';
@@ -26,8 +28,7 @@ import { ProductImage } from '../model/product-image.entity';
 import { ProductReview } from '../model/product-review.entity';
 import { Product } from '../model/product.entity';
 import { ProductsService } from './products.service';
-import { ConfigService } from '@nestjs/config';
-import { FindProductsDto } from '../api/dto/find-products.dto';
+import { ProductImageType } from '../model/enum/product-image-type.enum';
 
 @Injectable()
 export class ProductDocumentsService {
@@ -190,7 +191,13 @@ export class ProductDocumentsService {
   }
 
   private mapImageDocuments(images: ProductImage[]): ImageDocument[] {
-    return images.map((img) => ({
+    let detailImages = images.filter(
+      (img) => img.type === ProductImageType.LIST,
+    );
+    if (detailImages.length === 0 && images.length > 0) {
+      detailImages = [images[0]];
+    }
+    return detailImages.map((img) => ({
       url: img.url,
       primary: img.primary,
       type: img.type,
@@ -205,7 +212,7 @@ export class ProductDocumentsService {
     return {
       merchantCode: brand.merchantBrandCode,
       name: brand.gmcBrand.name,
-      description: brand.gmcBrand.description,
+      // description: brand.gmcBrand.description,
       // logo: brand.gmcBrand.logo,
       // url: brand.gmcBrand.url,
       slug: brand.gmcBrand.slug,
@@ -236,7 +243,7 @@ export class ProductDocumentsService {
       gmcCategory = {
         name: category.gmcCategory.name,
         slug: category.gmcCategory.slug,
-        description: category.gmcCategory.description,
+        // description: category.gmcCategory.description,
       };
 
       if (
@@ -246,7 +253,7 @@ export class ProductDocumentsService {
         gmcCategory = {
           name: category.gmcCategory.parent.name,
           slug: category.gmcCategory.parent.slug,
-          description: category.gmcCategory.parent.description,
+          // description: category.gmcCategory.parent.description,
           subcategory: gmcCategory,
         };
         if (
@@ -256,7 +263,7 @@ export class ProductDocumentsService {
           gmcCategory = {
             name: category.gmcCategory.parent.parent.name,
             slug: category.gmcCategory.parent.parent.slug,
-            description: category.gmcCategory.parent.parent.description,
+            // description: category.gmcCategory.parent.parent.description,
             subcategory: gmcCategory,
           };
         }
@@ -284,13 +291,13 @@ export class ProductDocumentsService {
         gmcLabel = {
           slug: label.gmcLabel.slug,
           name: label.gmcLabel.name,
-          description: label.gmcLabel.description,
+          // description: label.gmcLabel.description,
         };
         if (label.gmcLabel.parent && label.gmcLabel.parent.name !== 'Root') {
           gmcLabel = {
             slug: label.gmcLabel.parent.slug,
             name: label.gmcLabel.parent.name,
-            description: label.gmcLabel.parent.description,
+            // description: label.gmcLabel.parent.description,
             sublabel: gmcLabel,
           };
           if (
@@ -300,7 +307,7 @@ export class ProductDocumentsService {
             gmcLabel = {
               slug: label.gmcLabel.parent.parent.slug,
               name: label.gmcLabel.parent.parent.name,
-              description: label.gmcLabel.parent.parent.description,
+              // description: label.gmcLabel.parent.parent.description,
               sublabel: gmcLabel,
             };
           }

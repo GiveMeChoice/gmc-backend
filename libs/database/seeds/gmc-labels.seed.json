@@ -3,8 +3,8 @@
   "slug": "root",
   "children": [
     {
-      "name": "Certification",
-      "slug": "certification",
+      "name": "Certifications",
+      "slug": "certifications",
       "description": "Claim and of sustainable impact or ethical standard has been certified by a neutral third-party organization",
       "color": "#a7f700",
       "children": [
